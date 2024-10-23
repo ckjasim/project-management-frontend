@@ -1,5 +1,5 @@
 import React from 'react';
-import './NavBar.css'
+import './NavBar.css';
 import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import {
@@ -12,7 +12,7 @@ import {
   NavigationMenuTrigger,
   NavigationMenuViewport,
 } from '@/components/ui/navigation-menu';
-import { Button } from '../ui/button';
+import { Button } from '../../ui/button';
 
 const NavBar: React.FC = () => {
   return (
@@ -20,7 +20,7 @@ const NavBar: React.FC = () => {
       <Navbar bg="light" expand="lg">
         <Container className="flex justify-between items-center px-16 nav-container ">
           <LinkContainer to="/">
-            <Navbar.Brand className='text-lime-50'>Project Man</Navbar.Brand>
+            <Navbar.Brand className="text-lime-50">Project Man</Navbar.Brand>
           </LinkContainer>
           {/* <Navbar.Toggle aria-controls="basic-navbar-nav" /> */}
           <Navbar.Collapse id="basic-navbar-nav">
@@ -41,9 +41,8 @@ const NavBar: React.FC = () => {
             </Nav>
           </Navbar.Collapse>
           <button className="shadow-[inset_0_0_0_2px_#616467] text-lime-50 px-6 py-3 rounded-full text-xs font-medium tracking-wider bg-transparent hover:bg-lime-200/90 hover:text-zinc-950 dark:text-neutral-200 transition duration-200">
-  Get Started
-</button>
-
+            Get Started
+          </button>
         </Container>
       </Navbar>
     </header>
