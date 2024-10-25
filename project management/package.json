@@ -24,6 +24,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "focus-trap-react": "^10.3.0",
+    "formik": "^2.4.6",
     "framer-motion": "^11.11.9",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.453.0",
@@ -36,6 +37,7 @@
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^10.0.0",
+    "yup": "^1.4.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

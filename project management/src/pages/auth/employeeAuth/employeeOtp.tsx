@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -19,6 +19,7 @@ import {
   InputOTPSlot,
 } from '@/components/ui/input-otp';
 import axios from 'axios';
+import { Toaster } from '@/components/ui/toaster';
 
 const FormSchema = z.object({
   pin: z.string().min(6, {
@@ -40,6 +41,11 @@ export function EmployeeOtpForm() {
 
   useEffect(() => {
     let timerInterval: NodeJS.Timeout;
+
+    toast({
+      title: "OTP send into your Email",
+    
+    });
 
     if (timerActive) {
       timerInterval = setInterval(() => {
@@ -116,6 +122,7 @@ export function EmployeeOtpForm() {
 
   return (
     <div className="flex min-h-screen mt-32 justify-center">
+      <Toaster/>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
