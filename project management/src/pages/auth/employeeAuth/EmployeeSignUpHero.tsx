@@ -133,7 +133,7 @@ export function EmployeeSignUpHero() {
                   <BottomGradient />
                 </button>
 
-                {/* Google and GitHub buttons */}
+{/*   
                 <div className="flex flex-row space-x-4">
                   <button className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black dark:text-white rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-[#013a33] dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]" type="submit">
                     <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
@@ -145,12 +145,20 @@ export function EmployeeSignUpHero() {
                     <span className="text-neutral-700 dark:text-neutral-300 text-sm">GitHub</span>
                     <BottomGradient />
                   </button>
-                </div>
-                {/* Login Links */}
+                </div> */}
+      
                 <div className="text-center mt-4 text-lime-100 font-normal text-sm">
                   <p>
                     Already have an account?{' '}
-                    <Link to="/auth/userLogin" className="font-medium text-white">Login</Link>
+                    <Link to="/auth/employeeLogin" className="font-medium text-white">Login</Link>
+                  </p>
+                </div>
+                <div className="text-center mt-3 text-lime-100 font-normal text-sm">
+                  <p>
+                    Do you want to manage your project?{' '}
+                    <Link to="/auth/userLogin" className="font-medium text-white">
+                      Login
+                    </Link>
                   </p>
                 </div>
               </Form>

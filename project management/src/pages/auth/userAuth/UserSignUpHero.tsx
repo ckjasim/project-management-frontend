@@ -47,7 +47,7 @@ export function UserSignUpHero() {
       console.log('Sign up successful:', response.data.message);
       navigate('/auth/otp');
     } catch (error: any) {
-      // Show toast notification for errors
+
       toast({
         title: "Sign Up Failed",
         description: error.response?.data?.message || 'An error occurred during sign-up.',
@@ -55,6 +55,10 @@ export function UserSignUpHero() {
       });
       console.error('SignUp error:', error.response?.data?.message || 'Error occurred during sign-up');
     }
+  };
+
+  const googleAuth = () => {
+    window.location.href = 'http://localhost:3000/api/google';
   };
 
   return (
@@ -127,6 +131,7 @@ export function UserSignUpHero() {
             <button
               className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black dark:text-white rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-[#013a33]"
               type="button"
+              onClick={googleAuth}
             >
               <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
               <span className="text-neutral-700 dark:text-neutral-300 text-sm">Google</span>
@@ -146,6 +151,14 @@ export function UserSignUpHero() {
             <p>
               Already have an account?{' '}
               <Link to="/auth/userLogin" className="font-medium text-white">Login</Link>
+            </p>
+          </div>
+          <div className="text-center mt-3 text-lime-100 font-normal text-sm">
+            <p>
+              Do you want to join into a project?{' '}
+              <Link to="/auth/employeeLogin" className="font-medium text-white">
+                Login
+              </Link>
             </p>
           </div>
         </div>

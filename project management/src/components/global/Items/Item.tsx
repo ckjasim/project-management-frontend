@@ -1,14 +1,37 @@
+import { getTasksApi } from '@/services/api/api';
 import { UniqueIdentifier } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import clsx from 'clsx';
+import { useEffect } from 'react';
 
 type ItemsType = {
   id: UniqueIdentifier;
   title: string;
+  summary: string;
+  description: string;
+  dueDate: string;
 };
 
-const Items = ({ id, title }: ItemsType) => {
+const Items = ({ id, title,summary,description,dueDate }: ItemsType) => {
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const tasks = await getTasksApi(); 
+        console.log('Fetched tasks:', tasks);
+      } catch (error) {
+        console.error('Error fetching tasks:', error); // Log errors if any
+      }
+    };
+  
+    fetchTasks();
+  }, []);
+  
+
+  
+    
+
   const {
     attributes,
     listeners,
@@ -22,10 +45,12 @@ const Items = ({ id, title }: ItemsType) => {
       type: 'item',
     },
   });
+
   return (
     <div
       ref={setNodeRef}
       {...attributes}
+      {...listeners} // Apply listeners to the entire div for full draggable area
       style={{
         transition,
         transform: CSS.Translate.toString(transform),
@@ -37,12 +62,20 @@ const Items = ({ id, title }: ItemsType) => {
     >
       <div className="flex items-center justify-between">
         {title}
-        <button
-          className="border p-2 text-xs rounded-xl shadow-lg hover:shadow-xl"
-          {...listeners}
-        >
-          Drag Handle
-        </button>
+       
+      </div>
+      <div className="flex items-center justify-between">
+        {summary}
+    
+      </div>
+      <div className="flex items-center justify-between">
+
+        {description}
+
+      </div>
+      <div className="flex items-center justify-between">
+
+        {dueDate}
       </div>
     </div>
   );

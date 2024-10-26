@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/input-otp';
 import axios from 'axios';
 import { Toaster } from '@/components/ui/toaster';
+import { useNavigate } from 'react-router-dom';
 
 const FormSchema = z.object({
   pin: z.string().min(6, {
@@ -29,6 +30,8 @@ const FormSchema = z.object({
 
 export function EmployeeOtpForm() {
   const { toast } = useToast();
+  const navigate = useNavigate();
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -112,6 +115,7 @@ export function EmployeeOtpForm() {
         }
       );
       console.log('OTP verification successful:', res.data.message);
+      navigate('/employee/task');
     } catch (error: any) {
       console.error(
         'OTP verification error:',

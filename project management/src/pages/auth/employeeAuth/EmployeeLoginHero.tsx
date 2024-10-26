@@ -2,7 +2,7 @@ import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import { cn } from "@/lib/utils";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -11,7 +11,7 @@ import { useToast } from "@/components/hooks/use-toast";
 
 export function EmployeeLoginHero() {
   const { toast } = useToast();
-
+  const navigate = useNavigate();
   // Validation schema for form fields
   const validationSchema = Yup.object({
     email: Yup.string()
@@ -34,6 +34,7 @@ export function EmployeeLoginHero() {
         description: response.data.message || "Successfully logged in!",
         variant: 'default',
       });
+      navigate('/employee/task');
     } catch (error: any) {
       console.error('Login error:', error.response.data.message);
       toast({
@@ -109,7 +110,7 @@ export function EmployeeLoginHero() {
 
                 <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-600 to-transparent my-8 h-[1px] w-full" />
 
-                <div className="flex flex-row space-x-4">
+                {/* <div className="flex flex-row space-x-4">
                   <button
                     className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black dark:text-white rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-[#013a33] dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
                     type="button"
@@ -127,7 +128,7 @@ export function EmployeeLoginHero() {
                     <span className="text-neutral-700 dark:text-neutral-300 text-sm">GitHub</span>
                     <BottomGradient />
                   </button>
-                </div>
+                </div> */}
 
                 <div className="text-center mt-4 text-lime-100 font-normal text-sm">
                   <p>

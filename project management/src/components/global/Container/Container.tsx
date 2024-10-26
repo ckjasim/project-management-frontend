@@ -3,6 +3,7 @@ import ContainerProps from './container.type';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import clsx from 'clsx';
+
 // import { Button } from '../Button';
 
 const Container = ({
@@ -43,18 +44,18 @@ const Container = ({
           <h1 className="text-gray-800 text-xl">{title}</h1>
           <p className="text-gray-400 text-sm">{description}</p>
         </div>
-        <button
+        {/* <button
           className="border p-2 text-xs rounded-xl shadow-lg hover:shadow-xl"
           {...listeners}
         >
           Drag Handle
-        </button>
+        </button> */}
       </div>
 
       {children}
-      <button  onClick={onAddItem}>
-        Add Item
-      </button>
+      {/* <button  onClick={onAddItem}>
+        <IconPlus  />
+      </button> */}
     </div>
   );
 };

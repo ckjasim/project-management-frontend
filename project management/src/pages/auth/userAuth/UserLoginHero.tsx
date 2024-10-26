@@ -58,7 +58,7 @@ export function UserLoginHero() {
   const googleAuth = () => {
     window.location.href = 'http://localhost:3000/api/google'; // Redirect to backend
   };
-  
+     
 
   return (
     <div className="form-container flex justify-center align-center bg-[#0f4841f7]">

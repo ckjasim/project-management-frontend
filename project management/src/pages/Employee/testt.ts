@@ -12,7 +12,7 @@ import {
   UniqueIdentifier,
   closestCorners,
   useSensor,
-  useSensors,
+  useSensors,    
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -37,115 +37,115 @@ type DNDType = {
 };
 
 export default function Home() {
-  const [containers, setContainers] = useState<DNDType[]>([
-    { id: 'pending', title: 'Pending', items: [] },
-    { id: 'progressing', title: 'Progressing', items: [] },
-    { id: 'review', title: 'Review', items: [] },
-    { id: 'done', title: 'Done', items: [] },
-  ]);
-  
-  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
-  const [currentContainerId, setCurrentContainerId] = useState<UniqueIdentifier>();
-  const [itemName, setItemName] = useState('');
-  const [showAddItemModal, setShowAddItemModal] = useState(false);
+    const [containers, setContainers] = useState<DNDType[]>([
+      { id: 'pending', title: 'Pending', items: [] },
+      { id: 'progressing', title: 'Progressing', items: [] },
+      { id: 'review', title: 'Review', items: [] },
+      { id: 'done', title: 'Done', items: [] },
+    ]);
+    
+    const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+    const [currentContainerId, setCurrentContainerId] = useState<UniqueIdentifier>();
+    const [itemName, setItemName] = useState('');
+    const [showAddItemModal, setShowAddItemModal] = useState(false);
 
-  const onAddItem = () => {
-    if (!itemName) return;
-    const id = `item-${uuidv4()}`;
-    const container = containers.find((item) => item.id === currentContainerId);
-    if (!container) return;
-    container.items.push({
-      id,
-      title: itemName,
-    });
-    setContainers([...containers]);
-    setItemName('');
-    setShowAddItemModal(false);
-  };
+    const onAddItem = () => {
+      if (!itemName) return;
+      const id = `item-${uuidv4()}`;
+      const container = containers.find((item) => item.id === currentContainerId);
+      if (!container) return;
+      container.items.push({
+        id,
+        title: itemName,
+      });
+      setContainers([...containers]);
+      setItemName('');
+      setShowAddItemModal(false);
+    };
 
-  const findValueOfItems = (id: UniqueIdentifier | undefined, type: string) => {
-    if (type === 'container') {
-      return containers.find((item) => item.id === id);
-    }
-    if (type === 'item') {
-      return containers.find((container) =>
-        container.items.find((item) => item.id === id),
-      );
-    }
-  };
-
-  const findItemTitle = (id: UniqueIdentifier | undefined) => {
-    const container = findValueOfItems(id, 'item');
-    if (!container) return '';
-    const item = container.items.find((item) => item.id === id);
-    if (!item) return '';
-    return item.title;
-  };
-
-  const findContainerTitle = (id: UniqueIdentifier | undefined) => {
-    const container = findValueOfItems(id, 'container');
-    if (!container) return '';
-    return container.title;
-  };
-
-  const findContainerItems = (id: UniqueIdentifier | undefined) => {
-    const container = findValueOfItems(id, 'container');
-    if (!container) return [];
-    return container.items;
-  };
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
-  function handleDragStart(event: DragStartEvent) {
-    const { active } = event;
-    const { id } = active;
-    setActiveId(id);
-  }
-
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-
-    if (!over || active.id === over.id) {
-      setActiveId(null);
-      return;
-    }
-
-    // Handle Item Sorting and Movement between Containers
-    if (active.id.toString().includes('item')) {
-      const activeContainer = findValueOfItems(active.id, 'item');
-      const overContainer = findValueOfItems(over.id, 'container');
-
-      if (!activeContainer || !overContainer) return;
-
-      const activeContainerIndex = containers.findIndex((container) => container.id === activeContainer.id);
-      const overContainerIndex = containers.findIndex((container) => container.id === overContainer.id);
-
-      const activeItemIndex = activeContainer.items.findIndex((item) => item.id === active.id);
-
-      if (activeContainerIndex === overContainerIndex) {
-        const newItems = arrayMove(
-          containers[activeContainerIndex].items,
-          activeItemIndex,
-          over.items.findIndex((item) => item.id === over.id)
-        );
-        const newContainers = [...containers];
-        newContainers[activeContainerIndex].items = newItems;
-        setContainers(newContainers);
-      } else {
-        let newContainers = [...containers];
-        const [removedItem] = newContainers[activeContainerIndex].items.splice(activeItemIndex, 1);
-        newContainers[overContainerIndex].items.push(removedItem);
-        setContainers(newContainers);
+    const findValueOfItems = (id: UniqueIdentifier | undefined, type: string) => {
+      if (type === 'container') {
+        return containers.find((item) => item.id === id);
       }
+      if (type === 'item') {
+        return containers.find((container) =>
+          container.items.find((item) => item.id === id),
+        );
+      }
+    };
+
+    const findItemTitle = (id: UniqueIdentifier | undefined) => {
+      const container = findValueOfItems(id, 'item');
+      if (!container) return '';
+      const item = container.items.find((item) => item.id === id);
+      if (!item) return '';
+      return item.title;
+    };
+
+    const findContainerTitle = (id: UniqueIdentifier | undefined) => {
+      const container = findValueOfItems(id, 'container');
+      if (!container) return '';
+      return container.title;
+    };
+
+    const findContainerItems = (id: UniqueIdentifier | undefined) => {
+      const container = findValueOfItems(id, 'container');
+      if (!container) return [];
+      return container.items;
+    };
+
+    const sensors = useSensors(
+      useSensor(PointerSensor),
+      useSensor(KeyboardSensor, {
+        coordinateGetter: sortableKeyboardCoordinates,
+      })
+    );
+
+    function handleDragStart(event: DragStartEvent) {
+      const { active } = event;
+      const { id } = active;
+      setActiveId(id);
     }
 
-    setActiveId(null);
-  }
+    function handleDragEnd(event: DragEndEvent) {
+      const { active, over } = event;
+
+      if (!over || active.id === over.id) {
+        setActiveId(null);
+        return;
+      }
+
+      // Handle Item Sorting and Movement between Containers
+      if (active.id.toString().includes('item')) {
+        const activeContainer = findValueOfItems(active.id, 'item');
+        const overContainer = findValueOfItems(over.id, 'container');
+
+        if (!activeContainer || !overContainer) return;
+
+        const activeContainerIndex = containers.findIndex((container) => container.id === activeContainer.id);
+        const overContainerIndex = containers.findIndex((container) => container.id === overContainer.id);
+
+        const activeItemIndex = activeContainer.items.findIndex((item) => item.id === active.id);
+
+        if (activeContainerIndex === overContainerIndex) {
+          const newItems = arrayMove(
+            containers[activeContainerIndex].items,
+            activeItemIndex,
+            over.items.findIndex((item) => item.id === over.id)
+          );
+          const newContainers = [...containers];
+          newContainers[activeContainerIndex].items = newItems;
+          setContainers(newContainers);
+        } else {
+          let newContainers = [...containers];
+          const [removedItem] = newContainers[activeContainerIndex].items.splice(activeItemIndex, 1);
+          newContainers[overContainerIndex].items.push(removedItem);
+          setContainers(newContainers);
+        }
+      }
+
+      setActiveId(null);
+    }
 
   return (
   
