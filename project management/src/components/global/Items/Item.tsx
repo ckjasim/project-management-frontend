@@ -15,18 +15,7 @@ type ItemsType = {
 
 const Items = ({ id, title,summary,description,dueDate }: ItemsType) => {
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const tasks = await getTasksApi(); 
-        console.log('Fetched tasks:', tasks);
-      } catch (error) {
-        console.error('Error fetching tasks:', error); // Log errors if any
-      }
-    };
-  
-    fetchTasks();
-  }, []);
+ 
   
 
   
