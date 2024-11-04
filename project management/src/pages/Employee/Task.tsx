@@ -12,114 +12,21 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import Modal from '@/components/global/Modal/Modal';
 
-export function SidebarDemo() {
-  const links = [
-    {
-      label: 'Dashboard',
-      href: '#',
-      icon: (
-        <IconBrandTabler className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
-      ),
-    },
-    {
-      label: 'Chat',
-      href: '#',
-      icon: (
-        <IconMessageChatbot className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
-      ),
-    },
-    {
-      label: 'Meeting',
-      href: '#',
-      icon: (
-        <IconCalendarUser className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
-      ),
-    },
-    {
-      label: 'Files',
-      href: '#',
-      icon: (
-        <IconFolders className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
-      ),
-    },
-    {
-      label: 'Logout',
-      href: '#',
-      icon: (
-        <IconArrowLeft className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
-      ),
-    },
-  ];
+import { ErrorMessage, Field, Form, Formik, useFormik } from 'formik';
+import * as Yup from 'yup';
 
-  const [open, setOpen] = useState(false);
+const TodoSchema = Yup.object().shape({
+  title: Yup.string().required('Title is required'),
+  summary: Yup.string().required('Summary is required'),
+  description: Yup.string().required('Description is required'),
+  dueDate: Yup.date().required('Due date is required'),
+});
 
-  return (
-    <div
-      className={cn(
-        ' rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 w-screen flex-1 mx-auto border border-neutral-200 dark:border-neutral-700 overflow-hidden',
-        'h-screen' // for your use case, use `h-screen` instead of `h-[60vh]`
-      )}
-    >
-      <Sidebar open={open} setOpen={setOpen}>
-        <SidebarBody className="justify-between gap-10">
-          <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-            {open ? <Logo /> : <LogoIcon />}
-            <div className="mt-8 flex flex-col gap-2">
-              {links.map((link, idx) => (
-                <SidebarLink key={idx} link={link} />
-              ))}
-            </div>
-          </div>
-          <div>
-            <SidebarLink
-              link={{
-                label: 'jasim ck',
-                href: '#',
-                icon: (
-                  <img
-                    src="https://assets.aceternity.com/manu.png"
-                    className="h-7 w-7 flex-shrink-0 rounded-full"
-                    alt="Avatar"
-                  />
-                ),
-              }}
-            />
-          </div>
-        </SidebarBody>
-      </Sidebar>
-      <Dashboard />
-    </div>
-  );
-}
 
-export const Logo = () => {
-  return (
-    <Link
-      to="#"
-      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
-    >
-      <div className="h-5 w-5 bg-lime-200 dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
-      <motion.span
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="font-medium text-lime-200 dark:text-white whitespace-pre"
-      >
-        Acet Labs
-      </motion.span>
-    </Link>
-  );
-};
 
-export const LogoIcon = () => {
-  return (
-    <Link
-      to="#"
-      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
-    >
-      <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
-    </Link>
-  );
-};
+
+
+
 
 import {
   DndContext,
@@ -135,18 +42,17 @@ import {
 } from '@dnd-kit/core';
 import {
   SortableContext,
-  arrayMove,
   sortableKeyboardCoordinates,
+  arrayMove,
 } from '@dnd-kit/sortable';
 
 import Container from '@/components/global/Container/Container';
 import Items from '@/components/global/Items/Item';
-// import {Modal} from '@/components/global/Modal/Modal';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { v4 as generateUuid } from 'uuid';
 import { IconPlus } from '@tabler/icons-react';
-import { postTasksApi ,getTasksApi} from '@/services/api/api';
+import { postTasksApi, getTasksApi, patchTaskStatusApi } from '@/services/api/api';
 
 type DNDType = {
   id: UniqueIdentifier;
@@ -160,45 +66,43 @@ type DNDType = {
   }[];
 };
 
-
 const CONTAINER_IDS = {
   PENDING: 'pending',
   PROGRESSING: 'progressing',
-  REVIEW: 'review',
   COMPLETED: 'completed',
+  REVIEW: 'review',
 };
 
-const Dashboard = () => {
+export const TaskManagement = () => {
   const [containers, setContainers] = useState<DNDType[]>([
     { id: CONTAINER_IDS.PENDING, title: 'Pending', items: [] },
     { id: CONTAINER_IDS.PROGRESSING, title: 'Progressing', items: [] },
-    { id: CONTAINER_IDS.REVIEW, title: 'Review', items: [] },
     { id: CONTAINER_IDS.COMPLETED, title: 'Done', items: [] },
+    { id: CONTAINER_IDS.REVIEW, title: 'Review', items: [] },
   ]);
-  
+
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
-  const [currentContainerId, setCurrentContainerId] =
-    useState<UniqueIdentifier>(CONTAINER_IDS.PENDING);
+  const [currentContainerId, setCurrentContainerId] = useState<UniqueIdentifier>(CONTAINER_IDS.PENDING);
   const [itemName, setItemName] = useState('');
   const [itemSummary, setItemSummary] = useState('');
   const [itemDescription, setItemDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [showAddItemModal, setShowAddItemModal] = useState(false);
-  const [loading, setLoading] = useState(true); // New loading state
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchTasks = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
         const res = await getTasksApi();
         const tasks = res.tasks;
-  
+
         const itemsByContainerId = containers.reduce((acc, container) => {
           acc[container.id] = [];
           return acc;
         }, {} as Record<string, DNDType['items']>);
-  
-  
-        tasks.forEach((task: { _id: any; topic: any; summary: any; description: any; dueDate: any; status: string }) => {
+
+        tasks.forEach((task: { _id: UniqueIdentifier; topic: string; summary: string; description: string; dueDate: string; status: string }) => {
           const taskItem = {
             id: task._id,
             title: task.topic,
@@ -210,289 +114,314 @@ const Dashboard = () => {
             itemsByContainerId[task.status].push(taskItem);
           }
         });
-  
-   
-        const updatedContainers = containers.map(container => ({
+
+        setContainers(containers.map(container => ({
           ...container,
-          items: itemsByContainerId[container.id] || [], // Set items for each container
-        }));
-  
-        setContainers(updatedContainers);
+          items: itemsByContainerId[container.id] || [],
+        })));
       } catch (error) {
         console.error('Error fetching tasks:', error);
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchTasks();
-  }, [currentContainerId]);
+  }, [currentContainerId]); // Dependency on currentContainerId might be needed depending on your logic.
+
+  const onAddItem = async (values: { title: any; summary: any; description: any; dueDate: any; }, { setSubmitting, resetForm }: any) => {
+    const { title, summary, description, dueDate } = values;
   
+    if (!title) return;
   
-  const onAddItem = async () => {
-    if (!itemName) return;
-  
-    const items = {
-      title: itemName,
-      summary: itemSummary,
-      description: itemDescription,
+    const newItem = {
+      title,
+      summary,
+      description,
       dueDate,
       status: currentContainerId,
     };
   
     try {
-      const res = await postTasksApi(items);
-      console.log(res,'ooooooooooooooooo')
+      const res = await postTasksApi(newItem);
       const task = res.createdTask;
-      console.log(task,'kkkkkkkkkkkkkk')
   
-      const updatedContainers = containers.map(container => {
-        if (container.id === currentContainerId) {
-          return {
-            ...container,
-            items: [
-              ...container.items,
-              { id: task._id, title: itemName, summary: itemSummary, description: itemDescription, dueDate },
-            ],
-          };
-        }
-        return container;
-      });
+      setContainers(prevContainers =>
+        prevContainers.map(container => {
+          if (container.id === currentContainerId) {
+            return {
+              ...container,
+              items: [
+                ...container.items,
+                { id: task._id, title, summary, description, dueDate },
+              ],
+            };
+          }
+          return container;
+        })
+      );
   
-      setContainers(updatedContainers);
-      resetForm();
       setShowAddItemModal(false);
+      resetForm(); // Reset the Formik form
     } catch (error) {
       console.error('Error adding item:', error);
+    } finally {
+      setSubmitting(false); // End submitting state in Formik
     }
   };
-  
+
   const resetForm = () => {
     setItemName('');
     setItemSummary('');
     setItemDescription('');
     setDueDate('');
   };
-  
-  const findContainerById = (id: UniqueIdentifier | undefined) =>
-    containers.find((container) => container.id === id);
-  
-  const findItemInContainer = (itemId: UniqueIdentifier | undefined) =>
-    containers.find((container) =>
-      container.items.find((item) => item.id === itemId)
-    );
-  
-  const findItemTitle = (id: UniqueIdentifier | undefined) => {
-    const container = findItemInContainer(id);
-    if (!container) return '';
-    const item = container.items.find((item) => item.id === id);
-    return item ? item.title : '';
-  };
-  
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
-  
-  function handleDragStart(event: DragStartEvent) {
+
+  const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
-    setActiveId(active.id);
-  }
+    setActiveId(active.id); // Set the active item being dragged
+  };
   
-  function handleDragEnd(event: DragEndEvent) {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
   
+    // If dropped outside or over the same item, do nothing
     if (!over || active.id === over.id) {
       setActiveId(null);
       return;
     }
   
-    if (active.id.toString().includes('item')) {
-      const activeContainer = findItemInContainer(active.id);
-      const overContainer = findContainerById(over.id);
+    // Find the source and target containers
+    const sourceContainer = containers.find(container =>
+      container.items.some(item => item.id === active.id)
+    );
   
-      if (!activeContainer || !overContainer) return;
+    const targetContainer = containers.find(container => container.id === over.id);
   
-      const activeContainerIndex = containers.findIndex(
-        (c) => c.id === activeContainer.id
+    if (!sourceContainer || !targetContainer) return;
+  
+    // Indices for source and target containers
+    const sourceIndex = containers.findIndex(c => c.id === sourceContainer.id);
+    const targetIndex = containers.findIndex(c => c.id === targetContainer.id);
+    const activeIndex = sourceContainer.items.findIndex(item => item.id === active.id);
+  
+    // Move the item within the same container
+    if (sourceIndex === targetIndex) {
+      const newItems = arrayMove(
+        [...sourceContainer.items],
+        activeIndex,
+        targetContainer.items.findIndex(item => item.id === over.id)
       );
-      const overContainerIndex = containers.findIndex(
-        (c) => c.id === overContainer.id
-      );
   
-      const activeItemIndex = activeContainer.items.findIndex(
-        (item) => item.id === active.id
-      );
+      setContainers(containers.map((container, index) =>
+        index === sourceIndex ? { ...container, items: newItems } : container
+      ));
+    } else {
+      // Move the item to a different container
+      const updatedContainers = [...containers];
+      const [movedItem] = updatedContainers[sourceIndex].items.splice(activeIndex, 1);
+      updatedContainers[targetIndex].items.push(movedItem);
   
-      // When dragging within the same container
-      if (activeContainerIndex === overContainerIndex) {
-        const newItems = arrayMove(
-          containers[activeContainerIndex].items,
-          activeItemIndex,
-          overContainer.items.findIndex((item) => item.id === over.id) // Fix here
-        );
-        const newContainers = [...containers];
-        newContainers[activeContainerIndex].items = newItems;
-        setContainers(newContainers);
-      } else {
-        const newContainers = [...containers];
-        const [removedItem] = newContainers[activeContainerIndex].items.splice(
-          activeItemIndex,
-          1
-        );
-        newContainers[overContainerIndex].items.push(removedItem);
-        setContainers(newContainers);
-      }
+      setContainers(updatedContainers);
+  
+      // Update the task status in the backend (optional)
+      patchTaskStatusApi(active.id, { status: targetContainer.id }).catch(error => {
+        console.error('Error updating task status:', error);
+        // Optionally revert the state if API call fails
+        setContainers(containers);
+      });
     }
   
+    // Clear the active ID after drag ends
     setActiveId(null);
-  }
+  };
+  
+
+  // Placeholder function to find the title of an item by ID
+  const findItemTitle = (id: UniqueIdentifier) => {
+    for (const container of containers) {
+      const item = container.items.find(item => item.id === id);
+      if (item) return item.title;
+    }
+    return '';
+  };
+  const validationSchema = Yup.object().shape({
+    title: Yup.string()
+      .trim() // Trim spaces from start and end
+      .matches(/^(?!\s*$).+/, "enter a valid title")
+      .required("Title is required"),
+    
+    summary: Yup.string()
+      .trim()
+      .matches(/^(?!\s*$).+/, "Enter a valid summary")
+      .required("Summary is required"),
+    
+    description: Yup.string(), 
+    
+    dueDate: Yup.date()
+      .required("Due date is required")
+      .nullable(),
+  });
   
 
   return (
     <div className="mx-auto max-w-7xl w-svw py-10">
-      <Modal showModal={showAddItemModal} setShowModal={setShowAddItemModal}>
-        <div className="flex flex-col w-full items-center p-6 gap-y-6">
-          <h1 className="text-gray-800 text-3xl font-bold mb-4">
-            Create To-do
-          </h1>
-
-          <div className="flex flex-col w-full">
-            <label htmlFor="itemname" className="text-gray-600 font-medium">
-              Title
-            </label>
-            <Input
-              type="text"
-              id="itemname"
-              placeholder="Enter item title"
-              value={itemName}
-              onChange={(e) => setItemName(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
-            />
-          </div>
-
-          <div className="flex flex-col w-full">
-            <label htmlFor="itemsummary" className="text-gray-600 font-medium">
-              Summary
-            </label>
-            <Input
-              type="text"
-              id="itemsummary"
-              placeholder="Enter summary"
-              value={itemSummary}
-              onChange={(e) => setItemSummary(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
-            />
-          </div>
-
-          <div className="flex flex-col w-full">
-            <label
-              htmlFor="itemdescription"
-              className="text-gray-600 font-medium"
-            >
-              Description
-            </label>
-            <Input
-              type="text"
-              id="itemdescription"
-              placeholder="Enter description"
-              value={itemDescription}
-              onChange={(e) => setItemDescription(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
-            />
-          </div>
-
-          <div className="flex flex-col w-full">
-            <label htmlFor="duedate" className="text-gray-600 font-medium">
-              Due Date
-            </label>
-            <Input
-              type="date"
-              id="duedate"
-              placeholder="Select due date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
-            />
-          </div>
-
-          <Button
-            onClick={onAddItem}
-            className="mt-4 w-1/3 py-2 bg-emerald-700 text-white rounded-md hover:bg-emerald-600"
-          >
-            Add Item
-          </Button>
+   <Modal showModal={showAddItemModal} setShowModal={setShowAddItemModal}>
+  <Formik
+    initialValues={{ title: '', summary: '', description: '', dueDate: '' }}
+    validationSchema={validationSchema} // Ensure you define this
+    onSubmit={onAddItem} // Function to handle form submission
+  >
+    {({ isSubmitting }) => (
+      <Form className="flex flex-col w-full items-center p-6 gap-y-6">
+        <h1 className="text-gray-800 text-3xl font-bold mb-4">Create To-do</h1>
+        {/* Title Field */}
+        <div className="flex flex-col w-full mb-4">
+          <label htmlFor="title" className="text-gray-600 font-medium">Title</label>
+          <Field
+            name="title"
+            type="text"
+            as={Input} // Use your custom Input component
+            placeholder="Enter item title"
+            className="w-full px-4 py-2 border rounded-md"
+          />
+          <ErrorMessage
+            name="title"
+            component="div"
+            className="text-red-600 font-semibold text-sm"
+          />
         </div>
-      </Modal>
+        {/* Summary Field */}
+        <div className="flex flex-col w-full mb-4">
+          <label htmlFor="summary" className="text-gray-600 font-medium">Summary</label>
+          <Field
+            name="summary"
+            type="text"
+            as={Input} // Use your custom Input component
+            placeholder="Enter summary"
+            className="w-full px-4 py-2 border rounded-md"
+          />
+          <ErrorMessage
+            name="summary"
+            component="div"
+            className="text-red-600 font-semibold text-sm"
+          />
+        </div>
+        {/* Description Field */}
+        <div className="flex flex-col w-full mb-4">
+          <label htmlFor="description" className="text-gray-600 font-medium">Description</label>
+          <Field
+            name="description"
+            type="text"
+            as={Input} // Use your custom Input component
+            placeholder="Enter description"
+            className="w-full px-4 py-2 border rounded-md"
+          />
+          <ErrorMessage
+            name="description"
+            component="div"
+            className="text-red-600 font-semibold text-sm"
+          />
+        </div>
+        {/* Due Date Field */}
+        <div className="flex flex-col w-full mb-4">
+          <label htmlFor="dueDate" className="text-gray-600 font-medium">Due Date</label>
+          <Field
+            name="dueDate"
+            type="date"
+            as={Input} // Use your custom Input component
+            className="w-full px-4 py-2 border rounded-md"
+          />
+          <ErrorMessage
+            name="dueDate"
+            component="div"
+            className="text-red-600 font-semibold text-sm"
+          />
+        </div>
+        {/* Submit Button */}
+        <Button
+          type="submit" // Use type="submit" for Formik to handle submission
+          disabled={isSubmitting} // Disable while submitting
+          className="mt-4 w-1/3 py-2 bg-emerald-700 text-white rounded-md hover:bg-emerald-600"
+        >
+          Add Item
+        </Button>
+      </Form>
+    )}
+  </Formik>
+</Modal>
 
-      <div className="flex items-center justify-between gap-y-2 ">
+  
+      <div className="flex items-center justify-between gap-y-2">
         <h1 className="text-gray-800 text-3xl font-bold">Task Management</h1>
       </div>
-
+  
       <div className="mt-10">
-        <div className="grid grid-cols-4 gap-6">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCorners}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={containers.map((container) => container.id)}
-            >
-              {containers.map((container) => (
-                <div>
-                  <div className="w-full  p-4 bg-gray-50 rounded-xl flex flex-row justify-between px-6 gap-y-4 mb-4">
-                    {container.title}
-                    <button
-                      onClick={() => {
-                        setShowAddItemModal(true);
-                        setCurrentContainerId(container.id);
-                      }}
-                    >
-                      <IconPlus />
-                    </button>
-                  </div>
-                  <Container id={container.id} key={container.id}>
-                    <SortableContext
-                      items={container.items.map((item) => item.id)}
-                    >
-                      <div className="flex items-start flex-col gap-y-4">
-                        {container.items.map((item) => (
-                          <Items
-                            title={item.title}
-                            id={item.id}
-                            key={item.id}
-                            summary={item.summary}
-                            description={item.description}
-                            dueDate={item.dueDate}
-                          />
-                        ))}
-                      </div>
-                    </SortableContext>
-                  </Container>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="grid grid-cols-4 gap-6">
+            {containers.map((container) => (
+              <div key={container.id}>
+                <div className="w-full p-4 bg-gray-50 rounded-xl flex flex-row justify-between px-6 gap-y-4 mb-4">
+                  {container.title}
+                  <button
+                    onClick={() => {
+                      setShowAddItemModal(true);
+                      setCurrentContainerId(container.id);
+                    }}
+                  >
+                    <IconPlus />
+                  </button>
                 </div>
-              ))}
-            </SortableContext>
-            <DragOverlay adjustScale={false}>
-              {activeId && activeId.toString().includes('item') && (
-                <Items
-                  id={activeId}
-                  title={findItemTitle(activeId)}
-                  summary={''}
-                  description={''}
-                  dueDate={''}
-                />
-              )}
-            </DragOverlay>
-          </DndContext>
-        </div>
+                <Container id={container.id}>
+                  <SortableContext items={container.items.map(item => item.id)}>
+                    <div className="flex items-start flex-col gap-y-4">
+                      
+                      {container.items.map((item) => (
+                        <Items
+                          title={item.title}
+                          id={item.id}
+                          key={item.id}
+                          summary={item.summary}
+                          description={item.description}
+                          dueDate={item.dueDate}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </Container>
+              </div>
+            ))}
+          </div>
+          <DragOverlay adjustScale={false}>
+            {activeId && (
+              <Items
+                id={activeId}
+                title={findItemTitle(activeId)}
+                summary={''}
+                description={''}
+                dueDate={''}
+              />
+            )}
+          </DragOverlay>
+        </DndContext>
       </div>
     </div>
   );
 };
+
+// Define uuidv4 function if needed
 function uuidv4() {
-  throw new Error('Function not implemented.');
+  return generateUuid(); // Or implement a unique ID generation logic if not using uuid
 }

@@ -1,10 +1,13 @@
-import NavBar from '@/components/global/NavBar/NavBar'
+
+import { UserNavbar } from '@/components/global/NavBar/LandingNavbar'
 import { Outlet } from 'react-router-dom'
 
 const AuthLayout = () => {
   return (
-    <div>
-    <NavBar/>
+    <div className='relative  w-full '>
+    <UserNavbar/>
+    <div className='mt-28'></div>
+
     <Outlet/>
     </div>
   )

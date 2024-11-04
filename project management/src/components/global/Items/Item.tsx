@@ -3,6 +3,7 @@ import { UniqueIdentifier } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import clsx from 'clsx';
+import { IconTrash } from '@tabler/icons-react';
 import { useEffect } from 'react';
 
 type ItemsType = {
@@ -11,16 +12,10 @@ type ItemsType = {
   summary: string;
   description: string;
   dueDate: string;
+ 
 };
 
-const Items = ({ id, title,summary,description,dueDate }: ItemsType) => {
-
- 
-  
-
-  
-    
-
+const Items = ({ id, title, summary, description, dueDate,  }: ItemsType) => {
   const {
     attributes,
     listeners,
@@ -35,11 +30,21 @@ const Items = ({ id, title,summary,description,dueDate }: ItemsType) => {
     },
   });
 
+ const deleteItem = (e: React.MouseEvent<HTMLButtonElement> | undefined) => {
+  if (e) {
+    e.stopPropagation();
+    console.log('Delete button clicked');
+  } else {
+    console.error('Event is undefined');
+  }
+};
+
+
   return (
     <div
       ref={setNodeRef}
       {...attributes}
-      {...listeners} // Apply listeners to the entire div for full draggable area
+      {...listeners}
       style={{
         transition,
         transform: CSS.Translate.toString(transform),
@@ -50,20 +55,18 @@ const Items = ({ id, title,summary,description,dueDate }: ItemsType) => {
       )}
     >
       <div className="flex items-center justify-between">
-        {title}
-       
+        <div>{title}</div>
+        <button onClick={deleteItem} className="text-red-500 hover:text-red-700">
+          <IconTrash size={20} />
+        </button>
       </div>
       <div className="flex items-center justify-between">
         {summary}
-    
       </div>
       <div className="flex items-center justify-between">
-
         {description}
-
       </div>
       <div className="flex items-center justify-between">
-
         {dueDate}
       </div>
     </div>

@@ -8,9 +8,17 @@ import { AdminLoginHero } from "@/pages/auth/adminAuth/AdminLoginHero";
 import TaskLayout from "@/pages/Employee/EmployeeLayout";
 import EmployeeLayout from "@/pages/Employee/EmployeeLayout";
 
+
 import { InputOTPForm } from "@/pages/auth/userAuth/otp";
-import { SidebarDemo } from "@/pages/Employee/Task";
+
 import { EmployeeOtpForm } from "@/pages/auth/employeeAuth/employeeOtp";
+import { AdminLayout } from "@/pages/admin/AdminLayout";
+import { TaskManagement } from "@/pages/Employee/Task";
+import UserManagement from "@/pages/admin/UserManagement";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import EmployeeManagement from "@/pages/admin/EmployeeManagement";
+import { UserLayout } from "@/pages/user/UserLayout";
+import UserDashboard from "@/pages/user/UserDashboard";
 
 const router = createBrowserRouter([
   // {
@@ -64,8 +72,48 @@ const router = createBrowserRouter([
         children: [
           {
             path: "task",
-            element: <SidebarDemo/>,
+            element: <TaskManagement/>,
           },
+          
+        ],
+      },
+    ],
+  },
+  {
+    element: <AdminLayout />, 
+    children: [
+      {
+        path: "admin",  
+        children: [
+          {
+            path: "dashboard",
+            element: <AdminDashboard/>,
+          },
+          {
+            path: "userManagement",
+            element: <UserManagement/>,
+          },
+          
+          {
+            path: "employeeManagement",
+            element: <EmployeeManagement/>,
+          },
+          
+        ],
+      },
+    ],
+  },
+  {
+    element: <UserLayout />, 
+    children: [
+      {
+        path: "user",  
+        children: [
+          {
+            path: "dashboard",
+            element: <UserDashboard/>,
+          },
+          
           
         ],
       },

@@ -27,3 +27,16 @@ export const postTasksApi = async (data:any) => {
     throw error;
   }
 };
+export const patchTaskStatusApi = async (taskId:any,status:any) => {
+  try {
+    console.log('sssssssssssssssssssssssssssssssss')
+    const response = await axios.patch(`${TASK_BASE_URL}/task/updateStatus`,{taskId,status},{
+      withCredentials: true,
+    });
+    const tasks = response.data;
+    return tasks;
+  } catch (error) {
+    console.error("Error adding tasks:", error);
+    throw error;
+  }
+};
