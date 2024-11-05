@@ -34,10 +34,27 @@ const Container = ({
         transition,
         transform: CSS.Translate.toString(transform),
       }}
-      className={clsx(
-        'w-full h-full p-4 bg-gray-50 rounded-xl flex flex-col gap-y-4',
-        isDragging && 'opacity-50',
-      )}
+      className={`
+        w-full 
+        min-h-[calc(100vh-16rem)]  
+        max-h-full 
+        bg-white
+        rounded-2xl
+        shadow-lg
+        hover:shadow-xl
+        transition-all
+        duration-300
+        p-6
+        pb-72
+        flex
+        flex-col
+        gap-y-6
+        border
+        border-gray-100
+        ${isDragging ? 'opacity-50 rotate-2 scale-105' : ''}
+      `}
+      
+      
     > 
       
       <div className="flex items-center justify-between">

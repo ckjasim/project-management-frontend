@@ -21,10 +21,10 @@ const AdminDashboard = () => {
   ];
 
   const reviews = [
-    { id: 1, name: 'Cris Morich', message: 'Hi Angelina! How are You?', avatar: '/api/placeholder/32/32' },
-    { id: 2, name: 'Charmie', message: 'Do you need that design?', avatar: '/api/placeholder/32/32' },
-    { id: 3, name: 'Jason Mandala', message: 'What is the price of hourly...', avatar: '/api/placeholder/32/32' },
-    { id: 4, name: 'Charlie Chu', message: 'Awesome design!!', avatar: '/api/placeholder/32/32' },
+    { id: 1, name: 'dfdf', message: 'Hi ddddd! How are You', avatar: '/api/placeholder/32/32' },
+    { id: 2, name: 'dfdfd', message: 'Do you dd that dd?', avatar: '/api/placeholder/32/32' },
+    { id: 3, name: 'dfdfgg', message: 'ddddddddddd', avatar: '/api/placeholder/32/32' },
+    { id: 4, name: 'ggg Cggghu', message: 'Awesomdddd', avatar: '/api/placeholder/32/32' },
   ];
 
   return (

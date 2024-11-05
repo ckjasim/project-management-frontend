@@ -7,11 +7,15 @@ import {
   IconMessageChatbot,
   IconFolders,
 } from '@tabler/icons-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import Modal from '@/components/global/Modal/Modal';
-
+import {
+  postTasksApi,
+  logoutApi,
+  patchTaskStatusApi,
+} from '@/services/api/api';
 import { ErrorMessage, Field, Form, Formik, useFormik } from 'formik';
 import * as Yup from 'yup';
 
@@ -21,7 +25,23 @@ const TodoSchema = Yup.object().shape({
   description: Yup.string().required('Description is required'),
   dueDate: Yup.date().required('Due date is required'),
 });
+
 export function SideNavbar() {
+  const [open, setOpen] = useState(false);
+  const navigate=useNavigate()
+
+  const logout = async () => {
+    try {
+      console.log('dddddddddddddddd')
+      const res = await logoutApi();
+      console.log(res, 'logout successfully');
+
+      navigate('/auth/userLogin')
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   const links = [
     {
       label: 'Dashboard',
@@ -53,6 +73,7 @@ export function SideNavbar() {
     },
     {
       label: 'Logout',
+      onClick: logout, 
       href: '#',
       icon: (
         <IconArrowLeft className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
@@ -60,12 +81,10 @@ export function SideNavbar() {
     },
   ];
 
-  const [open, setOpen] = useState(false);
-
   return (
     <div
       className={cn(
-        ' rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 overflow-hidden',
+        'rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 overflow-hidden',
         'h-screen' // for your use case, use `h-screen` instead of `h-[60vh]`
       )}
     >
@@ -96,7 +115,6 @@ export function SideNavbar() {
           </div>
         </SidebarBody>
       </Sidebar>
-  
     </div>
   );
 }
@@ -129,6 +147,3 @@ export const LogoIcon = () => {
     </Link>
   );
 };
-
-
-

@@ -3,7 +3,7 @@ import AuthLayout from "@/pages/auth/AuthLayout";
 import { UserLoginHero } from "@/pages/auth/userAuth/UserLoginHero";
 import { UserSignUpHero } from "@/pages/auth/userAuth/UserSignUpHero";
 import { EmployeeSignUpHero } from "@/pages/auth/employeeAuth/EmployeeSignUpHero";
-import { EmployeeLoginHero } from "@/pages/auth/employeeAuth/EmployeeLoginHero";
+import  EmployeeLoginHero  from "@/pages/auth/employeeAuth/EmployeeLoginHero";
 import { AdminLoginHero } from "@/pages/auth/adminAuth/AdminLoginHero";
 import TaskLayout from "@/pages/Employee/EmployeeLayout";
 import EmployeeLayout from "@/pages/Employee/EmployeeLayout";

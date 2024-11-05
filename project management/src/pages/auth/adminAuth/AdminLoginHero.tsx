@@ -1,19 +1,18 @@
+import React from 'react';
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import {
-  IconBrandGithub,
-  IconBrandGoogle,
-} from "@tabler/icons-react";
-import { Link } from "react-router-dom";
+import { BackgroundBeams } from "@/components/ui/background-beams";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/hooks/use-toast";
-import axios from "axios";
+import { IconBrandGoogle, IconBrandGithub } from '@tabler/icons-react';
 
 export function AdminLoginHero() {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const validationSchema = Yup.object({
     email: Yup.string()
@@ -36,6 +35,7 @@ export function AdminLoginHero() {
         description: response?.data?.message || "Logged in successfully.",
         variant: 'success',
       });
+      navigate('/admin/dashboard');
     } catch (error: any) {
       toast({
         title: "Login Failed",
@@ -47,13 +47,34 @@ export function AdminLoginHero() {
   };
 
   return (
-    <div className="form-container h-svh flex justify-center align-center bg-[#0f4841f7]">
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-50 p-4 py-32 overflow-hidden">
       <Toaster />
-      <div className="form-wrapper mt-8">
-        <div className="dark max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input dark:bg-neutral-900 backdrop-blur-2xl bg-[#013a33c0]">
-          <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
-            Admin Login
-          </h2>
+      <div className="w-full max-w-[1000px] flex rounded-3xl overflow-hidden bg-white shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] relative z-10">
+        {/* Left Side - Animated Background */}
+        <div className="hidden lg:block w-1/2 rounded-md bg-neutral-950 relative flex flex-col items-center justify-center antialiased">
+          <div className="max-w-2xl p-4">
+            <h1 className="relative z-10 text-lg md:text-7xl bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-600 text-center font-sans font-bold">
+              Welcome Back Admin
+            </h1>
+          </div>
+          <BackgroundBeams />
+        </div>
+
+        {/* Right Side - Form */}
+        <div className="w-full lg:w-1/2 p-8 md:p-12">
+          <div className="text-right mb-8">
+            <span className="text-sm text-slate-600">Need help? </span>
+            <Link to="/contact" className="text-teal-600 font-medium hover:text-teal-700">
+              Contact Support
+            </Link>
+          </div>
+
+          <div className="mb-10">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-emerald-500 bg-clip-text text-transparent mb-2">
+              Admin Portal
+            </h1>
+            <p className="text-slate-600">Secure access to dashboard</p>
+          </div>
 
           <Formik
             initialValues={{ email: '', password: '' }}
@@ -61,61 +82,75 @@ export function AdminLoginHero() {
             onSubmit={handleSubmit}
           >
             {({ isSubmitting }) => (
-              <Form className="my-8">
-                <LabelInputContainer className="mb-4">
-                  <Label htmlFor="email">Email</Label>
+              <Form className="space-y-6">
+                <div className="space-y-1">
                   <Field
                     name="email"
                     type="email"
                     as={Input}
-                    placeholder="projectmayhem@fc.com"
+                    placeholder="Enter admin email"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
                   />
-                  <ErrorMessage name="email" component="div" className="text-red-600 font-semibold text-sm" />
-                </LabelInputContainer>
+                  <ErrorMessage name="email" component="div" className="text-rose-500 text-sm" />
+                </div>
 
-                <LabelInputContainer className="mb-4">
-                  <Label htmlFor="password">Password</Label>
+                <div className="space-y-1">
                   <Field
                     name="password"
                     type="password"
                     as={Input}
-                    placeholder="••••••••"
+                    placeholder="Password"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
                   />
-                  <ErrorMessage name="password" component="div" className="text-red-600 font-semibold text-sm" />
-                </LabelInputContainer>
-
-                <button
-                  className="bg-gradient-to-br relative group/btn from-black dark:from-[#013a33] to-neutral-600 dark:to-emerald-700 block w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
-                  type="submit"
-                  disabled={isSubmitting}
-                >
-                  Login &rarr;
-                  <BottomGradient />
-                </button>
-
-                <div className='text-center mt-3 text-lime-100 font-normal text-sm'>
-                  <Link to="/forgotPassword">Forgot Password?</Link>
+                  <ErrorMessage name="password" component="div" className="text-rose-500 text-sm" />
                 </div>
 
-                <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-600 to-transparent my-8 h-[1px] w-full" />
+                <div className="flex justify-end">
+                  <Link 
+                    to="/forgotPassword" 
+                    className="text-sm text-slate-600 hover:text-teal-600 transition-colors"
+                  >
+                    Reset Password
+                  </Link>
+                </div>
 
-                <div className="flex flex-row space-x-4">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-gradient-to-r from-teal-600 to-emerald-500 hover:from-teal-700 hover:to-emerald-600 text-white font-medium py-3 rounded-xl transition-all duration-200 shadow-lg shadow-teal-500/20 hover:shadow-teal-500/30"
+                >
+                  Sign In
+                </button>
+
+                <div className="relative flex items-center justify-center my-6">
+                  <div className="border-t border-slate-200 w-full"></div>
+                  <div className="absolute bg-white px-4 text-sm text-slate-500">Or continue with</div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
                   <button
-                    className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black dark:text-white rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-[#013a33] dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
                     type="button"
+                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors"
                   >
-                    <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-                    <span className="text-neutral-700 dark:text-neutral-300 text-sm">Google</span>
-                    <BottomGradient />
+                    <IconBrandGoogle className="h-5 w-5" />
+                    <span className="text-sm font-medium">Google</span>
                   </button>
                   <button
-                    className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black dark:text-white rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-[#013a33] dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
                     type="button"
+                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors"
                   >
-                    <IconBrandGithub className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-                    <span className="text-neutral-700 dark:text-neutral-300 text-sm">GitHub</span>
-                    <BottomGradient />
+                    <IconBrandGithub className="h-5 w-5" />
+                    <span className="text-sm font-medium">GitHub</span>
                   </button>
+                </div>
+
+                <div className="text-center mt-6">
+                  <p className="text-sm text-slate-600">
+                    Looking for user login?{' '}
+                    <Link to="/auth/userLogin" className="text-teal-600 font-medium hover:text-teal-700">
+                      Click here
+                    </Link>
+                  </p>
                 </div>
               </Form>
             )}
@@ -126,25 +161,4 @@ export function AdminLoginHero() {
   );
 }
 
-const BottomGradient = () => {
-  return (
-    <>
-      <span className="group-hover/btn:opacity-100 block transition duration-500 opacity-0 absolute h-px w-full -bottom-px inset-x-0 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
-      <span className="group-hover/btn:opacity-100 blur-sm block transition duration-500 opacity-0 absolute h-px w-1/2 mx-auto -bottom-px inset-x-10 bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
-    </>
-  );
-};
-
-const LabelInputContainer = ({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => {
-  return (
-    <div className={cn("flex flex-col space-y-2 w-full", className)}>
-      {children}
-    </div>
-  );
-};
+export default AdminLoginHero;

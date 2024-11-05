@@ -54,13 +54,6 @@ const Item = ({
       console.error('Error deleting task:', error);
     }
   };
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0'); // Get day and pad with zero if needed
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Get month (0-11) and pad with zero
-    const year = date.getFullYear(); // Get full year
-    return `${day} ${month} ${year}`; // Return formatted string
-  };
 
   const handleEditSubmit = async (values: Omit<ItemsType, 'id' | 'status' | 'priority'>) => {
     try {
@@ -207,12 +200,12 @@ const Item = ({
           </div>
           <p className="text-sm text-gray-600 break-words max-w-[150px]">{description}</p>
           <div className="flex items-center justify-between pt-2">
-            {/* <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
               {status}
-            </span> */}
+            </span>
             <div className="flex items-center text-sm text-gray-500">
               <Clock className="w-4 h-4 mr-1" />
-              <span>{formatDate(dueDate)}</span>
+              <span>{dueDate}</span>
             </div>
           </div>
         </div>

@@ -1,14 +1,13 @@
-import { Label } from '../../../components/ui/label';
-import { Input } from '../../../components/ui/input';
-import { cn } from '@/lib/utils';
-import { IconBrandGithub, IconBrandGoogle } from '@tabler/icons-react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import axios from 'axios';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
-import { Toaster } from '@/components/ui/toaster';
-import { useToast } from '@/components/hooks/use-toast';
+import React from 'react';
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { BackgroundBeams } from "@/components/ui/background-beams";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/components/hooks/use-toast";
 
 export function EmployeeSignUpHero() {
   const { toast } = useToast();
@@ -36,15 +35,7 @@ export function EmployeeSignUpHero() {
   });
 
   const handleSubmit = async (values: any) => {
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-      mobile,
-      projectCode,
-      jobRole,
-    } = values;
+    const { firstName, lastName, email, password, mobile, projectCode, jobRole } = values;
     const name = `${firstName} ${lastName}`;
 
     try {
@@ -65,26 +56,43 @@ export function EmployeeSignUpHero() {
     } catch (error: any) {
       console.error('Sign up error:', error.response.data.message);
       toast({
-        title: 'Login Failed',
-        description:
-          error?.response?.data?.message || 'An error occurred during login.',
+        title: 'Registration Failed',
+        description: error?.response?.data?.message || 'An error occurred during registration.',
         variant: 'destructive',
       });
     }
   };
 
   return (
-    <div className="form-container flex justify-center align-center bg-[#0f4841f7]">
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-rose-50 p-4 py-32 overflow-hidden">
       <Toaster />
+      <div className="w-full max-w-[1000px] flex rounded-3xl overflow-hidden bg-white shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] relative z-10">
+        {/* Left Side - Animation */}
+          <div className="  rounded-md  bg-neutral-950 relative flex flex-col items-center justify-center antialiased">
+      <div className="max-w-2xl  p-4">
+        <h1 className="relative z-10 text-lg md:text-7xl  bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-600  text-center font-sans font-bold">
+         Join our team today
+        </h1>
+       
+      </div>
+      <BackgroundBeams />
+    </div> 
 
-      <div className="form-wrapper py-8">
-        <div className="dark max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input dark:bg-neutral-900 backdrop-blur-2xl bg-[#013a33c0]">
-          <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
-            Employee Sign Up
-          </h2>
-          <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-400">
-            Do you want to join your project? Signup here
-          </p>
+        {/* Right Side - Form */}
+        <div className="w-full lg:w-1/2 p-8 md:p-12">
+          <div className="text-right mb-8">
+            <span className="text-sm text-slate-600">Already have an account? </span>
+            <Link to="/auth/employeeLogin" className="text-indigo-600 font-medium hover:text-indigo-700">
+              Sign in
+            </Link>
+          </div>
+
+          <div className="mb-10">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-rose-500 bg-clip-text text-transparent mb-2">
+              Welcome!
+            </h1>
+            <p className="text-slate-600">Let's get you started with your account</p>
+          </div>
 
           <Formik
             initialValues={{
@@ -100,172 +108,111 @@ export function EmployeeSignUpHero() {
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {() => (
-              <Form className="my-8">
-                <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
-                  <LabelInputContainer>
-                    <Label htmlFor="firstName">First name</Label>
+            {({ isSubmitting }) => (
+              <Form className="space-y-4">
+                <div className="flex gap-4">
+                  <div className="flex-1 space-y-1">
                     <Field
-                      id="firstName"
                       name="firstName"
-                      placeholder="Tyler"
                       type="text"
                       as={Input}
+                      placeholder="First Name"
+                      className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                     />
-                    <ErrorMessage
-                      name="firstName"
-                      component="div"
-                      className="text-red-600 font-semibold text-sm"
-                    />
-                  </LabelInputContainer>
-                  <LabelInputContainer>
-                    <Label htmlFor="lastName">Last name</Label>
+                    <ErrorMessage name="firstName" component="div" className="text-rose-500 text-sm" />
+                  </div>
+
+                  <div className="flex-1 space-y-1">
                     <Field
-                      id="lastName"
                       name="lastName"
-                      placeholder="Durden"
                       type="text"
                       as={Input}
+                      placeholder="Last Name"
+                      className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                     />
-                    <ErrorMessage
-                      name="lastName"
-                      component="div"
-                      className="text-red-600 font-semibold text-sm"
-                    />
-                  </LabelInputContainer>
+                    <ErrorMessage name="lastName" component="div" className="text-rose-500 text-sm" />
+                  </div>
                 </div>
-                <LabelInputContainer className="mb-4">
-                  <Label htmlFor="email">Email</Label>
+
+                <div className="space-y-1">
                   <Field
-                    id="email"
                     name="email"
-                    placeholder="projectmayhem@fc.com"
                     type="email"
                     as={Input}
+                    placeholder="Email Address"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                   />
-                  <ErrorMessage
-                    name="email"
-                    component="div"
-                    className="text-red-600 font-semibold text-sm"
-                  />
-                </LabelInputContainer>
-                <LabelInputContainer className="mb-4">
-                  <Label htmlFor="password">Password</Label>
+                  <ErrorMessage name="email" component="div" className="text-rose-500 text-sm" />
+                </div>
+
+                <div className="space-y-1">
                   <Field
-                    id="password"
                     name="password"
-                    placeholder="••••••••"
                     type="password"
                     as={Input}
+                    placeholder="Password"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                   />
-                  <ErrorMessage
-                    name="password"
-                    component="div"
-                    className="text-red-600 font-semibold text-sm"
-                  />
-                </LabelInputContainer>
-                <LabelInputContainer className="mb-4">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <ErrorMessage name="password" component="div" className="text-rose-500 text-sm" />
+                </div>
+
+                <div className="space-y-1">
                   <Field
-                    id="confirmPassword"
                     name="confirmPassword"
-                    placeholder="••••••••"
                     type="password"
                     as={Input}
+                    placeholder="Confirm Password"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                   />
-                  <ErrorMessage
-                    name="confirmPassword"
-                    component="div"
-                    className="text-red-600 font-semibold text-sm"
-                  />
-                </LabelInputContainer>
-                <LabelInputContainer className="mb-4">
-                  <Label htmlFor="mobile">Mobile Number</Label>
+                  <ErrorMessage name="confirmPassword" component="div" className="text-rose-500 text-sm" />
+                </div>
+
+                <div className="space-y-1">
                   <Field
-                    id="mobile"
                     name="mobile"
-                    placeholder="9999999999"
                     type="text"
                     as={Input}
+                    placeholder="Mobile Number"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                   />
-                  <ErrorMessage
-                    name="mobile"
-                    component="div"
-                    className="text-red-600 font-semibold text-sm"
-                  />
-                </LabelInputContainer>
-                <LabelInputContainer className="mb-4">
-                  <Label htmlFor="jobRole">Job Role</Label>
+                  <ErrorMessage name="mobile" component="div" className="text-rose-500 text-sm" />
+                </div>
+
+                <div className="space-y-1">
                   <Field
-                    id="jobRole"
                     name="jobRole"
-                    placeholder="Designer"
                     type="text"
                     as={Input}
+                    placeholder="Job Role"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                   />
-                  <ErrorMessage
-                    name="jobRole"
-                    component="div"
-                    className="text-red-600 font-semibold text-sm"
-                  />
-                </LabelInputContainer>
-                <LabelInputContainer className="mb-4">
-                  <Label htmlFor="projectCode">Project Code</Label>
+                  <ErrorMessage name="jobRole" component="div" className="text-rose-500 text-sm" />
+                </div>
+
+                <div className="space-y-1">
                   <Field
-                    id="projectCode"
                     name="projectCode"
-                    placeholder="DFDFD"
                     type="text"
                     as={Input}
+                    placeholder="Project Code"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                   />
-                  <ErrorMessage
-                    name="projectCode"
-                    component="div"
-                    className="text-red-600 font-semibold text-sm"
-                  />
-                </LabelInputContainer>
+                  <ErrorMessage name="projectCode" component="div" className="text-rose-500 text-sm" />
+                </div>
 
                 <button
-                  className="bg-gradient-to-br relative group/btn from-black dark:from-[#013a33] to-neutral-600 dark:to-emerald-700 block w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
                   type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white font-medium py-3 rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30"
                 >
-                  Sign up &rarr;
-                  <BottomGradient />
+                  Create Account
                 </button>
 
-                {/*   
-                <div className="flex flex-row space-x-4">
-                  <button className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black dark:text-white rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-[#013a33] dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]" type="submit">
-                    <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-                    <span className="text-neutral-700 dark:text-neutral-300 text-sm">Google</span>
-                    <BottomGradient />
-                  </button>
-                  <button className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black dark:text-white rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-[#013a33] dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]" type="submit">
-                    <IconBrandGithub className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-                    <span className="text-neutral-700 dark:text-neutral-300 text-sm">GitHub</span>
-                    <BottomGradient />
-                  </button>
-                </div> */}
-
-                <div className="text-center mt-4 text-lime-100 font-normal text-sm">
-                  <p>
-                    Already have an account?{' '}
-                    <Link
-                      to="/auth/employeeLogin"
-                      className="font-medium text-white"
-                    >
-                      Login
-                    </Link>
-                  </p>
-                </div>
-                <div className="text-center mt-3 text-lime-100 font-normal text-sm">
-                  <p>
-                    Do you want to manage your project?{' '}
-                    <Link
-                      to="/auth/userLogin"
-                      className="font-medium text-white"
-                    >
-                      Login
+                <div className="text-center mt-6">
+                  <p className="text-sm text-slate-600">
+                    Want to manage your project?{' '}
+                    <Link to="/auth/userLogin" className="text-indigo-600 font-medium hover:text-indigo-700">
+                      Login here
                     </Link>
                   </p>
                 </div>
@@ -278,14 +225,4 @@ export function EmployeeSignUpHero() {
   );
 }
 
-const LabelInputContainer = ({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => <div className={`flex flex-col ${className}`}>{children}</div>;
-
-const BottomGradient = () => (
-  <div className="absolute -inset-1 bg-gradient-to-br from-black to-neutral-600 rounded-md blur opacity-0 transition-opacity duration-300 group-hover/btn:opacity-100" />
-);
+export default EmployeeSignUpHero;

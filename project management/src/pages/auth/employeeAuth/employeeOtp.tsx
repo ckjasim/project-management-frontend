@@ -18,6 +18,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from '@/components/ui/input-otp';
+import { BackgroundBeams } from "@/components/ui/background-beams";
 import axios from 'axios';
 import { Toaster } from '@/components/ui/toaster';
 import { useNavigate } from 'react-router-dom';
@@ -46,8 +47,8 @@ export function EmployeeOtpForm() {
     let timerInterval: NodeJS.Timeout;
 
     toast({
-      title: "OTP send into your Email",
-    
+      title: "OTP sent to your Email",
+      description: "Please check your inbox",
     });
 
     if (timerActive) {
@@ -75,8 +76,8 @@ export function EmployeeOtpForm() {
   };
 
   const handleResendOTP = async () => {
-    if (timerActive) return; 
-  
+    if (timerActive) return;
+
     try {
       setRemainingTime(120);
       setTimerActive(true);
@@ -85,97 +86,144 @@ export function EmployeeOtpForm() {
         {},
         { withCredentials: true }
       );
-      console.log('OTP sent successfully:', response.data.message);
-      toast({ title: 'OTP sent successfully', description: response.data.message });
+      toast({ 
+        title: 'OTP Sent Successfully', 
+        description: 'A new OTP has been sent to your email',
+        variant: 'default'
+      });
     } catch (error: any) {
-      console.error(
-        'Error resending OTP:',
-        error.response?.data?.message || 'An error occurred'
-      );
-      toast({ title: 'Error', description: error.response?.data?.message || 'An error occurred' });
+      toast({ 
+        title: 'Error Sending OTP', 
+        description: error.response?.data?.message || 'An error occurred',
+        variant: 'destructive'
+      });
     }
   };
-  
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: 'You submitted the following values:',
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
     try {
       const res = await axios.post(
         'http://localhost:3000/api/employeeOtp',
         { otp: data.pin },
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
-      console.log('OTP verification successful:', res.data.message);
+      toast({
+        title: 'Verification Successful',
+        description: 'Redirecting to dashboard...',
+        variant: 'default'
+      });
       navigate('/employee/task');
     } catch (error: any) {
-      console.error(
-        'OTP verification error:',
-        error.response?.data?.message || 'Error during OTP verification'
-      );
+      toast({
+        title: 'Verification Failed',
+        description: error.response?.data?.message || 'Invalid OTP',
+        variant: 'destructive'
+      });
     }
   }
 
   return (
-    <div className="flex min-h-screen mt-32 justify-center">
-      <Toaster/>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full max-w-md flex flex-col items-center space-y-6"
-        >
-          <FormField
-            control={form.control}
-            name="pin"
-            render={({ field }) => (
-              <FormItem className="flex flex-col items-center w-full">
-                <FormLabel className="text-center">One-Time Password</FormLabel>
-                <FormControl>
-                  <InputOTP maxLength={6} {...field}>
-                    <InputOTPGroup className="flex justify-center">
-                      <InputOTPSlot index={0} />
-                      <InputOTPSlot index={1} />
-                      <InputOTPSlot index={2} />
-                      <InputOTPSlot index={3} />
-                      <InputOTPSlot index={4} />
-                      <InputOTPSlot index={5} />
-                    </InputOTPGroup>
-                  </InputOTP>
-                </FormControl>
-                <FormDescription className="text-center">
-                  Please enter the one-time password sent to your email.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-rose-50 p-4 py-32 overflow-hidden">
+      <Toaster />
+      <div className="w-full max-w-[1000px] flex rounded-3xl overflow-hidden bg-white shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] relative z-10">
+        {/* Left Side - Animation */}
+        <div className="hidden lg:block w-1/2 rounded-md bg-neutral-950 relative flex flex-col items-center justify-center antialiased">
+          <div className="max-w-2xl p-4">
+            <h1 className="relative z-10 text-lg md:text-7xl bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-600 text-center font-sans font-bold">
+              Verify your email
+            </h1>
+          </div>
+          <BackgroundBeams />
+        </div>
 
-          <div id="otpTimer" className="text-center text-red-700 font-semibold">
-            {remainingTime > 0 ? formatTime(remainingTime) : '00:00'}
+        {/* Right Side - OTP Form */}
+        <div className="w-full lg:w-1/2 p-8 md:p-12">
+          <div className="mb-10">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-rose-500 bg-clip-text text-transparent mb-2">
+              Enter OTP
+            </h1>
+            <p className="text-slate-600">
+              We've sent a verification code to your email
+            </p>
           </div>
 
-          {!timerActive && (
-            <span
-              onClick={handleResendOTP}
-              className="self-center cursor-pointer text-red-700 font-semibold text-sm"
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-8"
             >
-              Resend OTP?
-            </span>
-          )}
+              <FormField
+                control={form.control}
+                name="pin"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <InputOTP
+                        maxLength={6}
+                        {...field}
+                        className="flex justify-center gap-2"
+                      >
+                        <InputOTPGroup>
+                          <InputOTPSlot 
+                            index={0} 
+                            className="w-12 h-12 text-lg border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                          />
+                          <InputOTPSlot 
+                            index={1} 
+                            className="w-12 h-12 text-lg border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                          />
+                          <InputOTPSlot 
+                            index={2} 
+                            className="w-12 h-12 text-lg border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                          />
+                          <InputOTPSlot 
+                            index={3} 
+                            className="w-12 h-12 text-lg border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                          />
+                          <InputOTPSlot 
+                            index={4} 
+                            className="w-12 h-12 text-lg border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                          />
+                          <InputOTPSlot 
+                            index={5} 
+                            className="w-12 h-12 text-lg border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                          />
+                        </InputOTPGroup>
+                      </InputOTP>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          <Button type="submit" className="self-center">
-            Submit
-          </Button>
-        </form>
-      </Form>
+              <div className="flex flex-col items-center space-y-4">
+                <div className="text-indigo-600 font-semibold">
+                  {remainingTime > 0 ? formatTime(remainingTime) : '00:00'}
+                </div>
+
+                {!timerActive && (
+                  <button
+                    type="button"
+                    onClick={handleResendOTP}
+                    className="text-indigo-600 hover:text-indigo-700 font-medium text-sm"
+                  >
+                    Resend OTP
+                  </button>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white font-medium py-3 rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30"
+                >
+                  Verify Email
+                </button>
+              </div>
+            </form>
+          </Form>
+        </div>
+      </div>
     </div>
   );
 }
+
+export default EmployeeOtpForm;

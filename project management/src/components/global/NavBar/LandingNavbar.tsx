@@ -2,21 +2,21 @@
 import React from "react";
 
 import { IconHome, IconMessage, IconUser } from "@tabler/icons-react";
-import { FloatingNav } from "@/components/ui/floating-navbar";
-export function UserNavbar() {
+import { FloatingNav } from "@/components/ui/floating-navbar-landing";
+export function LandingNavbar() {
   const navItems = [
     {
-      name: "Dashboard",
+      name: "Home",
       link: "/admin/dashboard",
       icon: <IconHome className="h-4 w-4 text-neutral-500 dark:text-white" />,
     },
     {
-      name: "User",
+      name: "Contact",
       link: "/admin/userManagement",
       icon: <IconUser className="h-4 w-4 text-neutral-500 dark:text-white" />,
     },
     {
-      name: "Employee",
+      name: "About Us",
       link: "/admin/employeeManagement",
       icon: (
         <IconMessage className="h-4 w-4 text-neutral-500 dark:text-white" />
