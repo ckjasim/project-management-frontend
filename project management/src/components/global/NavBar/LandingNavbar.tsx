@@ -12,7 +12,7 @@ export function LandingNavbar() {
     },
     {
       name: "Contact",
-      link: "/admin/userManagement",
+      link: "/employee/chat",
       icon: <IconUser className="h-4 w-4 text-neutral-500 dark:text-white" />,
     },
     {

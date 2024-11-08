@@ -19,12 +19,10 @@ import AdminDashboard from "@/pages/admin/AdminDashboard";
 import EmployeeManagement from "@/pages/admin/EmployeeManagement";
 import { UserLayout } from "@/pages/user/UserLayout";
 import UserDashboard from "@/pages/user/UserDashboard";
+import ProjectDashboard from "@/pages/user/projectManagement";
+import MessagesPage from "@/pages/chat/chat";
 
 const router = createBrowserRouter([
-  // {
-  //   path: "/",
-  //   element: <Navigate replace={true} to={"/auth/userlogin"} />, 
-  // },
   {
     element: <AuthLayout />, 
     children: [
@@ -74,6 +72,10 @@ const router = createBrowserRouter([
             path: "task",
             element: <TaskManagement/>,
           },
+          {
+            path: "chat",
+            element: <MessagesPage/>,
+          },
           
         ],
       },
@@ -112,6 +114,10 @@ const router = createBrowserRouter([
           {
             path: "dashboard",
             element: <UserDashboard/>,
+          },
+          {
+            path: "projects",
+            element: <ProjectDashboard/>,
           },
           
           

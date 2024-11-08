@@ -1,25 +1,19 @@
-import axios from "axios";
-import { AUTH_BASE_URL, TASK_BASE_URL } from "@/lib/config";
-console.log(TASK_BASE_URL)
+import { taskApi, authApi } from "../interceptors/api"; 
 
 export const getTasksApi = async () => {
   try {
-    const response = await axios.get(`${TASK_BASE_URL}/task/getTask`, {
-      withCredentials: true
-    });
-    
+    const response = await taskApi.get('/task/getTask');
     const tasks = response?.data;
     return tasks;
   } catch (error) {
     console.error("Error fetching tasks:", error);
-    throw error;  
+    throw error;
   }
 };
-export const postTasksApi = async (data:any) => {
+
+export const postTasksApi = async (data: any) => {
   try {
-    const response = await axios.post(`${TASK_BASE_URL}/task/createTask`,{data},{
-      withCredentials: true,
-    });
+    const response = await taskApi.post('/task/createTask', { data });
     const tasks = response.data;
     return tasks;
   } catch (error) {
@@ -27,55 +21,47 @@ export const postTasksApi = async (data:any) => {
     throw error;
   }
 };
-export const patchTaskStatusApi = async (taskId:any,status:any) => {
+
+export const patchTaskStatusApi = async (taskId: any, status: any) => {
   try {
-    console.log('sssssssssssssssssssssssssssssssss')
-    const response = await axios.patch(`${TASK_BASE_URL}/task/updateStatus`,{taskId,status},{
-      withCredentials: true,
-    });
+    const response = await taskApi.patch('/task/updateStatus', { taskId, status });
     const tasks = response.data;
     return tasks;
   } catch (error) {
-    console.error("Error adding tasks:", error);
+    console.error("Error updating task status:", error);
     throw error;
   }
 };
-export const patchTaskApi = async (id:any,data:any) => {
+
+export const patchTaskApi = async (id: any, data: any) => {
   try {
-    console.log('111111111111111111111')
-    const response = await axios.patch(`${TASK_BASE_URL}/task/updateTask`,{id,data},{
-      withCredentials: true,
-    });
+    const response = await taskApi.patch('/task/updateTask', { id, data });
     const tasks = response.data;
     return tasks;
   } catch (error) {
-    console.error("Error updating tasks:", error);
+    console.error("Error updating task:", error);
     throw error;
   }
 };
-export const deleteTaskApi = async (id:any) => {
+
+export const deleteTaskApi = async (id: any) => {
   try {
-    console.log('222222222222222')
-    const response = await axios.patch(`${TASK_BASE_URL}/task/deleteTask`,{id},{
-      withCredentials: true,
-    });
+    const response = await taskApi.patch('/task/deleteTask', { id });
     const tasks = response.data;
     return tasks;
   } catch (error) {
-    console.error("Error deleting tasks:", error);
+    console.error("Error deleting task:", error);
     throw error;
   }
 };
+
 export const logoutApi = async () => {
   try {
-    console.log('444444444444444444')
-    const response = await axios.post(`${AUTH_BASE_URL}/auth/logout`,{
-      withCredentials: true,
-    });
+    const response = await authApi.post('/auth/logout');
     const tasks = response.data;
     return tasks;
   } catch (error) {
-    console.error("Error deleting tasks:", error);
+    console.error("Error logging out:", error);
     throw error;
   }
 };

@@ -34,6 +34,8 @@ export function UserLoginHero() {
         {
           email: values.email,
           password: values.password,
+        },{
+          withCredentials:true
         }
       );
       toast({
