@@ -45,7 +45,7 @@ export function SideNavbar() {
   const links = [
     {
       label: 'Dashboard',
-      href: '#',
+      href: '/employee/task',
       icon: (
         <IconBrandTabler className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),

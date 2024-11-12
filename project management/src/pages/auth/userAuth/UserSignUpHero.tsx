@@ -21,6 +21,8 @@ export function UserSignUpHero() {
       .email('Invalid email address')
       .matches(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, 'Invalid email address')
       .required('Email is required'),
+    organization: Yup.string().required('organization is required'),
+
     password: Yup.string() 
       .min(8, 'Password must be at least 8 characters')
       .required('Password is required'),
@@ -29,7 +31,7 @@ export function UserSignUpHero() {
       .required('Confirm password is required'),
   });
 
-  const handleSubmit = async (values: { firstName: any; lastName: any; email: any; password: any; }) => {
+  const handleSubmit = async (values: { firstName: string; lastName: string; email: any; password: any;organization:string }) => {
     const name = `${values.firstName} ${values.lastName}`;
     
     try {
@@ -37,13 +39,15 @@ export function UserSignUpHero() {
         name,
         email: values.email,
         password: values.password,
+        organization:values.organization
       }, {
         withCredentials: true,
       });
+      
       toast({
         title: "OTP send to your Email",
         description: response?.data?.message || "An error occurred while logging in.",
-        variant:'default',
+        variant:'success',
       });
       navigate('/auth/otp');
     } catch (error:any) {
@@ -63,7 +67,7 @@ export function UserSignUpHero() {
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-rose-50 p-4 py-32 overflow-hidden">
       <Toaster />
       <div className="w-full max-w-[1000px] flex rounded-3xl overflow-hidden bg-white shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] relative z-10">
-        {/* Left Side - Animated Background */}
+       
         <div className="hidden lg:block w-1/2 rounded-md bg-neutral-950 relative flex flex-col items-center justify-center antialiased">
           <div className="max-w-2xl p-4">
             <h1 className="relative z-10 text-lg md:text-7xl bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-600 text-center font-sans font-bold">
@@ -73,7 +77,7 @@ export function UserSignUpHero() {
           <BackgroundBeams />
         </div>
 
-        {/* Right Side - Form */}
+       
         <div className="w-full lg:w-1/2 p-8 md:p-12">
           <div className="text-right mb-8">
             <span className="text-sm text-slate-600">Already a member? </span>
@@ -90,7 +94,7 @@ export function UserSignUpHero() {
           </div>
 
           <Formik
-            initialValues={{ firstName: '', lastName: '', email: '', password: '', confirmPassword: '' }}
+            initialValues={{ firstName: '', lastName: '', email: '', password: '', confirmPassword: '' , organization:'',}}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
@@ -128,6 +132,16 @@ export function UserSignUpHero() {
                     className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                   />
                   <ErrorMessage name="email" component="div" className="text-rose-500 text-sm" />
+                </div>
+                <div className="space-y-1">
+                  <Field
+                    name="organization"
+                    type="organization"
+                    as={Input}
+                    placeholder="Organization"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                  />
+                  <ErrorMessage name="organization" component="div" className="text-rose-500 text-sm" />
                 </div>
 
                 <div className="space-y-1">

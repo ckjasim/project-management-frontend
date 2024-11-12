@@ -68,7 +68,7 @@ export const TaskManagement = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTasks = async () => {
+    const fetchTasks = async () => {  
       setLoading(true);
       try {
         const res = await getTasksApi();

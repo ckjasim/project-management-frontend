@@ -19,6 +19,7 @@ import {
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import axios from 'axios';
 import { Toaster } from '@/components/ui/toaster';
+import { useNavigate } from 'react-router-dom';
 
 const FormSchema = z.object({
   pin: z.string().min(6, {
@@ -28,6 +29,7 @@ const FormSchema = z.object({
 
 export function InputOTPForm() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -89,14 +91,7 @@ export function InputOTPForm() {
   };
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: 'You submitted the following values:',
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+   
     try {
       const res = await axios.post(
         'http://localhost:3000/api/otp',
@@ -105,8 +100,19 @@ export function InputOTPForm() {
           withCredentials: true,
         }
       );
+      toast({
+        title: 'Verification Successful',
+        description: 'Redirecting to dashboard...',
+        variant: 'success'
+      });
+      navigate('/user/dashboard');
       console.log('OTP verification successful:', res.data.message);
     } catch (error: any) {
+      toast({
+        title: 'Verification Failed',
+        description: error.response?.data?.message || 'Invalid OTP',
+        variant: 'destructive'
+      });
       console.error(
         'OTP verification error:',
         error.response?.data?.message || 'Error during OTP verification'
@@ -116,7 +122,7 @@ export function InputOTPForm() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-rose-50 p-4 py-32 overflow-hidden">
-      <Toaster />
+      
       <div className="w-full max-w-[1000px] flex rounded-3xl overflow-hidden bg-white shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] relative z-10">
         {/* Left Side - Animation */}
         <div className="hidden lg:block w-1/2 rounded-md bg-neutral-950 relative flex flex-col items-center justify-center antialiased">

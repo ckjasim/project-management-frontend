@@ -4,7 +4,7 @@ console.log('111111111111111111111')
 console.log(import.meta.env.VITE_BACKEND_URL,'sssssssssssssss')
 console.log('2222222222222222222222222')
 const authApi = axios.create({
-  baseURL: import.meta.env.VITE_TASK_BASE_URL,
+  baseURL: import.meta.env.VITE_AUTH_BASE_URL,
   withCredentials: true,
 });
 

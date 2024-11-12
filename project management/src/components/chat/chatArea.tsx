@@ -71,7 +71,7 @@ const ChatArea: React.FC = () => {
                 )}
                 <div
                   className={`bg-gray-100 p-4 rounded-2xl max-w-[70%] ${
-                    message.sender === 'You' ? 'bg-emerald-600 text-white rounded-br-none' : 'rounded-bl-none'
+                    message.sender === 'You' ? 'bg-emerald-400 text-white rounded-br-none' : 'rounded-bl-none'
                   }`}
                 >
                   <p className="text-sm font-medium mb-1">{message.sender}</p>

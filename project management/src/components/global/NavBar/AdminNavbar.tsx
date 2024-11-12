@@ -11,6 +11,11 @@ export function AdminNavbar() {
       icon: <IconHome className="h-4 w-4 text-neutral-500 dark:text-white" />,
     },
     {
+      name: "Dashboard",
+      link: "/auth/employeeLogin",
+      icon: <IconHome className="h-4 w-4 text-neutral-500 dark:text-white" />,
+    },
+    {
       name: "User",
       link: "/admin/userManagement",
       icon: <IconUser className="h-4 w-4 text-neutral-500 dark:text-white" />,
@@ -24,6 +29,7 @@ export function AdminNavbar() {
     },
   ];
   return (
+
     <div className="relative  w-full">
       <FloatingNav navItems={navItems} />
       {/* <DummyContent /> */}

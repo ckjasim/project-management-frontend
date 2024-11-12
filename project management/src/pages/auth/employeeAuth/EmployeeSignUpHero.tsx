@@ -32,10 +32,11 @@ export function EmployeeSignUpHero() {
     projectCode: Yup.string()
       .required('Project code is required')
       .length(5, 'Project code must be exactly 5 characters'),
+      organization: Yup.string().required('organization is required'),
   });
 
   const handleSubmit = async (values: any) => {
-    const { firstName, lastName, email, password, mobile, projectCode, jobRole } = values;
+    const { firstName, lastName, email, password, mobile, projectCode, jobRole,organization } = values;
     const name = `${firstName} ${lastName}`;
 
     try {
@@ -48,6 +49,7 @@ export function EmployeeSignUpHero() {
           mobile,
           projectCode,
           jobRole,
+          organization
         },
         { withCredentials: true }
       );
@@ -103,6 +105,7 @@ export function EmployeeSignUpHero() {
               confirmPassword: '',
               mobile: '',
               jobRole: '',
+              organization:'',
               projectCode: '',
             }}
             validationSchema={validationSchema}
@@ -144,39 +147,20 @@ export function EmployeeSignUpHero() {
                   />
                   <ErrorMessage name="email" component="div" className="text-rose-500 text-sm" />
                 </div>
-
                 <div className="space-y-1">
                   <Field
-                    name="password"
-                    type="password"
+                    name="organization"
+                    type="organization"
                     as={Input}
-                    placeholder="Password"
+                    placeholder="Organization"
                     className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                   />
-                  <ErrorMessage name="password" component="div" className="text-rose-500 text-sm" />
+                  <ErrorMessage name="organization" component="div" className="text-rose-500 text-sm" />
                 </div>
 
-                <div className="space-y-1">
-                  <Field
-                    name="confirmPassword"
-                    type="password"
-                    as={Input}
-                    placeholder="Confirm Password"
-                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
-                  />
-                  <ErrorMessage name="confirmPassword" component="div" className="text-rose-500 text-sm" />
-                </div>
+                
 
-                <div className="space-y-1">
-                  <Field
-                    name="mobile"
-                    type="text"
-                    as={Input}
-                    placeholder="Mobile Number"
-                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
-                  />
-                  <ErrorMessage name="mobile" component="div" className="text-rose-500 text-sm" />
-                </div>
+              
 
                 <div className="space-y-1">
                   <Field
@@ -200,6 +184,37 @@ export function EmployeeSignUpHero() {
                   <ErrorMessage name="projectCode" component="div" className="text-rose-500 text-sm" />
                 </div>
 
+                <div className="space-y-1">
+                  <Field
+                    name="mobile"
+                    type="text"
+                    as={Input}
+                    placeholder="Mobile Number"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                  />
+                  <ErrorMessage name="mobile" component="div" className="text-rose-500 text-sm" />
+                </div>
+                <div className="space-y-1">
+                  <Field
+                    name="password"
+                    type="password"
+                    as={Input}
+                    placeholder="Password"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                  />
+                  <ErrorMessage name="password" component="div" className="text-rose-500 text-sm" />
+                </div>
+
+                <div className="space-y-1">
+                  <Field
+                    name="confirmPassword"
+                    type="password"
+                    as={Input}
+                    placeholder="Confirm Password"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                  />
+                  <ErrorMessage name="confirmPassword" component="div" className="text-rose-500 text-sm" />
+                </div>
                 <button
                   type="submit"
                   disabled={isSubmitting}

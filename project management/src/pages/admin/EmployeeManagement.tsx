@@ -1,38 +1,89 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Search, Filter, MoreVertical } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { employeeManageApi, getAllEmployeesApi } from '@/services/api/api';
+
+type Employee = {
+  status: any;
+  dateJoined: string;
+  _id: string;
+  name: string;
+  email: string;
+  mobile: string;
+  role: string;
+  organization: string;
+  isBlock: boolean;
+  jobRole: string; 
+  projectCode: string;
+  createdAt: string;
+  updatedAt: string;
+};
 
 const EmployeeManagement = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
+  const [employees, setEmployees] = useState<Employee[]>([]);
 
-  const initialUsers = [
-    { id: 1, name: 'Jasim Ahmed', dateJoined: '12/12/2024', status: 'active', blocked: false },
-    { id: 2, name: 'Sarah Wilson', dateJoined: '15/12/2024', status: 'active', blocked: false },
-    { id: 3, name: 'Mike Johnson', dateJoined: '18/12/2024', status: 'inactive', blocked: true },
-    { id: 4, name: 'Emma Davis', dateJoined: '20/12/2024', status: 'active', blocked: false },
-  ];
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const res = await getAllEmployeesApi();
+        const employeesData = res.employees.map((employee: Employee) => ({
+          ...employee,
+          dateJoined: new Date(employee.createdAt).toLocaleDateString('en-GB'),
+        }));
+        setEmployees(employeesData);
+      } catch (error) {
+        console.error('Error fetching employees:', error);
+      }
+    };
+    fetchEmployees();
+  }, []);
 
-  const [users, setUsers] = useState(initialUsers);
+  const handleBlock = async (employeeId: string, email: string) => {
+    try {
 
-  const handleBlock = (userId:number) => {
-    setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.id === userId ? { ...user, blocked: !user.blocked } : user
-      )
-    );
-    setShowAlert(true);
-    setTimeout(() => setShowAlert(false), 3000);
+      setEmployees((prevEmployees) =>
+        prevEmployees.map((employee) =>
+          employee._id === employeeId ? { ...employee, isBlock: !employee.isBlock } : employee
+        )
+      );
+
+
+      const res = await employeeManageApi(email);
+      
+      if (res && res.status === 200) {
+        console.log('Employee status updated:', res.data);
+      } else {
+        console.error('Error updating employee status on backend.');
+      }
+
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
+    } catch (error) {
+      console.error('Error updating employee status:', error);
+
+      setEmployees((prevEmployees) =>
+        prevEmployees.map((employee) =>
+          employee._id === employeeId ? { ...employee, isBlock: !employee.isBlock } : employee
+        )
+      );
+
+      setShowAlert(true);
+    }
   };
 
-  // Filter and search logic
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === 'all' || user.status.toLowerCase() === filterStatus.toLowerCase();
+  const filteredEmployees = employees.filter((employee) => {
+    const matchesSearch = employee.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesFilter =
+      filterStatus === 'all' ||
+      employee.status.toLowerCase() === filterStatus.toLowerCase();
     return matchesSearch && matchesFilter;
   });
 
@@ -101,53 +152,62 @@ const EmployeeManagement = () => {
           <div className="overflow-x-auto">
             <div className="min-w-full">
               {/* Header */}
-              <div className="hidden md:grid grid-cols-4 gap-8 px-6 py-4 bg-gray-50 rounded-t-lg font-semibold text-gray-600">
+              <div className="hidden md:grid grid-cols-6 gap-8 px-6 py-4 bg-gray-50 rounded-t-lg font-semibold text-gray-600">
                 <div>Name</div>
+                <div>Email</div>
+                <div>Organization</div>
+                <div>Job Role</div>
                 <div>Date Joined</div>
-                <div>Status</div>
                 <div>Actions</div>
               </div>
 
               {/* Mobile and Desktop Rows */}
-              {filteredUsers.length === 0 ? (
+              {filteredEmployees.length === 0 ? (
                 <div className="p-12 text-center text-gray-500">
-                  No users match your search criteria
+                  No employees match your search criteria
                 </div>
               ) : (
-                filteredUsers.map((user) => (
+                filteredEmployees.map((employee) => (
                   <div
-                    key={user.id}
-                    className="flex flex-col md:grid md:grid-cols-4 gap-4 md:gap-8 px-6 py-6 border-b hover:bg-gray-50 transition-colors"
+                    key={employee._id}
+                    className="flex flex-col md:grid md:grid-cols-6 gap-4 md:gap-8 px-6 py-6 border-b hover:bg-gray-50 transition-colors"
                   >
-                    <div className="font-medium text-gray-500 md:hidden">Name:</div>
-                    <div>{user.name}</div>
-
-                    <div className="font-medium text-gray-500 md:hidden">Date Joined:</div>
-                    <div>{user.dateJoined}</div>
-
-                    <div className="font-medium text-gray-500 md:hidden">Status:</div>
-                    <div>
-                      <span
-                        className={`px-3 py-1 rounded-full text-sm ${
-                          user.status === 'active'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}
-                      >
-                        {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
-                      </span>
+                    <div className="font-medium text-gray-500 md:hidden">
+                      Name:
                     </div>
+                    <div>{employee.name}</div>
+                    <div className="font-medium text-gray-500 md:hidden">
+                      Email:
+                    </div>
+                    <div>{employee.email}</div>
+
+                    <div className="font-medium text-gray-500 md:hidden">
+                      Organization:
+                    </div>
+                    <div>{employee.organization}</div>
+
+                    <div className="font-medium text-gray-500 md:hidden">
+                      Job Role:
+                    </div>
+                    <div>{employee.jobRole}</div>
+
+                    <div className="font-medium text-gray-500 md:hidden">
+                      Date Joined:
+                    </div>
+                    <div>{employee.dateJoined}</div>
 
                     <div className="flex items-center gap-4 justify-end md:justify-start">
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => handleBlock(user.id)}
+                        onClick={() => handleBlock(employee._id, employee.email)}
                         className={`${
-                          user.blocked ? 'bg-green-600' : 'bg-red-600'
-                        } hover:${user.blocked ? 'bg-green-700' : 'bg-red-700'}`}
+                          employee.isBlock ? 'bg-green-600' : 'bg-red-600'
+                        } hover:${
+                          employee.isBlock ? 'bg-green-700' : 'bg-red-700'
+                        }`}
                       >
-                        {user.blocked ? 'Unblock' : 'Block'}
+                        {employee.isBlock ? 'Unblock' : 'Block'}
                       </Button>
                       <Button variant="ghost" size="icon" className="h-10 w-10">
                         <MoreVertical size={18} />
