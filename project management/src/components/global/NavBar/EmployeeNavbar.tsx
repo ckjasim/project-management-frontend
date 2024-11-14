@@ -26,7 +26,7 @@ const TodoSchema = Yup.object().shape({
   dueDate: Yup.date().required('Due date is required'),
 });
 
-export function SideNavbar() {
+export function EmployeeNavbar() {
   const [open, setOpen] = useState(false);
   const navigate=useNavigate()
 
@@ -50,23 +50,24 @@ export function SideNavbar() {
         <IconBrandTabler className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
+    
     {
       label: 'Chat',
-      href: '#',
+      href: '/employee/chat',
       icon: (
         <IconMessageChatbot className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
     {
       label: 'Meeting',
-      href: '#',
+      href: '/employee/meeting',
       icon: (
         <IconCalendarUser className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
     {
       label: 'Files',
-      href: '#',
+      href: '/employee/files',
       icon: (
         <IconFolders className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
@@ -74,7 +75,7 @@ export function SideNavbar() {
     {
       label: 'Logout',
       onClick: logout, 
-      href: '#',
+      href: '/auth/employeeLogin',
       icon: (
         <IconArrowLeft className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),

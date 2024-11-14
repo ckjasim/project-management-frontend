@@ -56,10 +56,10 @@ const Item = ({
   };
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0'); // Get day and pad with zero if needed
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Get month (0-11) and pad with zero
-    const year = date.getFullYear(); // Get full year
-    return `${day} ${month} ${year}`; // Return formatted string
+    const day = String(date.getDate()).padStart(2, '0'); 
+    const month = String(date.getMonth() + 1).padStart(2, '0'); 
+    const year = date.getFullYear(); 
+    return `${day} ${month} ${year}`; 
   };
 
   const handleEditSubmit = async (values: Omit<ItemsType, 'id' | 'status' | 'priority'>) => {

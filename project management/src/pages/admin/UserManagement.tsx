@@ -84,7 +84,7 @@ const UserManagement = () => {
   });
 
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto">
+    <div className="p-6 md:p-8 max-w-7xl mx-auto h-screen">
       {showAlert && (
         <Alert className="mb-6 bg-red-50 border-red-200">
           <AlertDescription className="text-red-800">

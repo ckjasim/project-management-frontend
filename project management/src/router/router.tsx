@@ -119,6 +119,10 @@ const router = createBrowserRouter([
             path: "projects",
             element: <ProjectDashboard/>,
           },
+          {
+            path: "chat",
+            element: <MessagesPage/>,
+          },
           
           
         ],

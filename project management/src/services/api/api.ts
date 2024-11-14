@@ -1,4 +1,4 @@
-import { taskApi, authApi } from "../interceptors/api"; 
+import { taskApi, authApi, projectApi } from "../interceptors/api"; 
 
 export const getTasksApi = async () => {
   try {
@@ -91,6 +91,76 @@ export const employeeManageApi = async (email:string) => {
     const response = await authApi.post('/employeeManage',{email});
     const status = response.data;
     return status;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+}
+export const getEmployeesByOrganizationApi = async () => {
+  try {
+    const response = await authApi.get('/employeesByOrg');
+    const employees = response.data;
+    return employees;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+}
+export const getTeamsApi = async () => {
+  try {
+    const response = await projectApi.get('/project/teamList');
+    const teams = response.data;
+    return teams;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+}
+export const createTeamApi = async (data: any) => {
+  try {
+    const response = await projectApi.post('/project/createTeam',{data});
+    const teams = response.data;
+    return teams;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+}
+export const createProjectApi = async (data: any) => {
+  try {
+    const response = await projectApi.post('/project',{data});
+    const teams = response.data;
+    return teams;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+}
+export const getAllProjectApi = async () => {
+  try {
+    const response = await projectApi.get('/project');
+    const teams = response.data;
+    return teams;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+}
+export const editProjectApi = async (id:string | undefined,data: any) => {
+  try {
+    const response = await projectApi.patch('/project',{id,data});
+    const teams = response.data;
+    return teams;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+}
+export const deleteProjectApi = async (id: string) => {
+  try {
+    const response = await projectApi.patch('/project/delete',{id});
+    const teams = response.data;
+    return teams;
   } catch (error) {
     console.error("Error logging out:", error);
     throw error;
