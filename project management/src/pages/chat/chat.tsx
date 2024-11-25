@@ -132,16 +132,16 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import Sidebar from '@/components/chat/sideBar';
+import UserSideBar from '@/components/chat/UserSideBar';
 import ChatArea from '@/components/chat/chatArea';
 import DetailsSidebar from '@/components/chat/detailesSideBar';
 
 const MessagesPage = () => {
-  const teams = [
-    { name: 'Testing team', lastMessage: 'Typing...', time: '4:30 PM', isTyping: true },
-    { name: 'Design Team', lastMessage: 'Hello! Everyone', time: '9:36 AM' },
-    { name: 'Development team', lastMessage: 'Wow really Cool 🔥', time: '1:15 AM' },
-  ];
+  // const teams = [
+  //   { name: 'Testing team', lastMessage: 'Typing...', time: '4:30 PM', isTyping: true },
+  //   { name: 'Design Team', lastMessage: 'Hello! Everyone', time: '9:36 AM' },
+  //   { name: 'Development team', lastMessage: 'Wow really Cool 🔥', time: '1:15 AM' },
+  // ];
  
   const attachments = [
     { name: 'Very important file.fig', type: 'figma', size: '7.5 MB', timestamp: '3.22.22, 11:15 AM' },
@@ -152,8 +152,8 @@ const MessagesPage = () => {
   const members = ['Novita', 'Millie Nose', 'Ikhsan SD', 'Aditya'];
   return (
     <div className="flex h-screen">
-      <Sidebar teams={teams} />
-      <ChatArea  />
+      <UserSideBar/>
+      <ChatArea />
       <DetailsSidebar attachments={attachments} members={members} />
     </div>
   );

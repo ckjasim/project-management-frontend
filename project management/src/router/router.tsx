@@ -30,7 +30,7 @@ const router = createBrowserRouter([
         path: "auth",  
         children: [
           {
-            path: "userlogin",
+            path: "userLogin",
             element: <UserLoginHero />,
           },
           {
@@ -38,7 +38,7 @@ const router = createBrowserRouter([
             element: <UserSignUpHero />,
           },
           {
-            path: "employeesignup",
+            path: "employeeSignup",
             element: <EmployeeSignUpHero />,
           },
           {

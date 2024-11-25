@@ -1,5 +1,16 @@
 import { taskApi, authApi, projectApi } from "../interceptors/api"; 
 
+export const logoutApi = async () => {
+  try {
+    const response = await authApi.post('/auth/logout');
+    const tasks = response.data;
+    return tasks;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+};
+
 export const getTasksApi = async () => {
   try {
     const response = await taskApi.get('/task/getTask');
@@ -166,13 +177,25 @@ export const deleteProjectApi = async (id: string) => {
     throw error;
   }
 }
-export const logoutApi = async () => {
+export const getProjectByProjectCodeApi = async () => {
   try {
-    const response = await authApi.post('/auth/logout');
-    const tasks = response.data;
-    return tasks;
+    const response = await projectApi.get('/project/singleProject');
+    const teams = response.data;
+    return teams;
   } catch (error) {
     console.error("Error logging out:", error);
     throw error;
   }
-};
+}
+export const getTeamMembersByProjectCodeApi = async () => {
+  try {
+    const response = await projectApi.get('/project/teamMembers');
+    const teams = response.data;
+    return teams;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+}
+
+

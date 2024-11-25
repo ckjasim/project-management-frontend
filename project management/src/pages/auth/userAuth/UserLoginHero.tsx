@@ -9,10 +9,17 @@ import * as Yup from "yup";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/hooks/use-toast";
 import { IconBrandGoogle, IconBrandGithub } from '@tabler/icons-react';
+import { useDispatch,useSelector } from 'react-redux';
+import { SetUser } from '@/redux/features/auth/authSlice';
+import { RootState } from '@/redux/store';
+
 
 export function UserLoginHero() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const dispatch=useDispatch()
+  // const {userInfo} = useSelector((state: RootState) => state.Auth);
+
 
   const validationSchema = Yup.object({
     email: Yup.string()
@@ -38,11 +45,20 @@ export function UserLoginHero() {
           withCredentials:true
         }
       );
+      console.log(response,'kkkkkkkk122121212121')
+      const {role,email,_id,isBlock,name}  = response?.data?.data?.user
+      const payload = {role,email,_id,isBlock,name}
+      console.log(payload,'pppppppppppppppppp')
+      
       toast({
         title: "Login Successful",
-        description: response?.data?.message || "Successfully logged in!",
+        description:"Successfully logged in!",
         variant: 'success',
       });
+      
+      dispatch(SetUser(payload))
+      
+      
       navigate('/user/dashboard');
     } catch (error: any) {
       toast({

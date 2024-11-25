@@ -10,6 +10,8 @@ import * as Yup from "yup";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/hooks/use-toast";
 import sss from "@/assets/menu-3.jpg"
+import { useDispatch } from 'react-redux';
+import { SetUser } from '@/redux/features/auth/authSlice';
 interface FormValues {
   email: string;
   password: string;
@@ -19,6 +21,7 @@ interface FormValues {
 const EmployeeLoginHero: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const dispatch= useDispatch()
 
   const validationSchema = Yup.object({
     email: Yup.string()
@@ -47,6 +50,12 @@ const EmployeeLoginHero: React.FC = () => {
         description: response.data.message || "Successfully logged in!",
         variant: 'success',
       });
+      console.log(response,'kkkkkkkk122121212121')
+      const {role,email,_id,isBlock,name}  = response?.data?.data?.user
+      const payload = {role,email,_id,isBlock,name}
+      console.log(payload,'pppppppppppppppppp')
+      dispatch(SetUser(payload))
+
       navigate('/employee/task');
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;

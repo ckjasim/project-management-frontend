@@ -22,6 +22,8 @@ import { BackgroundBeams } from "@/components/ui/background-beams";
 import axios from 'axios';
 import { Toaster } from '@/components/ui/toaster';
 import { useNavigate } from 'react-router-dom';
+import { SetUser } from '@/redux/features/auth/authSlice';
+import { useDispatch } from 'react-redux';
 
 const FormSchema = z.object({
   pin: z.string().min(6, {
@@ -32,6 +34,7 @@ const FormSchema = z.object({
 export function EmployeeOtpForm() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -107,11 +110,17 @@ export function EmployeeOtpForm() {
         { otp: data.pin },
         { withCredentials: true }
       );
+      console.log(res)
+      const {role,email,_id,isBlock,name}  = res?.data?.newUser
+      const payload = {role,email,_id,isBlock,name}
+      console.log(payload,'pppppppppppppppppp')
       toast({
         title: 'Verification Successful',
         description: 'Redirecting to dashboard...',
         variant: 'default'
       });
+      dispatch(SetUser(payload))
+
       navigate('/employee/task');
     } catch (error: any) {
       toast({
