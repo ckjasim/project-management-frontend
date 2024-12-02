@@ -5,7 +5,6 @@ import { UserSignUpHero } from "@/pages/auth/userAuth/UserSignUpHero";
 import { EmployeeSignUpHero } from "@/pages/auth/employeeAuth/EmployeeSignUpHero";
 import  EmployeeLoginHero  from "@/pages/auth/employeeAuth/EmployeeLoginHero";
 import { AdminLoginHero } from "@/pages/auth/adminAuth/AdminLoginHero";
-import TaskLayout from "@/pages/Employee/EmployeeLayout";
 import EmployeeLayout from "@/pages/Employee/EmployeeLayout";
 
 
@@ -21,6 +20,9 @@ import { UserLayout } from "@/pages/user/UserLayout";
 import UserDashboard from "@/pages/user/UserDashboard";
 import ProjectDashboard from "@/pages/user/projectManagement";
 import MessagesPage from "@/pages/chat/chat";
+import EmployeesPage from "@/pages/user/employeesList";;
+import TeamDashboard from "@/pages/user/teamManagement";
+import TaskDashboard from "@/pages/user/TaskDashboard";
 
 const router = createBrowserRouter([
   {
@@ -120,8 +122,20 @@ const router = createBrowserRouter([
             element: <ProjectDashboard/>,
           },
           {
+            path: "taskManagement/:projectId",
+            element: <TaskDashboard/>,
+          },
+          {
+            path: "teams",
+            element: <TeamDashboard/>,
+          },
+          {
             path: "chat",
             element: <MessagesPage/>,
+          },
+          {
+            path: "employees",
+            element: <EmployeesPage/>,
           },
           
           

@@ -5,8 +5,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { SetChat } from '@/redux/features/chat/chatSlice';
-import { getAllProjectApi, getEmployeesByOrganizationApi, getProjectByProjectCodeApi } from '@/services/api/api';
+import { 
+  getAllProjectApi, 
+  getEmployeesByOrganizationApi, 
+  getProjectByProjectCodeApi 
+} from '@/services/api/api';
 import { RootState } from '@/redux/store';
+import SocketService from '@/services/SocketService';
 
 interface ITeam {
   groupName: string;
@@ -22,42 +27,38 @@ const UserSideBar: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [groups, setGroups] = useState<ITeam[]>([]);
   const [personal, setPersonal] = useState<IPersonal[]>([]);
-  const { userInfo } = useSelector((state: RootState) => state.Auth);
   const dispatch = useDispatch();
-
+  const socketService = SocketService.getInstance();
+  
+  const { userInfo } = useSelector((state: RootState) => state.Auth);
   useEffect(() => {
     const fetchTeams = async () => {
       try {
         const empResponse = await getEmployeesByOrganizationApi();
-        const personals = empResponse?.employees.map((val: { name: string; _id: string }) => ({
-          name: val.name,
-          _id: val._id,
-        })) || [];
+        const personals = empResponse?.employees
+          ?.filter((val: { _id: string | undefined; }) => val._id !== userInfo?._id)
+          .map((val: { name: any; _id: any; }) => ({ name: val.name, _id: val._id })) || [];
         setPersonal(personals);
-
+  
         if (userInfo?.role === 'project manager') {
           const projResponse = await getAllProjectApi();
-          const groups = projResponse?.projects.map((val: { title: string; _id: string }) => ({
-            groupName: val.title,
-            _id: val._id,
-          })) || [];
-          setGroups(groups);
+          setGroups(projResponse?.projects.map((proj: { title: any; _id: any; }) => ({ groupName: proj.title, _id: proj._id })) || []);
         } else if (userInfo?.role === 'employee') {
           const projResponse = await getProjectByProjectCodeApi();
-          const groups = projResponse?.project.map((val: { title: string; _id: string }) => ({
-            groupName: val.title,
-            _id: val._id,
-          })) || [];
-          setGroups(groups);
+          setGroups(projResponse?.project.map((proj: { title: any; _id: any; }) => ({ groupName: proj.title, _id: proj._id })) || []);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-
+  
     if (userInfo?._id) {
       fetchTeams();
     }
+  
+    return () => {
+      // Cleanup logic if necessary
+    };
   }, [userInfo]);
 
   const filteredGroups = groups.filter((group) =>
@@ -70,6 +71,14 @@ const UserSideBar: React.FC = () => {
 
   const handleItemClick = (id: string, chatMode: 'group' | 'private', name: string) => {
     dispatch(SetChat({ currentRoom: id, chatMode, name }));
+    
+    // Register user for private chat or join group chat
+    if (chatMode === 'private') {
+      console.log('333333333333333')
+      socketService.connect(id);
+    } else if (chatMode === 'group') {
+      socketService.joinRoom(id);
+    }
   };
 
   return (

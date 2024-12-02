@@ -111,7 +111,7 @@ const Container = ({ id, title, children, className }: ContainerProps) => {
       className={`
         transition-all
         duration-200
-        h-screen
+        
         ${className}
         ${isDragging ? 'opacity-50 scale-105' : ''}
       `}

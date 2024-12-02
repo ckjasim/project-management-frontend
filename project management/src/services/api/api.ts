@@ -11,6 +11,27 @@ export const logoutApi = async () => {
   }
 };
 
+export const addEmployeeInvitationApi = async (data:any) => {
+  try {
+    const response = await authApi.post('/employeeInvitation',data);
+    const tasks = response.data;
+    return tasks;
+  } catch (error) {
+    console.error("Error invitation out:", error);
+    throw error;
+  }
+};
+export const verifyInvitationApi = async (token:string) => {
+  try {
+    const response = await authApi.post('/verifyInvitation',token);
+    const tasks = response.data;
+    return tasks;
+  } catch (error) {
+    console.error("Error invitation out:", error);
+    throw error;
+  }
+};
+
 export const getTasksApi = async () => {
   try {
     const response = await taskApi.get('/task/getTask');

@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import socket from '@/services/socket/socket';
+import socket from '@/services/SocketService';
 
 // Define message types
 interface Message {

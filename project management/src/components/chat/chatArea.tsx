@@ -165,194 +165,133 @@
 // export default ChatArea;
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { FiSend, FiMessageCircle } from 'react-icons/fi';
+import { FiSend } from 'react-icons/fi';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '../hooks/use-toast';
-import SocketService, { Message } from '@/services/socket/socket';
+import SocketService, { Message } from '@/services/SocketService';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-
-
+import ChatService from '@/services/ChatService';
 
 const ChatArea: React.FC = () => {
   const { toast } = useToast();
-  
-
   const messageEndRef = useRef<HTMLDivElement>(null);
-  
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
-  const [isConnected, setIsConnected] = useState(false);
-  const [socketService] = useState(SocketService.getInstance());
-
-  const { currentRoom,chatMode,name } = useSelector((state: RootState) => state.chat);
   const { userInfo } = useSelector((state: RootState) => state.Auth);
+  const { currentRoom, chatMode,name } = useSelector((state: RootState) => state.chat);
 
- 
-
+  const socketService = SocketService.getInstance();
 
   useEffect(() => {
+    // Connect to socket when component mounts
+    if (userInfo?._id) {
+      socketService.connect(userInfo._id);
+    }
 
-    socketService.connect();
+    // Join the current room
+    if (currentRoom) {
+      socketService.joinRoom(currentRoom);
+    }
 
-    socketService.registerUser(currentRoom);
+    // Listen for incoming messages
+    socketService.onMessage((message) => {
+      // Only add message if it's for the current room/chat
+      if (
+        (chatMode === 'group' && message.roomId === currentRoom) ||
+        (chatMode === 'private' && 
+         (message.senderId === currentRoom || message.recipientId === currentRoom))
+      ) {
+        setMessages(prev => [...prev, message]);
+        
+        // Optionally save to database
+        ChatService.saveMessage(message);
+      }
+    });
 
-    // Return cleanup function
+    // Fetch previous messages when room changes
+    const fetchPreviousMessages = async () => {
+      try {
+        const prevMessages = await ChatService.getMessages(currentRoom, chatMode);
+        setMessages(prevMessages);
+      } catch (error) {
+        console.error('Failed to fetch previous messages');
+      }
+    };
+
+    if (currentRoom) {
+      fetchPreviousMessages();
+    }
+
     return () => {
-      socketService.disconnect();
+      // Cleanup socket listeners and leave room
+      if (currentRoom) {
+        socketService.leaveRoom(currentRoom);
+      }
     };
-  }, []);
+  }, [currentRoom, chatMode, userInfo]);
 
+  // Auto-scroll to latest message
   useEffect(() => {
-    if (!currentRoom) return;
-  
-  
-    socketService.joinRoom( currentRoom);
-  
-    return () => {
-      
-      socketService.socket.emit('leave room', currentRoom);
-    };
-  }, [currentRoom, socketService]);
-
-  const setupSocketListeners = useCallback(() => {
-    const handleGroupMessage = (data: { room: string; message: Message }) => {
-      console.log(data, 'shaakkkk');
-      setMessages(prev => [...prev, { ...data, type: 'group' }]);
-    };
-  
-    const handlePrivateMessage = (message: Message) => {
-      setMessages(prev => [...prev, { ...message, type: 'private' }]);
-    };
-  
-    const handleOnlineUsers = (users: string[]) => {
-      const uniqueUsers = Array.from(new Set(users)).filter(user => user !== currentRoom);
-      setOnlineUsers(uniqueUsers);
-    };
-  
-    const handleConnect = () => {
-      setIsConnected(true);
-      toast({
-        title: "Connected",
-        description: "Successfully connected to the chat server",
-        variant: "default",
-      });
-    };
-  
-    const handleDisconnect = () => {
-      setIsConnected(false);
-      toast({
-        title: "Disconnected",
-        description: "Lost connection to the chat server",
-        variant: "destructive",
-      });
-    };
-  
-    const handleError = (error: any) => {
-      toast({
-        title: "Connection Error",
-        description: error.message || "An unexpected error occurred",
-        variant: "destructive",
-      });
-    };
-  
-    // Attach listeners
-    socketService.socket.on('connect', handleConnect);
-    socketService.socket.on('disconnect', handleDisconnect);
-    socketService.socket.on('group message', handleGroupMessage);
-    socketService.socket.on('private message', handlePrivateMessage);
-    socketService.socket.on('online users', handleOnlineUsers);
-    socketService.socket.on('error', handleError);
-  
-    // Cleanup listeners
-    return () => {
-      socketService.socket.off('connect', handleConnect);
-      socketService.socket.off('disconnect', handleDisconnect);
-      socketService.socket.off('group message', handleGroupMessage);
-      socketService.socket.off('private message', handlePrivateMessage);
-      socketService.socket.off('online users', handleOnlineUsers);
-      socketService.socket.off('error', handleError);
-    };
-  }, [currentRoom, socketService, toast]);
-  
-
- 
-  
-  
-
-  useEffect(() => {
-    const cleanup = setupSocketListeners();
-    return () => cleanup();
-  }, [setupSocketListeners]);
-
-  useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !currentRoom) return;
 
-  const handleSendMessage = () => {
-    if (newMessage.trim() === '' || (chatMode === 'private' && !currentRoom)) return;
-  
     const messagePayload: Message = {
-      id: `msg_${messages.length + 1}`,
-      sender: userInfo?._id,
+      id: Date.now().toString(),
+      senderId: userInfo?._id || '',
+      senderName: userInfo?.name || 'Anonymous',
       content: newMessage,
-      timestamp: new Date().toLocaleTimeString(),
+      timestamp: new Date(),
       type: chatMode,
-      room: chatMode === 'group' ? currentRoom : undefined,
-      recipient: chatMode === 'private' ? currentRoom : undefined,
+      roomId: chatMode === 'group' ? currentRoom : undefined,
+      recipientId: chatMode === 'private' ? currentRoom : undefined,
     };
-  
-    console.log('Sending message:', messagePayload);
-  
+
     try {
-      if (chatMode === 'group') {
-        socketService.sendGroupMessage(currentRoom, messagePayload);
-      } else if (chatMode === 'private' && currentRoom) {
-        socketService.sendPrivateMessage(currentRoom, messagePayload);
-      }
-  
-      // setMessages(prev => [...prev, { ...messagePayload }]);
+      // Send via socket
+      socketService.sendMessage(messagePayload);
+      
+      // Clear input
       setNewMessage('');
     } catch (error) {
-      toast({
-        title: "Message Send Error",
-        description: "Failed to send message. Please check your connection.",
-        variant: "destructive",
-      });
+      console.error('Failed to send message', error);
+      // Optionally show error toast
     }
   };
-  
 
+
+  // Render chat messages
   const renderMessages = () => {
     const filteredMessages = messages.filter(
       msg =>
-        (msg.type === 'group' && chatMode === 'group' && msg.room === currentRoom) ||
+        (msg.type === 'group' && chatMode === 'group' && msg.roomId === currentRoom) ||
         (msg.type === 'private' &&
           chatMode === 'private' &&
-          (msg.sender === userInfo?._id || msg.recipient === currentRoom))
+          (msg.senderId === userInfo?._id || msg.recipientId === currentRoom))
     );
 
     return filteredMessages.map(msg => (
-      <div   
-        key={msg.id} 
-        className={`flex items-start mb-4 ${msg.sender === userInfo?._id ? 'justify-end' : 'justify-start'}`}
+      <div
+        key={msg.id}
+        className={`flex items-start mb-4 ${msg.senderId === userInfo?._id ? 'justify-end' : 'justify-start'}`}
       >
         <div
           className={`p-4 rounded-2xl max-w-[70%] ${
-            msg.sender === userInfo?._id
-              ? 'bg-emerald-300 rounded-br-none' 
+            msg.senderId === userInfo?._id
+              ? 'bg-emerald-300 rounded-br-none'
               : 'bg-gray-100 rounded-bl-none'
           }`}
         >
-          <p className="text-sm font-medium mb-1">{msg.sender}</p>
+          <p className="text-sm font-medium mb-1">{msg.senderName}</p>
           <p className="text-sm">{msg.content}</p>
           <span className="text-xs text-gray-500">{msg.timestamp}</span>
         </div>
@@ -364,74 +303,49 @@ const ChatArea: React.FC = () => {
     <div className="flex h-screen w-full max-w-4xl mx-auto bg-gray-100">
       <div className="flex-1 p-8">
         <Card className="h-full flex flex-col rounded-3xl shadow-lg">
-          {/* Header */}
           <CardHeader className="bg-emerald-600 text-white p-6 rounded-t-3xl">
             <div className="flex items-center justify-between">
-              {/* User Info & Connection Status */}
               <div className="flex items-center">
                 <Avatar className="mr-4">
                   <AvatarImage src="/avatar.png" />
                   <AvatarFallback>{currentRoom?.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <CardTitle className="text-white">
-                    {name}
-                  </CardTitle>
+                  <CardTitle>{name}</CardTitle>
                   <div className="flex items-center space-x-2">
                     <p className="text-sm text-gray-300">
-                      {chatMode === 'group' 
-                        ? `${onlineUsers.length} online` 
-                        : 'Private Chat'
-                      }
+                      {chatMode === 'group' ? ` online` : 'Private Chat'}
                     </p>
-                    <div 
-                      className={`w-3 h-3 rounded-full ${
-                        isConnected ? 'bg-green-500' : 'bg-red-500'
-                      }`}
-                    />
+                    {/* <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} /> */}
                   </div>
                 </div>
               </div>
-
-              {/* Chat Mode & Room/Recipient Selector */}
-          
             </div>
           </CardHeader>
 
-          {/* Message Display Area */}
           <CardContent className="flex-1 overflow-y-auto p-6 space-y-2">
             {renderMessages()}
             <div ref={messageEndRef} />
           </CardContent>
 
-          {/* Message Input */}
           <CardFooter className="bg-gray-100 p-4 rounded-b-3xl">
             <div className="flex items-center border rounded-full px-4 py-2 w-full">
               <Input
                 type="text"
-                placeholder={
-                  chatMode === 'group' 
-                    ? `Message...` 
-                    : `Message ${name || 'Select a recipient'}`
-                }
+                placeholder={`Message${chatMode === 'group' ? '' : ` ${name || 'Select a recipient'}`}`}
                 className="flex-1 focus:outline-none"
                 value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                onChange={e => setNewMessage(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
                 disabled={chatMode === 'private' && !currentRoom}
               />
-              <div className="ml-4">
-                <Button 
-                  onClick={handleSendMessage} 
-                  className="rounded-full"
-                  disabled={
-                    newMessage.trim() === '' || 
-                    (chatMode === 'private' && !currentRoom)
-                  }
-                >
-                  <FiSend className="text-xl text-blue-500" />
-                </Button>
-              </div>
+              <Button
+                onClick={handleSendMessage}
+                className="rounded-full ml-4"
+                disabled={newMessage.trim() === '' || (chatMode === 'private' && !currentRoom)}
+              >
+                <FiSend className="text-xl text-blue-500" />
+              </Button>
             </div>
           </CardFooter>
         </Card>

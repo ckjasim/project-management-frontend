@@ -61,7 +61,13 @@ export function EmployeeSignUpHero() {
         { withCredentials: true }
       );
       console.log('Sign up successful:', response.data.message);
-      navigate('/auth/employeeOtp');
+      toast({
+        title: 'Registration successfull',
+        description:
+          response?.data?.message || 'An error occurred during login.',
+        variant: 'success',
+      });
+      navigate('/employee/task');
     } catch (error: any) {
       console.error('Sign up error:', error.response.data.message);
       toast({

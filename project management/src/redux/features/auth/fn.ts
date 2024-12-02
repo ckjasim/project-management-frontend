@@ -1,7 +1,7 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { TUser } from "./type";
 
-export const setUser = (state :{userInfo:TUser |undefined},{payload}:PayloadAction<TUser>)=>{
+export const setUser = (state :{userInfo:TUser},{payload}:PayloadAction<TUser>)=>{
   state.userInfo={...payload}
   localStorage.setItem("user",JSON.stringify(payload))
 }

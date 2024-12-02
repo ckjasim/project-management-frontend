@@ -7,6 +7,8 @@ import {
   IconMessageChatbot,
   IconFolders,
   IconDeviceProjector,
+  IconUsersGroup,
+  IconUsers,
 } from '@tabler/icons-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -59,6 +61,13 @@ export function UserNavbar() {
       ),
     },
     {
+      label: 'Teams',
+      href: '/user/teams',
+      icon: (
+        <IconUsers className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+      ),
+    },
+    {
       label: 'Chat',
       href: '/user/chat',
       icon: (
@@ -77,6 +86,13 @@ export function UserNavbar() {
       href: '/user/files',
       icon: (
         <IconFolders className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+      ),
+    },
+    {
+      label: 'Employees',
+      href: '/user/employees',
+      icon: (
+        <IconUsersGroup className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
     {
