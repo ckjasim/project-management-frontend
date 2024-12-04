@@ -7,7 +7,6 @@ const user=window.localStorage.getItem("user") || ""
 
 const initialState:{userInfo:TUser | undefined}={
     userInfo:user?JSON.parse(user):undefined,
-
 }
 
 const authSlice =createSlice({

@@ -3,18 +3,31 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Modal from '@/components/global/Modal/Modal';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { 
-  IconPlus, 
-  IconClipboardList, 
-  IconProgress, 
-  IconCheck, 
-  IconEye 
+import {
+  IconPlus,
+  IconClipboardList,
+  IconProgress,
+  IconCheck,
+  IconEye,
 } from '@tabler/icons-react';
-import { postTasksApi, getTasksApi } from '@/services/api/api';
+import {
+  postTasksApi,
+  getTasksApi,
+  getTeamsApi,
+  getTeamsByProject,
+  getTeamMembersByTeamIdApi,
+} from '@/services/api/api';
 import Container from '@/components/global/Container/Container';
 import Items from '@/components/global/Items/Item';
 import { ArrowLeftIcon } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 type TaskType = {
   id: string;
@@ -30,6 +43,13 @@ type ContainerType = {
   items: TaskType[];
 };
 
+interface ITeam {
+  id: string;
+  name: string;
+}
+
+const teamMember = [{ id: '123', name: 'jasim' }];
+
 const CONTAINER_IDS = {
   PENDING: 'pending',
   PROGRESSING: 'progressing',
@@ -38,6 +58,8 @@ const CONTAINER_IDS = {
 };
 
 const TaskDashboard = () => {
+  const { projectId: projectId } = useParams();
+
   const [containers, setContainers] = useState<ContainerType[]>([
     { id: CONTAINER_IDS.PENDING, title: 'Pending', items: [] },
     { id: CONTAINER_IDS.PROGRESSING, title: 'Progressing', items: [] },
@@ -45,19 +67,33 @@ const TaskDashboard = () => {
     { id: CONTAINER_IDS.REVIEW, title: 'Review', items: [] },
   ]);
 
-  const teams = ["Developers", "Designers", "Sales"];
-  // useEffect(()=>{
+  const [teams, setTeams] = useState<ITeam[]>([]);
+  useEffect(() => {
+    const fetchTeams = async () => {
+      const res = await getTeamsByProject(projectId);
+      console.log(res);
+      const teams = res?.teams?.map((team: any) => ({
+        id: team?._id,
+        name: team?.name,
+      }));
 
-  // })
-  // const[teams,setTeams()]
-  const [selectedTeam, setSelectedTeam] = useState(teams[0]);
+      setTeams(teams);
+      setSelectedTeam({name:teams[0]?.name,id:teams[0].id});
+    };
+
+    fetchTeams();
+  }, []);
+
+  const [selectedTeam, setSelectedTeam] = useState<ITeam>();
   const [currentContainerId, setCurrentContainerId] = useState<string>(
     CONTAINER_IDS.PENDING
   );
   const [itemName, setItemName] = useState('');
   const [itemSummary, setItemSummary] = useState('');
   const [itemDescription, setItemDescription] = useState('');
+  const [assignedEmployee, setAssignedEmployee] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [priority, setPriority] = useState('');
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -168,50 +204,63 @@ const TaskDashboard = () => {
   const navigate = useNavigate();
 
   const handleBack = () => {
-    navigate(-1); 
+    navigate(-1);
   };
 
+  const priorityLevels = [
+    { value: 'low', label: 'Low Priority', color: 'text-green-600' },
+    { value: 'medium', label: 'Medium Priority', color: 'text-yellow-600' },
+    { value: 'high', label: 'High Priority', color: 'text-red-600' },
+  ];
+
+  const addTask = async() => {
+    setShowAddItemModal(true);
+    setCurrentContainerId(CONTAINER_IDS.PENDING);
+    if(selectedTeam){
+      const teamMembers=await getTeamMembersByTeamIdApi(selectedTeam.id)
+      console.log(teamMembers)
+    }
+  };
   return (
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen py-10">
       <div className="container mx-auto max-w-7xl px-4">
         {/* Team Selection */}
-      <Button 
-      variant="outline" 
-      onClick={handleBack} 
-      className="flex items-center space-x-2"
-    >
-      <ArrowLeftIcon className="h-4 w-4" />
-      
-    </Button>
+        <Button
+          variant="outline"
+          onClick={handleBack}
+          className="flex items-center space-x-2"
+        >
+          <ArrowLeftIcon className="h-4 w-4" />
+        </Button>
         <div className="flex justify-center mb-8">
           <div className="bg-white shadow-lg rounded-full p-2 flex space-x-2">
             {teams.map((team) => (
               <button
-                key={team}
+                key={team.id}
                 className={`px-4 py-2 rounded-full transition-all duration-300 ${
-                  selectedTeam === team
+                  selectedTeam?.name === team.name
                     ? 'bg-blue-500 text-white'
                     : 'hover:bg-blue-100 text-gray-700'
                 }`}
-                onClick={() => setSelectedTeam(team)}
+                onClick={() => setSelectedTeam({name:team.name,id:team.id})}
               >
-                {team}
+                {team.name}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Team Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="w-full p-6 bg-white rounded-xl shadow-md flex justify-between items-center mb-6"
         >
-          <h2 className="text-2xl font-bold text-gray-800">{selectedTeam} Tasks</h2>
+          <h2 className="text-2xl font-bold text-gray-800">
+            {selectedTeam?.name} Tasks
+          </h2>
           <button
             onClick={() => {
-              setShowAddItemModal(true);
-              setCurrentContainerId(CONTAINER_IDS.PENDING);
+              addTask();
             }}
             className="bg-blue-500 text-white p-3 rounded-full hover:bg-blue-600 transition-colors shadow-lg"
           >
@@ -219,34 +268,30 @@ const TaskDashboard = () => {
           </button>
         </motion.div>
 
-        {/* Modal for Adding Items */}
         <Modal showModal={showAddItemModal} setShowModal={setShowAddItemModal}>
           <div className="flex flex-col w-full items-center p-8 gap-y-6 bg-white rounded-xl">
-            <h1 className="text-3xl font-bold text-gray-800 mb-4">Create Task</h1>
-            
-            {/* Input fields with enhanced styling */}
+            <h1 className="text-3xl font-bold text-gray-800 mb-4">
+              Create Task
+            </h1>
+
             {[
-              { 
-                label: 'Title', 
-                value: itemName, 
+              {
+                label: 'Title',
+                value: itemName,
                 onChange: (e) => setItemName(e.target.value),
-                placeholder: 'Enter task title' 
+                placeholder: 'Enter task title',
               },
-              { 
-                label: 'Summary', 
-                value: itemSummary, 
-                onChange: (e) => setItemSummary(e.target.value),
-                placeholder: 'Brief task summary' 
-              },
-              { 
-                label: 'Description', 
-                value: itemDescription, 
+              {
+                label: 'Description',
+                value: itemDescription,
                 onChange: (e) => setItemDescription(e.target.value),
-                placeholder: 'Detailed task description' 
-              }
+                placeholder: 'Detailed task description',
+              },
             ].map(({ label, value, onChange, placeholder }) => (
               <div key={label} className="w-full">
-                <label className="block text-gray-600 font-medium mb-2">{label}</label>
+                <label className="block text-gray-600 font-medium mb-2">
+                  {label}
+                </label>
                 <Input
                   type="text"
                   placeholder={placeholder}
@@ -256,10 +301,57 @@ const TaskDashboard = () => {
                 />
               </div>
             ))}
-
-            {/* Due Date with enhanced styling */}
             <div className="w-full">
-              <label htmlFor="duedate" className="block text-gray-600 font-medium mb-2">
+              <label className="block text-gray-600 font-medium mb-2">
+                Assign Employee
+              </label>
+              <Select
+                value={assignedEmployee}
+                onValueChange={(value) => setAssignedEmployee(value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Employee" />
+                </SelectTrigger>
+                <SelectContent>
+                  {teamMember.map((employee) => (
+                    <SelectItem key={employee.id} value={employee.id}>
+                      {employee.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="w-full">
+              <label className="block text-gray-600 font-medium mb-2">
+                Priority
+              </label>
+              <Select
+                value={priority}
+                onValueChange={(value) => setPriority(value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  {priorityLevels.map((level) => (
+                    <SelectItem key={level.value} value={level.value}>
+                      <div className="flex items-center">
+                        <span className={`mr-2 ${level.color}`}>●</span>
+                        {level.label}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Due Date */}
+            <div className="w-full">
+              <label
+                htmlFor="duedate"
+                className="block text-gray-600 font-medium mb-2"
+              >
                 Due Date
               </label>
               <Input
@@ -270,6 +362,10 @@ const TaskDashboard = () => {
                 className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-blue-500"
               />
             </div>
+
+            {/* Priority Selection */}
+
+            {/* Employee Assignment */}
 
             <Button
               onClick={onAddItem}
@@ -282,7 +378,7 @@ const TaskDashboard = () => {
 
         {/* Task Containers */}
         <AnimatePresence>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ staggerChildren: 0.1 }}
@@ -296,12 +392,14 @@ const TaskDashboard = () => {
                 exit={{ opacity: 0, y: 20 }}
                 className="bg-white rounded-xl shadow-md"
               >
-                <Container 
-                  id={container.id} 
+                <Container
+                  id={container.id}
                   title={
                     <div className="flex items-center space-x-2">
                       {containerIcons[container.id]}
-                      <span className="font-semibold text-gray-800">{container.title}</span>
+                      <span className="font-semibold text-gray-800">
+                        {container.title}
+                      </span>
                     </div>
                   }
                 >

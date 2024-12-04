@@ -148,6 +148,16 @@ export const getTeamsApi = async () => {
     throw error;
   }
 }
+export const getTeamsByProject = async (projectId:string |undefined) => {
+  try {
+    const response = await projectApi.post('/project/teamsByProject',projectId);
+    const teams = response.data;
+    return teams;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+}
 export const createTeamApi = async (data: any) => {
   try {
     const response = await projectApi.post('/project/createTeam',{data});
@@ -208,9 +218,9 @@ export const getProjectByProjectCodeApi = async () => {
     throw error;
   }
 }
-export const getTeamMembersByProjectCodeApi = async () => {
+export const getTeamMembersByTeamIdApi = async (teamId:string) => {
   try {
-    const response = await projectApi.get('/project/teamMembers');
+    const response = await projectApi.post('/project/teamMembers',teamId);
     const teams = response.data;
     return teams;
   } catch (error) {
