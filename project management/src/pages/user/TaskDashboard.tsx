@@ -12,7 +12,7 @@ import {
 } from '@tabler/icons-react';
 import {
   postTasksApi,
-  getTasksApi,
+  getTasksByTeamApi,
   getTeamsApi,
   getTeamsByProject,
   getTeamMembersByTeamIdApi,
@@ -32,7 +32,7 @@ import {
 type TaskType = {
   id: string;
   title: string;
-  summary: string;
+
   description: string;
   dueDate: string;
 };
@@ -48,7 +48,7 @@ interface ITeam {
   name: string;
 }
 
-const teamMember = [{ id: '123', name: 'jasim' }];
+
 
 const CONTAINER_IDS = {
   PENDING: 'pending',
@@ -71,12 +71,10 @@ const TaskDashboard = () => {
   useEffect(() => {
     const fetchTeams = async () => {
       const res = await getTeamsByProject(projectId);
-      console.log(res);
       const teams = res?.teams?.map((team: any) => ({
         id: team?._id,
         name: team?.name,
-      }));
-
+      }))
       setTeams(teams);
       setSelectedTeam({name:teams[0]?.name,id:teams[0].id});
     };
@@ -89,6 +87,7 @@ const TaskDashboard = () => {
     CONTAINER_IDS.PENDING
   );
   const [itemName, setItemName] = useState('');
+  const [teamMembers, setTeamMembers] = useState<any>([]);
   const [itemSummary, setItemSummary] = useState('');
   const [itemDescription, setItemDescription] = useState('');
   const [assignedEmployee, setAssignedEmployee] = useState('');
@@ -101,7 +100,8 @@ const TaskDashboard = () => {
     const fetchTasks = async () => {
       setLoading(true);
       try {
-        const res = await getTasksApi();
+        console.log(selectedTeam)
+        const res = await getTasksByTeamApi(selectedTeam?.id);
         const tasks = res.tasks;
 
         const itemsByContainerId = containers.reduce((acc, container) => {
@@ -112,16 +112,14 @@ const TaskDashboard = () => {
         tasks.forEach(
           (task: {
             _id: string;
-            topic: string;
-            summary: string;
+            title: string;
             description: string;
             dueDate: string;
             status: string;
           }) => {
             const taskItem = {
               id: task._id,
-              title: task.topic,
-              summary: task.summary,
+              title: task.title,
               description: task.description,
               dueDate: task.dueDate,
             };
@@ -145,14 +143,17 @@ const TaskDashboard = () => {
     };
 
     fetchTasks();
-  }, []);
+  }, [selectedTeam]);
 
   const onAddItem = async () => {
     if (!itemName) return;
 
     const newItem = {
       title: itemName,
-      summary: itemSummary,
+      team:selectedTeam?.id,
+      project:projectId,
+      priority,
+      assignedTo:assignedEmployee,
       description: itemDescription,
       dueDate,
       status: currentContainerId,
@@ -160,6 +161,7 @@ const TaskDashboard = () => {
 
     try {
       const res = await postTasksApi(newItem);
+      console.log(res)
       const task = res.createdTask;
 
       setContainers((prevContainers) =>
@@ -215,10 +217,11 @@ const TaskDashboard = () => {
 
   const addTask = async() => {
     setShowAddItemModal(true);
-    setCurrentContainerId(CONTAINER_IDS.PENDING);
+    setCurrentContainerId(CONTAINER_IDS.PENDING);  
     if(selectedTeam){
       const teamMembers=await getTeamMembersByTeamIdApi(selectedTeam.id)
       console.log(teamMembers)
+      setTeamMembers(teamMembers?.teamMembers?.members)
     }
   };
   return (
@@ -278,13 +281,13 @@ const TaskDashboard = () => {
               {
                 label: 'Title',
                 value: itemName,
-                onChange: (e) => setItemName(e.target.value),
+                onChange: (e: { target: { value: React.SetStateAction<string>; }; }) => setItemName(e.target.value),
                 placeholder: 'Enter task title',
               },
               {
                 label: 'Description',
                 value: itemDescription,
-                onChange: (e) => setItemDescription(e.target.value),
+                onChange: (e: { target: { value: React.SetStateAction<string>; }; }) => setItemDescription(e.target.value),
                 placeholder: 'Detailed task description',
               },
             ].map(({ label, value, onChange, placeholder }) => (
@@ -306,20 +309,20 @@ const TaskDashboard = () => {
                 Assign Employee
               </label>
               <Select
-                value={assignedEmployee}
-                onValueChange={(value) => setAssignedEmployee(value)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select Employee" />
-                </SelectTrigger>
-                <SelectContent>
-                  {teamMember.map((employee) => (
-                    <SelectItem key={employee.id} value={employee.id}>
-                      {employee.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+      value={assignedEmployee}
+      onValueChange={(value) => setAssignedEmployee(value)}
+    >
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder="Select Employee" />
+      </SelectTrigger>
+      <SelectContent>
+        {teamMembers.map((employee:any) => (
+          <SelectItem key={employee._id} value={employee._id}>
+            {employee.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
             </div>
 
             <div className="w-full">
@@ -415,7 +418,6 @@ const TaskDashboard = () => {
                           <Items
                             title={item.title}
                             id={item.id}
-                            summary={item.summary}
                             description={item.description}
                             dueDate={item.dueDate}
                           />

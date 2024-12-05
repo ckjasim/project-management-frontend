@@ -87,7 +87,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface ContainerProps {
   id: string;
-  title: string;
+  title: string ;
   children: React.ReactNode;
   className?: string;
 }

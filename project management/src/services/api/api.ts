@@ -32,9 +32,9 @@ export const verifyInvitationApi = async (token:string) => {
   }
 };
 
-export const getTasksApi = async () => {
+export const getTasksByTeamApi = async (teamId:string | undefined) => {
   try {
-    const response = await taskApi.get('/task/getTask');
+    const response = await taskApi.post('/task/getTaskByTeam',teamId);
     const tasks = response?.data;
     return tasks;
   } catch (error) {
