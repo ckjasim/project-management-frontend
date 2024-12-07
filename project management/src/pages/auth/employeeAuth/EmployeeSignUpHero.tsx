@@ -118,7 +118,7 @@ export function EmployeeSignUpHero() {
             { withCredentials: true }
           );
           console.log(response)
-          // navigate('/employee/task');
+          navigate('/employee/projects');
         } catch (error: any) {
           toast({
             title: 'Registration Failed',

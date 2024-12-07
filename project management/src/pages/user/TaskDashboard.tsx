@@ -30,9 +30,10 @@ import {
 } from '@/components/ui/select';
 
 type TaskType = {
+  assignedTo: string;
+  priority:string
   id: string;
   title: string;
-
   description: string;
   dueDate: string;
 };
@@ -88,7 +89,7 @@ const TaskDashboard = () => {
   );
   const [itemName, setItemName] = useState('');
   const [teamMembers, setTeamMembers] = useState<any>([]);
-  const [itemSummary, setItemSummary] = useState('');
+
   const [itemDescription, setItemDescription] = useState('');
   const [assignedEmployee, setAssignedEmployee] = useState('');
   const [dueDate, setDueDate] = useState('');
@@ -101,8 +102,9 @@ const TaskDashboard = () => {
       setLoading(true);
       try {
         console.log(selectedTeam)
-        const res = await getTasksByTeamApi(selectedTeam?.id);
+        const res = await getTasksByTeamApi(selectedTeam?.id,projectId);
         const tasks = res.tasks;
+        console.log(tasks,'tasks,--------------')
 
         const itemsByContainerId = containers.reduce((acc, container) => {
           acc[container.id] = [];
@@ -111,6 +113,8 @@ const TaskDashboard = () => {
 
         tasks.forEach(
           (task: {
+            assignedTo: any;
+            priority:stirng
             _id: string;
             title: string;
             description: string;
@@ -121,7 +125,9 @@ const TaskDashboard = () => {
               id: task._id,
               title: task.title,
               description: task.description,
+              assignedTo:task.assignedTo.name,
               dueDate: task.dueDate,
+              priority:task.priority
             };
             if (itemsByContainerId[task.status]) {
               itemsByContainerId[task.status].push(taskItem);
@@ -163,7 +169,7 @@ const TaskDashboard = () => {
       const res = await postTasksApi(newItem);
       console.log(res)
       const task = res.createdTask;
-
+console.log(task,'task,---------')
       setContainers((prevContainers) =>
         prevContainers.map((container) =>
           container.id === currentContainerId
@@ -174,9 +180,11 @@ const TaskDashboard = () => {
                   {
                     id: task._id,
                     title: itemName,
-                    summary: itemSummary,
+                    assignedTo: task.assignedTo.name,
+                    priority:task.priority,
                     description: itemDescription,
                     dueDate,
+                    
                   },
                 ],
               }
@@ -192,7 +200,6 @@ const TaskDashboard = () => {
 
   const resetForm = () => {
     setItemName('');
-    setItemSummary('');
     setItemDescription('');
     setDueDate('');
   };
@@ -220,7 +227,7 @@ const TaskDashboard = () => {
     setCurrentContainerId(CONTAINER_IDS.PENDING);  
     if(selectedTeam){
       const teamMembers=await getTeamMembersByTeamIdApi(selectedTeam.id)
-      console.log(teamMembers)
+      console.log(teamMembers,'teammem-----------------')
       setTeamMembers(teamMembers?.teamMembers?.members)
     }
   };
@@ -406,7 +413,7 @@ const TaskDashboard = () => {
                     </div>
                   }
                 >
-                  <div className="space-y-4 p-4">
+                  <div className="space-y-4 ">
                     <AnimatePresence>
                       {container.items.map((item) => (
                         <motion.div
@@ -418,6 +425,8 @@ const TaskDashboard = () => {
                           <Items
                             title={item.title}
                             id={item.id}
+                            assignedTo={item.assignedTo}
+                            priority={item.priority}
                             description={item.description}
                             dueDate={item.dueDate}
                           />

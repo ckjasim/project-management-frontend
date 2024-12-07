@@ -10,6 +10,8 @@ import {
 import { deleteProjectApi, editProjectApi } from '@/services/api/api';
 import { Project, ProjectFormValues } from '@/types';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 const getPriorityBadge = (priority: string) => {
   const priorityStyles = {
@@ -43,7 +45,7 @@ const getPriorityBadge = (priority: string) => {
     </div>
   );
 };
-
+  
 export const ProjectCard: React.FC<{
   project: Project;
   setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
@@ -51,6 +53,8 @@ export const ProjectCard: React.FC<{
 
   const navigate= useNavigate()
   const [showOptions, setShowOptions] = useState(false);
+  const {userInfo} = useSelector((state: RootState) => state.Auth);
+
 
   const isOverdue = useMemo(() => {
     const today = new Date();
@@ -140,7 +144,11 @@ export const ProjectCard: React.FC<{
   const statusDisplay = getStatusStyles(project.status, isOverdue);
 
   const handleTask=(projectId:string)=>{
-    navigate(`/user/taskManagement/${projectId}`)
+      if(userInfo?.role==='project manager'){
+        navigate(`/user/taskManagement/${projectId}`)
+      }else{
+        navigate(`/employee/task/${projectId}`)
+      }
   }
 
   return (

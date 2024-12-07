@@ -8,7 +8,7 @@ import { SetChat } from '@/redux/features/chat/chatSlice';
 import { 
   getAllProjectApi, 
   getEmployeesByOrganizationApi, 
-  getProjectByProjectCodeApi 
+
 } from '@/services/api/api';
 import { RootState } from '@/redux/store';
 import SocketService from '@/services/SocketService';
@@ -44,8 +44,8 @@ const UserSideBar: React.FC = () => {
           const projResponse = await getAllProjectApi();
           setGroups(projResponse?.projects.map((proj: { title: any; _id: any; }) => ({ groupName: proj.title, _id: proj._id })) || []);
         } else if (userInfo?.role === 'employee') {
-          const projResponse = await getProjectByProjectCodeApi();
-          setGroups(projResponse?.project.map((proj: { title: any; _id: any; }) => ({ groupName: proj.title, _id: proj._id })) || []);
+          // const projResponse = await getProjectByProjectCodeApi();
+          // setGroups(projResponse?.project.map((proj: { title: any; _id: any; }) => ({ groupName: proj.title, _id: proj._id })) || []);
         }
       } catch (error) {
         console.error('Error fetching data:', error);

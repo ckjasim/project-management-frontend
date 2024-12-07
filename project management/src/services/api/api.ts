@@ -32,9 +32,10 @@ export const verifyInvitationApi = async (token:string) => {
   }
 };
 
-export const getTasksByTeamApi = async (teamId:string | undefined) => {
+export const getTasksByTeamApi = async (teamId:string | undefined,projectId:string | undefined) => {
   try {
-    const response = await taskApi.post('/task/getTaskByTeam',teamId);
+    
+    const response = await taskApi.post('/task/getTaskByTeam',{teamId,projectId});
     const tasks = response?.data;
     return tasks;
   } catch (error) {
@@ -208,9 +209,10 @@ export const deleteProjectApi = async (id: string) => {
     throw error;
   }
 }
-export const getProjectByProjectCodeApi = async () => {
+//export to employee projects
+export const getProjectByTeamApi = async () => {
   try {
-    const response = await projectApi.get('/project/singleProject');
+    const response = await taskApi.get('/task/projectByTeam');
     const teams = response.data;
     return teams;
   } catch (error) {
@@ -223,6 +225,16 @@ export const getTeamMembersByTeamIdApi = async (teamId:string) => {
     const response = await projectApi.post('/project/teamMembers',teamId);
     const teams = response.data;
     return teams;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+}
+export const getTasksByProjectApi = async (projectId:any) => {
+  try {
+    const response = await taskApi.post('/task/taskByProjectId',projectId);
+    const teams = response.data;
+    return teams;  
   } catch (error) {
     console.error("Error logging out:", error);
     throw error;

@@ -6,6 +6,7 @@ import {
   IconCalendarUser,
   IconMessageChatbot,
   IconFolders,
+  IconDeviceProjector,
 } from '@tabler/icons-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -44,10 +45,10 @@ export function EmployeeNavbar() {
 
   const links = [
     {
-      label: 'Dashboard',
-      href: '/employee/task',
+      label: 'Projects',
+      href: '/employee/projects',
       icon: (
-        <IconBrandTabler className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+        <IconDeviceProjector className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
     

@@ -15,7 +15,6 @@ import { SetUser } from '@/redux/features/auth/authSlice';
 interface FormValues {
   email: string;
   password: string;
-  projectCode: string;
 }
 
 const EmployeeLoginHero: React.FC = () => {
@@ -30,19 +29,16 @@ const EmployeeLoginHero: React.FC = () => {
     password: Yup.string()
       .min(8, "Password must be at least 8 characters")
       .required("Password is required"),
-    projectCode: Yup.string()
-      .required("Project code is required")
-      .length(5, "Project code must be exactly 5 characters"),
   });
 
   const initialValues: FormValues = {
     email: '',
     password: '',
-    projectCode: ''
   };
 
   const handleSubmit = async (values: FormValues) => {
     try {
+    
       const response = await axios.post('http://localhost:3000/api/employeeLogin', values, 
         { withCredentials: true });
       toast({
@@ -50,13 +46,13 @@ const EmployeeLoginHero: React.FC = () => {
         description: response.data.message || "Successfully logged in!",
         variant: 'success',
       });
-      console.log(response,'kkkkkkkk122121212121')
+ 
       const {role,email,_id,isBlock,name}  = response?.data?.data?.user
       const payload = {role,email,_id,isBlock,name}
-      console.log(payload,'pppppppppppppppppp')
+
       dispatch(SetUser(payload))
 
-      navigate('/employee/task');
+      navigate('/employee/projects');
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
       toast({
@@ -139,16 +135,7 @@ const EmployeeLoginHero: React.FC = () => {
                   <ErrorMessage name="password" component="div" className="text-rose-500 text-sm" />
                 </div>
 
-                <div className="space-y-1">
-                  <Field
-                    name="projectCode"
-                    type="text"
-                    as={Input}
-                    placeholder="Project Code"
-                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
-                  />
-                  <ErrorMessage name="projectCode" component="div" className="text-rose-500 text-sm" />
-                </div>
+              
 
                 <div className="flex justify-end">
                   <Link 

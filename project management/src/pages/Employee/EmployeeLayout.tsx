@@ -1,7 +1,7 @@
 
 
 
-import { EmployeeNavbar } from '@/components/global/NavBar/employeeNavbar';
+import { EmployeeNavbar } from '@/components/global/NavBar/EmployeeNavbar';
 import { Toaster } from '@/components/ui/toaster';
 import { Outlet } from 'react-router-dom'
 

@@ -23,6 +23,7 @@ import MessagesPage from "@/pages/chat/chat";
 import EmployeesPage from "@/pages/user/employeesList";;
 import TeamDashboard from "@/pages/user/teamManagement";
 import TaskDashboard from "@/pages/user/TaskDashboard";
+import TeamProjectDashboard from "@/pages/Employee/TeamProjectDashboard";
 
 const router = createBrowserRouter([
   {
@@ -71,7 +72,11 @@ const router = createBrowserRouter([
         path: "employee",  
         children: [
           {
-            path: "task",
+            path: "projects",
+            element: <TeamProjectDashboard/>,
+          },
+          {
+            path: "task/:projectId",
             element: <TaskManagement/>,
           },
           {
