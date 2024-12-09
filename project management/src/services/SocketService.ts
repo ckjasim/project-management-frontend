@@ -1,5 +1,3 @@
-
-
 import io, { Socket } from 'socket.io-client';
 
 export interface Message {
@@ -8,28 +6,21 @@ export interface Message {
   senderName: string;
   content: string;
   timestamp: Date;
-  type:string| undefined;
+  type: 'private' | 'group';
   roomId?: string;
   recipientId?: string;
 }
 
-// Extend Socket interface
-declare module 'socket.io-client' {
-  interface Socket {
-    userId?: string;
-  }
-}
-
 class SocketService {
-  private static instance: SocketService | null = null;
+  private static instance: SocketService;
   private socket: Socket;
 
   private constructor() {
-    this.socket = io(import.meta.env.VITE_SOCKET_URL, {
+    this.socket = io('http://localhost:3003', {
+      transports: ['websocket'],
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
-      transports: ['websocket'],
     });
 
     this.setupListeners();
@@ -42,66 +33,56 @@ class SocketService {
     return this.instance;
   }
 
+  public connect(data: { userId: string }) {
+    this.socket.emit('register', data, (ack: { success: boolean; message?: string }) => {
+      if (ack.success) {
+        console.log('User registered successfully');
+      } else {
+        console.error('User registration failed:', ack.message);
+      }
+    });
+  }
+
   private setupListeners() {
     this.socket.on('connect', () => {
       console.log('Socket connected');
-      const userId = localStorage.getItem('user');
-      console.log(userId,'jjjjjjjjjjjjjjjjjjjj')
-      if (userId) {
-        this.connect(userId);
-      }
     });
 
-    this.socket.on('disconnect', (reason) => {
-      console.log('Socket disconnected:', reason);
+    this.socket.on('disconnect', () => {
+      console.log('Socket disconnected');
     });
 
-    // Error handling
     this.socket.on('connect_error', (error) => {
       console.error('Connection error:', error);
     });
-  }
 
-  public connect(userId: string) {
-    if (this.socket.connected) {
-      this.socket.emit('register', { userId });
-      this.socket.userId = userId;
-    } else {
-      this.socket.once('connect', () => {
-        this.socket.emit('register', { userId });
-        this.socket.userId = userId;
-      });
-    }
-  }
-
-  public joinRoom(roomId: string) {
-    this.socket.emit('join_room', roomId);
-  }
-
-  public leaveRoom(roomId: string) {
-    this.socket.emit('leave_room', roomId);
+    this.socket.on('error', (error) => {
+      console.error('Socket error:', error);
+    });
   }
 
   public sendMessage(message: Message) {
-    this.socket.emit('send_message', message);
+    this.socket.emit('send_message', message, (ack: { success: boolean; error?: string }) => {
+      if (!ack.success) {
+        console.error('Failed to send message:', ack.error);
+      }
+    });
   }
 
   public onMessage(callback: (message: Message) => void) {
     this.socket.on('new_message', callback);
   }
 
-  public removeMessageListener() {
-    this.socket.off('new_message');
+  public joinRoom(roomId: string) {
+    this.socket.emit('join_room', { roomId });
+  }
+
+  public leaveRoom(roomId: string) {
+    this.socket.emit('leave_room', { roomId });
   }
 
   public disconnect() {
     this.socket.disconnect();
-    SocketService.instance = null;
-  }
-
-  // Getter for accessing the socket directly if needed
-  public getSocket(): Socket {
-    return this.socket;
   }
 }
 

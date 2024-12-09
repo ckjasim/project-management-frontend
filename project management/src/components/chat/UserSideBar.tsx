@@ -7,11 +7,13 @@ import { useDispatch } from 'react-redux';
 import { SetChat } from '@/redux/features/chat/chatSlice';
 import { 
   getAllProjectApi, 
-  getEmployeesByOrganizationApi, 
+  getEmployeesByOrganizationApi,
+  getTeamsApi, 
 
 } from '@/services/api/api';
 import { RootState } from '@/redux/store';
 import SocketService from '@/services/SocketService';
+
 
 interface ITeam {
   groupName: string;
@@ -28,7 +30,6 @@ const UserSideBar: React.FC = () => {
   const [groups, setGroups] = useState<ITeam[]>([]);
   const [personal, setPersonal] = useState<IPersonal[]>([]);
   const dispatch = useDispatch();
-  const socketService = SocketService.getInstance();
   
   const { userInfo } = useSelector((state: RootState) => state.Auth);
   useEffect(() => {
@@ -39,12 +40,19 @@ const UserSideBar: React.FC = () => {
           ?.filter((val: { _id: string | undefined; }) => val._id !== userInfo?._id)
           .map((val: { name: any; _id: any; }) => ({ name: val.name, _id: val._id })) || [];
         setPersonal(personals);
-  
+        const teams = await getTeamsApi();
         if (userInfo?.role === 'project manager') {
-          const projResponse = await getAllProjectApi();
-          setGroups(projResponse?.projects.map((proj: { title: any; _id: any; }) => ({ groupName: proj.title, _id: proj._id })) || []);
+          
+          console.log(teams,'teeeeeeeammmmsssss')
+          setGroups(teams?.teams.map((team: { name: any; _id: any; }) => ({ groupName: team.name, _id: team._id })) || []);
         } else if (userInfo?.role === 'employee') {
-          // const projResponse = await getProjectByProjectCodeApi();
+          
+          // const employeeTeams = teams?.filter((team: { members: string | string[]; }) =>
+          //   team.members.includes(userInfo._id)
+          // );
+
+          // console.log(employeeTeams);
+
           // setGroups(projResponse?.project.map((proj: { title: any; _id: any; }) => ({ groupName: proj.title, _id: proj._id })) || []);
         }
       } catch (error) {
@@ -72,12 +80,12 @@ const UserSideBar: React.FC = () => {
   const handleItemClick = (id: string, chatMode: 'group' | 'private', name: string) => {
     dispatch(SetChat({ currentRoom: id, chatMode, name }));
     
-    // Register user for private chat or join group chat
+
     if (chatMode === 'private') {
-      console.log('333333333333333')
-      socketService.connect(id);
+      
     } else if (chatMode === 'group') {
-      socketService.joinRoom(id);
+      console.log('333333333333333')
+      // socketService.joinRoom(id);
     }
   };
 

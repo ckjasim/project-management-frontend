@@ -1,10 +1,16 @@
 
+
 export interface Message {
   id: string;
-  sender: string;
+  senderId: string;
+  senderName: string;
   content: string;
-  timestamp: string;
+  timestamp: Date;
+  type: string | undefined;
+  roomId?: string;
+  recipientId?: string;
 }
+
 
 // export interface Team {
 //   name: string;
