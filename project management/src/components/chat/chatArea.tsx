@@ -1,27 +1,27 @@
-
-import React, { useEffect, useRef, useState, useCallback, MutableRefObject } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FiSend } from 'react-icons/fi';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '../hooks/use-toast';
-import SocketService from '@/services/SocketService';
+
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-import ChatService from '@/services/ChatService';
-import { Message } from '@/types';
-import { Socket } from 'socket.io-client';
-import { DefaultEventsMap } from '@socket.io/component-emitter';
 
-type ChatAreaProps = {
-  serverRef:MutableRefObject<Socket<DefaultEventsMap, DefaultEventsMap> | undefined>,
-  messages: Message[],
-  setMessages: React.Dispatch<React.SetStateAction<Message[]>>
+import { ChatAreaProps, Message } from '@/types';
 
-};
-
-const ChatArea: React.FC<ChatAreaProps> = ({ serverRef,messages,setMessages }) => {
+const ChatArea: React.FC<ChatAreaProps> = ({
+  serverRef,
+  messages,
+  setMessages,
+}) => {
   const { toast } = useToast();
   const messageEndRef = useRef<HTMLDivElement>(null);
 
@@ -29,59 +29,12 @@ const ChatArea: React.FC<ChatAreaProps> = ({ serverRef,messages,setMessages }) =
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { userInfo } = useSelector((state: RootState) => state.Auth);
-  const { currentRoom, chatMode,name } = useSelector((state: RootState) => state.chat);
-
-
-
-  // useEffect(() => {
-
-
-
-  //   if (currentRoom) {
-  //     socketService.joinRoom(currentRoom);
-  //   }
-
-  //   // Listen for incoming messages
-  //   socketService.onMessage((message) => {
-  //     // Only add message if it's for the current room/chat
-  //     if (
-  //       (chatMode === 'group' && message.roomId === currentRoom) ||
-  //       (chatMode === 'private' && 
-  //        (message.senderId === currentRoom || message.recipientId === currentRoom))
-  //     ) {
-  //       setMessages(prev => [...prev, message]);
-        
-  //       // Optionally save to database
-  //       ChatService.saveMessage(message);
-  //     }
-  //   });
-
-
-  //   const fetchPreviousMessages = async () => {
-  //     try {
-  //       const prevMessages = await ChatService.getMessages(currentRoom, chatMode);
-  //       setMessages(prevMessages);
-  //     } catch (error) {
-  //       console.error('Failed to fetch previous messages');
-  //     }
-  //   };
-
-  //   if (currentRoom) {
-  //     fetchPreviousMessages();
-  //   }
-
-  //   return () => {
-  //     // Cleanup socket listeners and leave room
-  //     if (currentRoom) {
-  //       socketService.leaveRoom(currentRoom);
-  //     }
-  //   };
-  // }, [currentRoom, chatMode, userInfo]);
-
-  // Auto-scroll to latest message
+  const { currentRoom, chatMode, name } = useSelector(
+    (state: RootState) => state.chat
+  );
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const handleSendMessage = async () => {
@@ -97,34 +50,39 @@ const ChatArea: React.FC<ChatAreaProps> = ({ serverRef,messages,setMessages }) =
       roomId: chatMode === 'group' ? currentRoom : undefined,
       recipientId: chatMode === 'private' ? currentRoom : undefined,
     };
-    console.log(messagePayload,'message=--------------')
+    console.log(messagePayload, 'message=--------------');
 
-    setMessages((prev)=>[...prev,messagePayload])
+    if (chatMode === 'private') {
+      setMessages((prev) => [...prev, messagePayload]);
+    }
     setNewMessage('');
 
     try {
-      serverRef?.current?.emit('message',messagePayload)
+      serverRef?.current?.emit('message', messagePayload);
     } catch (error) {
       console.error('Failed to send message', error);
-
     }
   };
 
-
-
   const renderMessages = () => {
     const filteredMessages = messages.filter(
-      msg =>
-        (msg.type === 'group' && chatMode === 'group' && msg.roomId === currentRoom) ||
+      (msg) =>
+        (msg.type === 'group' &&
+          chatMode === 'group' &&
+          msg.roomId === currentRoom) ||
         (msg.type === 'private' &&
           chatMode === 'private' &&
-          (msg.senderId === userInfo?._id && msg.recipientId===currentRoom|| msg.senderId === currentRoom))
+          ((msg.senderId === userInfo?._id &&
+            msg.recipientId === currentRoom) ||
+            msg.senderId === currentRoom))
     );
-    console.log(messages,currentRoom)
-    return filteredMessages.map(msg => (
+    console.log(messages, currentRoom);
+    return filteredMessages.map((msg) => (
       <div
         key={msg.id}
-        className={`flex items-start mb-4 ${msg.senderId === userInfo?._id ? 'justify-end' : 'justify-start'}`}
+        className={`flex items-start mb-4 ${
+          msg.senderId === userInfo?._id ? 'justify-end' : 'justify-start'
+        }`}
       >
         <div
           className={`p-4 rounded-2xl max-w-[70%] ${
@@ -174,17 +132,22 @@ const ChatArea: React.FC<ChatAreaProps> = ({ serverRef,messages,setMessages }) =
             <div className="flex items-center border rounded-full px-4 py-2 w-full">
               <Input
                 type="text"
-                placeholder={`Message${chatMode === 'group' ? '' : ` ${name || 'Select a recipient'}`}`}
+                placeholder={`Message${
+                  chatMode === 'group' ? '' : ` ${name || 'Select a recipient'}`
+                }`}
                 className="flex-1 focus:outline-none"
                 value={newMessage}
-                onChange={e => setNewMessage(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                 disabled={chatMode === 'private' && !currentRoom}
               />
               <Button
                 onClick={handleSendMessage}
                 className="rounded-full ml-4"
-                disabled={newMessage.trim() === '' || (chatMode === 'private' && !currentRoom)}
+                disabled={
+                  newMessage.trim() === '' ||
+                  (chatMode === 'private' && !currentRoom)
+                }
               >
                 <FiSend className="text-xl text-blue-500" />
               </Button>

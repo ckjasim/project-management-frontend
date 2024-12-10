@@ -1,4 +1,6 @@
-
+import { MutableRefObject } from "react";
+import { Socket } from "socket.io-client";
+import { DefaultEventsMap } from '@socket.io/component-emitter';
 
 export interface Message {
   id: string;
@@ -11,7 +13,16 @@ export interface Message {
   recipientId?: string;
 }
 
+export type ChatAreaProps = {
+  serverRef:MutableRefObject<Socket<DefaultEventsMap, DefaultEventsMap> | undefined>,
+  messages: Message[],
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>
 
+};
+export type UserSideBarProps = {
+  serverRef:MutableRefObject<Socket<DefaultEventsMap, DefaultEventsMap> | undefined>,
+
+};
 // export interface Team {
 //   name: string;
 //   lastMessage: string;

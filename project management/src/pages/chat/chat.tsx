@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import UserSideBar from '@/components/chat/UserSideBar';
 import ChatArea from '@/components/chat/chatArea';
 import DetailsSidebar from '@/components/chat/detailesSideBar';
@@ -8,6 +8,7 @@ import { DefaultEventsMap } from '@socket.io/component-emitter';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { Message } from '@/types';
+import { getChats } from '@/services/api/api';
 
 const MessagesPage = () => {
   const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap>>();
@@ -15,7 +16,16 @@ const MessagesPage = () => {
 
   const {userInfo} = useSelector((state:RootState)=>state.Auth)
 
-  // Setup event listeners
+useEffect(() => {
+  const fetchChats =  async ()=>{
+    const prevMessages = await getChats();
+    console.log(prevMessages)
+    setMessages(prevMessages?.chats)
+  }
+  fetchChats()
+},[])
+
+
   const setupListeners = () => {
     if (!socketRef.current) return;
 
@@ -36,6 +46,8 @@ const MessagesPage = () => {
       setMessages((prev)=>[...prev,data])
     });
   };
+
+
 
   useEffect(() => {
     socketRef.current = io('http://localhost:3003', {
@@ -74,7 +86,7 @@ const MessagesPage = () => {
 
   return (
     <div className="flex h-screen">
-      <UserSideBar />
+      <UserSideBar serverRef={socketRef} />
   
       <ChatArea serverRef={socketRef} messages={messages} setMessages={setMessages}/>
       <DetailsSidebar attachments={attachments} members={members}  />

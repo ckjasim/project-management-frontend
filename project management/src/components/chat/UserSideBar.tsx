@@ -5,15 +5,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { SetChat } from '@/redux/features/chat/chatSlice';
-import { 
-  getAllProjectApi, 
+import {
   getEmployeesByOrganizationApi,
-  getTeamsApi, 
-
+  getTeamByEmployeeApi,
+  getTeamsApi,
 } from '@/services/api/api';
 import { RootState } from '@/redux/store';
-import SocketService from '@/services/SocketService';
-
+import {  UserSideBarProps } from '@/types';
 
 interface ITeam {
   groupName: string;
@@ -25,47 +23,60 @@ interface IPersonal {
   _id: string;
 }
 
-const UserSideBar: React.FC = () => {
+
+
+const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [groups, setGroups] = useState<ITeam[]>([]);
   const [personal, setPersonal] = useState<IPersonal[]>([]);
   const dispatch = useDispatch();
-  
+
   const { userInfo } = useSelector((state: RootState) => state.Auth);
   useEffect(() => {
     const fetchTeams = async () => {
       try {
         const empResponse = await getEmployeesByOrganizationApi();
-        const personals = empResponse?.employees
-          ?.filter((val: { _id: string | undefined; }) => val._id !== userInfo?._id)
-          .map((val: { name: any; _id: any; }) => ({ name: val.name, _id: val._id })) || [];
+        const personals =
+          empResponse?.employees
+            ?.filter(
+              (val: { _id: string | undefined }) => val._id !== userInfo?._id
+            )
+            .map((val: { name: any; _id: any }) => ({
+              name: val.name,
+              _id: val._id,
+            })) || [];
         setPersonal(personals);
-        const teams = await getTeamsApi();
+
         if (userInfo?.role === 'project manager') {
-          
-          console.log(teams,'teeeeeeeammmmsssss')
-          setGroups(teams?.teams.map((team: { name: any; _id: any; }) => ({ groupName: team.name, _id: team._id })) || []);
+          const teams = await getTeamsApi();
+
+          setGroups(
+            teams?.teams.map((team: { name: any; _id: any }) => ({
+              groupName: team.name,
+              _id: team._id,
+            })) || []
+          );
         } else if (userInfo?.role === 'employee') {
-          
-          // const employeeTeams = teams?.filter((team: { members: string | string[]; }) =>
-          //   team.members.includes(userInfo._id)
-          // );
+          const teams = await getTeamByEmployeeApi();
 
-          // console.log(employeeTeams);
-
-          // setGroups(projResponse?.project.map((proj: { title: any; _id: any; }) => ({ groupName: proj.title, _id: proj._id })) || []);
+          setGroups(
+            teams?.teams.map((team: { name: any; _id: any }) => ({
+              groupName: team.name,
+              _id: team._id,
+            })) || []
+          );
         }
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-  
+
     if (userInfo?._id) {
       fetchTeams();
     }
-  
+
     return () => {
-      // Cleanup logic if necessary
+
     };
   }, [userInfo]);
 
@@ -77,16 +88,16 @@ const UserSideBar: React.FC = () => {
     person.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleItemClick = (id: string, chatMode: 'group' | 'private', name: string) => {
+  const handleItemClick = (
+    id: string,
+    chatMode: 'group' | 'private',
+    name: string
+  ) => {
     dispatch(SetChat({ currentRoom: id, chatMode, name }));
-    
 
-    if (chatMode === 'private') {
-      
-    } else if (chatMode === 'group') {
-      console.log('333333333333333')
-      // socketService.joinRoom(id);
-    }
+    if (chatMode === 'group') {
+      serverRef?.current?.emit('joinRoom',id)
+    } 
   };
 
   return (
@@ -112,15 +123,23 @@ const UserSideBar: React.FC = () => {
               <div
                 key={team._id}
                 className="bg-white p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => handleItemClick(team._id, 'group', team.groupName)}
+                onClick={() =>
+                  handleItemClick(team._id, 'group', team.groupName)
+                }
               >
                 <div className="flex items-center space-x-4">
                   <Avatar>
-                    <AvatarImage src={`https://ui-avatars.com/api/?name=${encodeURIComponent(team.groupName)}`} />
+                    <AvatarImage
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        team.groupName
+                      )}`}
+                    />
                     <AvatarFallback>{team.groupName.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="min-w-48">
-                    <p className="text-gray-800 font-medium">{team.groupName}</p>
+                    <p className="text-gray-800 font-medium">
+                      {team.groupName}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -130,16 +149,24 @@ const UserSideBar: React.FC = () => {
 
         {filteredPersonal.length > 0 && (
           <div>
-            <h3 className="text-sm font-semibold text-gray-500 mb-2">Direct Messages</h3>
+            <h3 className="text-sm font-semibold text-gray-500 mb-2">
+              Direct Messages
+            </h3>
             {filteredPersonal.map((person) => (
               <div
                 key={person._id}
                 className="bg-white p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => handleItemClick(person._id, 'private', person.name)}
+                onClick={() =>
+                  handleItemClick(person._id, 'private', person.name)
+                }
               >
                 <div className="flex items-center space-x-4">
                   <Avatar>
-                    <AvatarImage src={`https://ui-avatars.com/api/?name=${encodeURIComponent(person.name)}`} />
+                    <AvatarImage
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        person.name
+                      )}`}
+                    />
                     <AvatarFallback>{person.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="min-w-48">

@@ -16,6 +16,10 @@ const projectApi = axios.create({
   baseURL: import.meta.env.VITE_PROJECT_BASE_URL,
   withCredentials: true,
 });
+const chatApi = axios.create({
+  baseURL: import.meta.env.VITE_CHAT_BASE_URL,
+  withCredentials: true,
+});
 
 authApi.interceptors.response.use(
   (response) => response,
@@ -43,4 +47,4 @@ authApi.interceptors.response.use(
   }
 );
 
-export { authApi, taskApi,projectApi };
+export { authApi, taskApi,projectApi,chatApi };

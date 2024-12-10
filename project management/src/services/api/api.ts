@@ -1,4 +1,4 @@
-import { taskApi, authApi, projectApi } from "../interceptors/api"; 
+import { taskApi, authApi, projectApi, chatApi } from "../interceptors/api"; 
 
 export const logoutApi = async () => {
   try {
@@ -241,4 +241,26 @@ export const getTasksByProjectApi = async (projectId:any) => {
   }
 }
 
+//------------chat service------------------
 
+
+    export const getTeamByEmployeeApi = async () => {
+      try {
+        const response = await chatApi.get('/chat/teamListByEmployee');
+        const teams = response.data;
+        return teams;
+      } catch (error) {
+        console.error("Error logging out:", error);
+        throw error;
+      }
+    }
+    export const getChats = async () => {
+      try {
+        const response = await chatApi.get('/chat/getChats',);
+        const chats = response.data;
+        return chats;
+      } catch (error) {
+        console.error("Error logging out:", error);
+        throw error;
+      }
+    }
