@@ -42,6 +42,14 @@ export const useNotificationService = () => {
         variant:'success',
       });
     });
+    socket.on("new_chat", (data) => {
+      console.log("New chat:", data); 
+      toast({
+        title:data.senderName,
+        description:data.content,
+        variant:'success',
+      });
+    });
 
     return () => {
       if (notificationSocketRef.current) {
