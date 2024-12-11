@@ -6,8 +6,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { IconMenu2, IconX } from "@tabler/icons-react";
 
 interface Links {
+  onClick?: () => void;
   label: string;
-  href: string;
+  href? : string;
   icon: React.JSX.Element | React.ReactNode;
 }
 
@@ -154,30 +155,56 @@ export const SidebarLink = ({
   className,
   ...props
 }: {
-  link: Links;
+  link: Links; // Ensure Links interface has both href and onClick (optional)
   className?: string;
 }) => {
   const { open, animate } = useSidebar();
-  return (
-    <Link
-      to={link.href} // Use "to" instead of "href" for react-router-dom
-      className={cn(
-        "flex items-center justify-start gap-2 group/sidebar py-2",
-        className
-      )}
-      {...props}
-    >
-      {link.icon}
 
-      <motion.span
-        animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
-        }}
-        className="text-lime-200 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+  const isClickable = Boolean(link.href || link.onClick);
+
+  return isClickable ? (
+    link.href ? (
+      // Render a React Router Link when href is provided
+      <Link
+        to={link.href}
+        className={cn(
+          "flex items-center justify-start gap-2 group/sidebar py-2",
+          className
+        )}
+        {...props}
       >
-        {link.label}
-      </motion.span>
-    </Link>
-  );
+        {link.icon}
+        <motion.span
+          animate={{
+            display: animate ? (open ? "inline-block" : "none") : "inline-block",
+            opacity: animate ? (open ? 1 : 0) : 1,
+          }}
+          className="text-lime-200 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+        >
+          {link.label}
+        </motion.span>
+      </Link>
+    ) : (
+      // Render a div for onClick handlers when no href is provided
+      <div
+        onClick={link.onClick}
+        className={cn(
+          "cursor-pointer flex items-center justify-start gap-2 group/sidebar py-2",
+          className
+        )}
+        {...props}
+      >
+        {link.icon}
+        <motion.span
+          animate={{
+            display: animate ? (open ? "inline-block" : "none") : "inline-block",
+            opacity: animate ? (open ? 1 : 0) : 1,
+          }}
+          className="text-lime-200 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+        >
+          {link.label}
+        </motion.span>
+      </div>
+    )
+  ) : null;
 };

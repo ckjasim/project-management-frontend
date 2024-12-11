@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Users, Briefcase, Clock, Calendar, ArrowUp, ArrowDown, Activity, DollarSign, CheckCircle, AlertCircle } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
+import { useNotificationService } from '@/services/notificationService';
 
 const UserDashboard = () => {
-  const [selectedPeriod, setSelectedPeriod] = useState('Monthly');
 
+  useNotificationService()
+
+  const [selectedPeriod, setSelectedPeriod] = useState('Monthly');
   const projectData = [
     { month: 'May', completedTasks: 120, activeProjects: 4 },
     { month: 'Jun', completedTasks: 150, activeProjects: 6 },

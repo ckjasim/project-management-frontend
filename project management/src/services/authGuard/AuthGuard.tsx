@@ -1,28 +1,22 @@
-// import React from 'react';
-// import { Navigate } from 'react-router-dom';
-// import { getUserRole } from '@/utils/jwt/jwt'; 
-// import Cookies from 'js-cookie'; 
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
 
-// interface AuthGuardProps {
-//   children: React.ReactNode;
-//   allowedRoles: string[]; 
-// }
 
-// const AuthGuard: React.FC<AuthGuardProps> = ({ children, allowedRoles }) => {
-  
-//   // const token = Cookies.get('jwt'); 
-// console.log(token,'token sett')
- 
-//   const userRole = token ? getUserRole(token) : null;
-// console.log(userRole,'userrole sett');
 
- 
-//   if (!token || !allowedRoles.includes(userRole as string)) {
-//     return <Navigate to="/auth/userlogin" replace />;
-//   }
+export function ProtectedRoute({ role, children }: { role: string; children: JSX.Element }) {
+  const { userInfo } = useSelector((state: RootState) => state.Auth);
 
-//   return <>{children}</>; 
-// };
+  if (!userInfo) {
+    // Redirect to login if user is not authenticated
+    return <Navigate to="/auth/userLogin" />;
+  }
 
-// export default AuthGuard;
+  if (userInfo.role !== role) {
+    console.log(userInfo.role,role)
+    // Redirect to appropriate dashboard if role doesn't match
+    return <Navigate to={`/auth/userLogin`} />;
+  }
 
+  return children;
+}

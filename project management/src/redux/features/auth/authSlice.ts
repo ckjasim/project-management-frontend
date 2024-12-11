@@ -5,7 +5,7 @@ import { logoutUser, setUser } from "./fn";
 
 const user=window.localStorage.getItem("user") || ""
 
-const initialState:{userInfo:TUser | undefined}={
+const initialState:{userInfo:TUser }={
     userInfo:user?JSON.parse(user):undefined,
 }
 
@@ -15,7 +15,10 @@ const authSlice =createSlice({
   reducers:{
     SetUser:setUser,
     LogoutUser:logoutUser
-  }
+  },
+  extraReducers: (builder) => {
+    builder.addCase('LOGOUT', () => initialState); 
+  },
 })
 
 export const {SetUser,LogoutUser}=authSlice.actions

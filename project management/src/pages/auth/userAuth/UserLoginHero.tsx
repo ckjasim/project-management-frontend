@@ -6,7 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { Toaster } from "@/components/ui/toaster";
+
 import { useToast } from "@/components/hooks/use-toast";
 import { IconBrandGoogle, IconBrandGithub } from '@tabler/icons-react';
 import { useDispatch,useSelector } from 'react-redux';
@@ -75,7 +75,7 @@ export function UserLoginHero() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-rose-50 p-4 py-32 overflow-hidden">
-      <Toaster />
+ 
       <div className="w-full max-w-[1000px] flex rounded-3xl overflow-hidden bg-white shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] relative z-10">
         {/* Left Side - Animated Background */}
         <div className="  rounded-md bg-neutral-950 relative flex flex-col items-center justify-center antialiased">

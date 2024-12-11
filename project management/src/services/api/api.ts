@@ -2,7 +2,8 @@ import { taskApi, authApi, projectApi, chatApi } from "../interceptors/api";
 
 export const logoutApi = async () => {
   try {
-    const response = await authApi.post('/auth/logout');
+    console.log('jaaaaaaaaasiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii')
+    const response = await authApi.post('/logout');
     const tasks = response.data;
     return tasks;
   } catch (error) {

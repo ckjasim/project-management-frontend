@@ -11,21 +11,14 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import Modal from '@/components/global/Modal/Modal';
+
 import {
   postTasksApi,
   logoutApi,
   patchTaskStatusApi,
 } from '@/services/api/api';
-import { ErrorMessage, Field, Form, Formik, useFormik } from 'formik';
-import * as Yup from 'yup';
 
-const TodoSchema = Yup.object().shape({
-  title: Yup.string().required('Title is required'),
-  summary: Yup.string().required('Summary is required'),
-  description: Yup.string().required('Description is required'),
-  dueDate: Yup.date().required('Due date is required'),
-});
+
 
 export function EmployeeNavbar() {
   const [open, setOpen] = useState(false);
@@ -33,10 +26,8 @@ export function EmployeeNavbar() {
 
   const logout = async () => {
     try {
-      console.log('dddddddddddddddd')
       const res = await logoutApi();
-      console.log(res, 'logout successfully');
-
+      localStorage.removeItem('user')
       navigate('/auth/userLogin')
     } catch (error) {
       console.error('Logout failed:', error);
@@ -76,7 +67,6 @@ export function EmployeeNavbar() {
     {
       label: 'Logout',
       onClick: logout, 
-      href: '/auth/employeeLogin',
       icon: (
         <IconArrowLeft className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),

@@ -4,6 +4,7 @@ import { Loader2, FolderPlus } from 'lucide-react';
 import { getAllProjectApi, getProjectByTeamApi } from '@/services/api/api';
 import { ProjectCard } from '@/components/project/projectCard';
 import { Project } from '@/types';
+import { useNotificationService } from '@/services/notificationService';
 
 const getProjectStatus = (
   dueDate: string
@@ -15,6 +16,7 @@ const getProjectStatus = (
 };
 
 const TeamProjectDashboard: React.FC = () => {
+  useNotificationService()
   const [projects, setProjects] = useState<Project[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);

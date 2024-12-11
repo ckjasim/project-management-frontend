@@ -10,10 +10,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/hooks/use-toast";
 import { useSearchParams } from "react-router-dom";
 import { UploadCloud, X, ImagePlus } from "lucide-react";
+import { SetUser } from '@/redux/features/auth/authSlice';
+import { useDispatch } from 'react-redux';
 
 export function EmployeeSignUpHero() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const dispatch = useDispatch()
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -118,6 +121,11 @@ export function EmployeeSignUpHero() {
             { withCredentials: true }
           );
           console.log(response)
+          const {role,email,_id,isBlock,name}  = response?.data?.newUser
+          console.log(role)
+          const payload = {role,email,_id,isBlock,name}
+    
+          dispatch(SetUser(payload))
           navigate('/employee/projects');
         } catch (error: any) {
           toast({
