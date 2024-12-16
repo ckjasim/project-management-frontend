@@ -1,14 +1,12 @@
-import React from 'react';
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/hooks/use-toast";
-import { IconBrandGoogle, IconBrandGithub } from '@tabler/icons-react';
+import { userSignupApi } from '@/services/api/api';
+import { Chrome, Github } from 'lucide-react';
 
 export function UserSignUpHero() {
   const navigate = useNavigate();
@@ -35,15 +33,13 @@ export function UserSignUpHero() {
     const name = `${values.firstName} ${values.lastName}`;
     
     try {
-      const response = await axios.post('http://localhost:3000/api/userRegister', {
+      const data ={
         name,
         email: values.email,
         password: values.password,
         organization:values.organization
-      }, {
-        withCredentials: true,
-      });
-      
+      }
+      const response = await userSignupApi(data)
       toast({
         title: "OTP send to your Email",
         description: response?.data?.message || "An error occurred while logging in.",
@@ -185,14 +181,14 @@ export function UserSignUpHero() {
                     type="button"
                     className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors"
                   >
-                    <IconBrandGoogle className="h-5 w-5" />
+                    <Chrome className="h-5 w-5" />
                     <span className="text-sm font-medium">Google</span>
                   </button>
                   <button
                     type="button"
                     className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors"
                   >
-                    <IconBrandGithub className="h-5 w-5" />
+                    <Github className="h-5 w-5" />
                     <span className="text-sm font-medium">GitHub</span>
                   </button>
                 </div>

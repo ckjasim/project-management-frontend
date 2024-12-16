@@ -3,15 +3,15 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/hooks/use-toast";
 import { useSearchParams } from "react-router-dom";
-import { UploadCloud, X, ImagePlus } from "lucide-react";
+import { UploadCloud, X } from "lucide-react";
 import { SetUser } from '@/redux/features/auth/authSlice';
 import { useDispatch } from 'react-redux';
+import { employeeSignupApi } from '@/services/api/api';
 
 export function EmployeeSignUpHero() {
   const { toast } = useToast();
@@ -110,20 +110,17 @@ export function EmployeeSignUpHero() {
         const base64Image = reader.result as string;
 
         try {
-          const response = await axios.post(
-            'http://localhost:3000/api/employeeRegister',
-            {
-              token: token,
-              password,
-              mobile,
-              image: base64Image
-            },
-            { withCredentials: true }
-          );
-          console.log(response)
+          const data = {
+            token: token,
+            password,
+            mobile,
+            image: base64Image
+          }
+          const response = await employeeSignupApi(data)
+    
           const {role,email,_id,isBlock,name}  = response?.data?.newUser
           console.log(role)
-          const payload = {role,email,_id,isBlock,name}
+          const payload = {role,email,_id,isBlock,name,token:response?.data?.token}
     
           dispatch(SetUser(payload))
           navigate('/employee/projects');
@@ -185,7 +182,7 @@ export function EmployeeSignUpHero() {
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
               >
-                {({ isSubmitting, setFieldValue, values }) => (
+                {({ isSubmitting, setFieldValue }) => (
                   <Form className="space-y-4">
                                        <div className="space-y-2">
                       <Label className="block mb-2">Profile Picture</Label>
@@ -208,7 +205,7 @@ export function EmployeeSignUpHero() {
                         {previewImage ? (
                           <div className="relative group">
                             <img 
-                              src={previewImage} 
+                              src={previewImage}    
                               alt="Profile Preview" 
                               className="h-40 w-40 object-cover rounded-full shadow-lg"
                             />

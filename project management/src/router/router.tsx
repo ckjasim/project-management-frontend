@@ -8,7 +8,6 @@ import EmployeeLoginHero from '@/pages/auth/employeeAuth/EmployeeLoginHero';
 import { AdminLoginHero } from '@/pages/auth/adminAuth/AdminLoginHero';
 
 import { InputOTPForm } from '@/pages/auth/userAuth/otp';
-import { EmployeeOtpForm } from '@/pages/auth/employeeAuth/employeeOtp';
 
 import EmployeeLayout from '@/pages/Employee/EmployeeLayout';
 import TeamProjectDashboard from '@/pages/Employee/TeamProjectDashboard';
@@ -27,6 +26,7 @@ import TaskDashboard from '@/pages/user/TaskDashboard';
 import TeamDashboard from '@/pages/user/teamManagement';
 import EmployeesPage from '@/pages/user/employeesList';
 import { ProtectedRoute } from '@/services/authGuard/AuthGuard';
+import TeamList from '@/pages/user/teamList';
 
 const router = createBrowserRouter([
   {
@@ -39,7 +39,6 @@ const router = createBrowserRouter([
       { path: 'employeeLogin', element: <EmployeeLoginHero /> },
       { path: 'adminLogin', element: <AdminLoginHero /> },
       { path: 'otp', element: <InputOTPForm /> },
-      { path: 'employeeOtp', element: <EmployeeOtpForm /> },
     ],
   },
   {
@@ -80,6 +79,7 @@ const router = createBrowserRouter([
       { path: 'projects', element: <ProjectDashboard /> },
       { path: 'taskManagement/:projectId', element: <TaskDashboard /> },
       { path: 'teams', element: <TeamDashboard /> },
+      { path: 'teams/:id', element: <TeamList /> },
       { path: 'chat', element: <MessagesPage /> },
       { path: 'employees', element: <EmployeesPage /> },
     ],

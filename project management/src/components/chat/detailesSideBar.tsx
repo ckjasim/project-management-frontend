@@ -42,7 +42,7 @@ const DetailsSidebar: React.FC<DetailsSidebarProps> = ({ attachments, members })
             {members.map((member, index) => (
               <div key={index} className="flex flex-col items-center">
                 <Avatar>
-                  <AvatarImage src={`https://ui-avatars.com/api/?name=${member}`} />
+                  <AvatarImage src='' />
                   <AvatarFallback>{member.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <p className="text-sm font-medium text-gray-700 mt-2">{member}</p>

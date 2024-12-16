@@ -6,7 +6,7 @@ import DetailsSidebar from '@/components/chat/detailesSideBar';
 import { io, Socket } from 'socket.io-client';
 import { DefaultEventsMap } from '@socket.io/component-emitter';
 import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
+import { RootState } from '@/redux/store';   
 import { Message } from '@/types';
 import { getChats } from '@/services/api/api';
 

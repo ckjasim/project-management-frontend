@@ -17,11 +17,10 @@ import {
   InputOTPSlot,
 } from '@/components/ui/input-otp';
 import { BackgroundBeams } from "@/components/ui/background-beams";
-import axios from 'axios';
-import { Toaster } from '@/components/ui/toaster';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { SetUser } from '@/redux/features/auth/authSlice';
+import { otpApi, resendOtpApi } from '@/services/api/api';
 
 const FormSchema = z.object({
   pin: z.string().min(6, {
@@ -32,7 +31,7 @@ const FormSchema = z.object({
 export function InputOTPForm() {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const dispatch =useDispatch()
+  const dispatch = useDispatch()
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -42,6 +41,7 @@ export function InputOTPForm() {
 
   const [remainingTime, setRemainingTime] = useState(120);
   const [timerActive, setTimerActive] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     let timerInterval: NodeJS.Timeout;
@@ -79,11 +79,8 @@ export function InputOTPForm() {
     try {
       setRemainingTime(120);
       setTimerActive(true);
-      const response = await axios.post(
-        'http://localhost:3000/api/resendOtp',
-        {},
-        { withCredentials: true }
-      );
+      const response = await resendOtpApi()
+      
       console.log('OTP sent successfully:', response.data.message);
     } catch (error: any) {
       console.error(
@@ -94,18 +91,14 @@ export function InputOTPForm() {
   };
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-   
+    setIsLoading(true);
     try {
-      const res = await axios.post(
-        'http://localhost:3000/api/otp',
-        { otp: data.pin },
-        {
-          withCredentials: true,
-        }
-      );
+      const res = await otpApi({ otp: data.pin })
+       
       console.log(res)
-      const {role,email,_id,isBlock,name}  = res?.data?.newUser
-      const payload = {role,email,_id,isBlock,name}
+      const {role,email,_id,isBlock,name }  = res?.data?.newUser
+      const payload = {role,email,_id,isBlock,name,token:res?.data?.token}
+      
       console.log(payload,'pppppppppppppppppp')
       toast({
         title: 'Verification Successful',
@@ -114,7 +107,7 @@ export function InputOTPForm() {
       });
       dispatch(SetUser(payload))
       navigate('/user/dashboard');
-      console.log('OTP verification successful:', res.data.message);
+      console.log('OTP verification successful:', res?.data?.message);
     } catch (error: any) {
       toast({
         title: 'Verification Failed',
@@ -125,6 +118,8 @@ export function InputOTPForm() {
         'OTP verification error:',
         error.response?.data?.message || 'Error during OTP verification'
       );
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -219,9 +214,36 @@ export function InputOTPForm() {
 
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white font-medium py-3 rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30"
+                  disabled={isLoading}
+                  className={`w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white font-medium py-3 rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 ${
+                    isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
-                  Verify Email
+                  {isLoading ? (
+                    <div className="flex items-center justify-center">
+                      <svg 
+                        className="animate-spin h-5 w-5 mr-3" 
+                        viewBox="0 0 24 24"
+                      >
+                        <circle 
+                          className="opacity-25" 
+                          cx="12" 
+                          cy="12" 
+                          r="10" 
+                          stroke="currentColor" 
+                          strokeWidth="4"
+                        ></circle>
+                        <path 
+                          className="opacity-75" 
+                          fill="currentColor" 
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Verifying...
+                    </div>
+                  ) : (
+                    'Verify Email'
+                  )}
                 </button>
               </div>
             </form>

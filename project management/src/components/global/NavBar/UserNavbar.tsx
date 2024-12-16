@@ -1,31 +1,25 @@
 import React, {  useState } from 'react';
 import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar';
-import {
-  IconArrowLeft,
-  IconBrandTabler,
-  IconCalendarUser,
-  IconMessageChatbot,
-  IconFolders,
-  IconDeviceProjector,
-  IconUsersGroup,
-  IconUsers,
-} from '@tabler/icons-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 import {
-  postTasksApi,
+
   logoutApi,
-  patchTaskStatusApi,
+ 
 } from '@/services/api/api';
 import { useToast } from '@/components/hooks/use-toast';
-
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { CalendarClock, FolderTree, Group, LayoutDashboard, LogOut, MessagesSquare, SquareDashedKanban, Users} from 'lucide-react';
 
 export function UserNavbar() {
   const [open, setOpen] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const navigate=useNavigate()
   const{toast}=useToast()
+  const {userInfo}=useSelector((state:RootState)=>(state.Auth))
 
   const logout = async () => {
     try {
@@ -48,56 +42,56 @@ export function UserNavbar() {
       label: 'Dashboard',
       href: '/user/dashboard',
       icon: (
-        <IconBrandTabler className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+        <LayoutDashboard className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
     {
       label: 'Projects',
       href: '/user/projects',
       icon: (
-        <IconDeviceProjector className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+        <SquareDashedKanban className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
     {
       label: 'Teams',
       href: '/user/teams',
       icon: (
-        <IconUsers className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+        <Group className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
     {
       label: 'Chat',
       href: '/user/chat',
       icon: (
-        <IconMessageChatbot className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+        <MessagesSquare className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
     {
       label: 'Meeting',
       href: '/user/meeting',
       icon: (
-        <IconCalendarUser className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+        <CalendarClock  className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
     {
       label: 'Files',
       href: '/user/files',
       icon: (
-        <IconFolders className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+        <FolderTree className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
     {
       label: 'Employees',
       href: '/user/employees',
       icon: (
-        <IconUsersGroup className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+        <Users className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
     {
       label: 'Logout',
       onClick: logout, 
       icon: (
-        <IconArrowLeft className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+        <LogOut className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
   ];
@@ -112,7 +106,9 @@ export function UserNavbar() {
       <Sidebar open={open} setOpen={setOpen}>
         <SidebarBody className="justify-between gap-10">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+
             {open ? <Logo /> : <LogoIcon />}
+           
             <div className="mt-8 flex flex-col gap-2">
               {links.map((link, idx) => (
                 <SidebarLink key={idx} link={link} />
@@ -122,11 +118,11 @@ export function UserNavbar() {
           <div>
             <SidebarLink
               link={{
-                label: 'jasim ck',
+                label: `${userInfo?.name}`,
                 href: '#',
                 icon: (
                   <img
-                    src="https://assets.aceternity.com/manu.png"
+                    src=""
                     className="h-7 w-7 flex-shrink-0 rounded-full"
                     alt="Avatar"
                   />

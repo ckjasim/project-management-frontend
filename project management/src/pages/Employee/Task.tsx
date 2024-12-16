@@ -178,7 +178,7 @@ export const TaskManagement = () => {
               <Container
                 key={container.id}
                 id={container.id}
-                title={container.title}
+                title={container.title }
                 className={CONTAINER_COLORS[container.id as keyof typeof CONTAINER_COLORS]}
               >
                 <SortableContext items={container.items.map((item) => item.id)}>

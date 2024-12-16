@@ -37,7 +37,7 @@ const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef }) => {
       try {
         const empResponse = await getEmployeesByOrganizationApi();
         const personals =
-          empResponse?.employees
+          empResponse?.data?.all
             ?.filter(
               (val: { _id: string | undefined }) => val._id !== userInfo?._id
             )

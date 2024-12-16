@@ -4,36 +4,25 @@ import Modal from '@/components/global/Modal/Modal';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
-  IconPlus,
-  IconClipboardList,
-  IconProgress,
-  IconCheck,
-  IconEye,
-} from '@tabler/icons-react';
-import {
   postTasksApi,
   getTasksByTeamApi,
-  getTeamsApi,
   getTeamsByProject,
   getTeamMembersByTeamIdApi,
 } from '@/services/api/api';
 import Container from '@/components/global/Container/Container';
 import Items from '@/components/global/Items/Item';
-import { ArrowLeftIcon } from 'lucide-react';
+import { ArrowLeftIcon, Check, CircleDashed, ClipboardList, Eye, Plus } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  EmployeeSelect,
+  PrioritySelect,
 } from '@/components/ui/select';
 
 type TaskType = {
   assignedTo: string;
   priority:string
   id: string;
-  title: string;
+  title: any;
   description: string;
   dueDate: string;
 };
@@ -114,7 +103,7 @@ const TaskDashboard = () => {
         tasks.forEach(
           (task: {
             assignedTo: any;
-            priority:stirng
+            priority:string
             _id: string;
             title: string;
             description: string;
@@ -169,7 +158,7 @@ const TaskDashboard = () => {
       const res = await postTasksApi(newItem);
       console.log(res)
       const task = res.createdTask;
-console.log(task,'task,---------')
+
       setContainers((prevContainers) =>
         prevContainers.map((container) =>
           container.id === currentContainerId
@@ -205,10 +194,10 @@ console.log(task,'task,---------')
   };
 
   const containerIcons = {
-    [CONTAINER_IDS.PENDING]: <IconClipboardList className="text-blue-500" />,
-    [CONTAINER_IDS.PROGRESSING]: <IconProgress className="text-yellow-500" />,
-    [CONTAINER_IDS.COMPLETED]: <IconCheck className="text-green-500" />,
-    [CONTAINER_IDS.REVIEW]: <IconEye className="text-purple-500" />,
+    [CONTAINER_IDS.PENDING]: <ClipboardList className="text-blue-500" />,
+    [CONTAINER_IDS.PROGRESSING]: <CircleDashed className="text-yellow-500" />,
+    [CONTAINER_IDS.COMPLETED]: <Check className="text-green-500" />,
+    [CONTAINER_IDS.REVIEW]: <Eye className="text-purple-500" />,
   };
   const navigate = useNavigate();
 
@@ -274,7 +263,7 @@ console.log(task,'task,---------')
             }}
             className="bg-blue-500 text-white p-3 rounded-full hover:bg-blue-600 transition-colors shadow-lg"
           >
-            <IconPlus />
+            <Plus />
           </button>
         </motion.div>
 
@@ -315,45 +304,22 @@ console.log(task,'task,---------')
               <label className="block text-gray-600 font-medium mb-2">
                 Assign Employee
               </label>
-              <Select
-      value={assignedEmployee}
-      onValueChange={(value) => setAssignedEmployee(value)}
-    >
-      <SelectTrigger className="w-full">
-        <SelectValue placeholder="Select Employee" />
-      </SelectTrigger>
-      <SelectContent>
-        {teamMembers.map((employee:any) => (
-          <SelectItem key={employee._id} value={employee._id}>
-            {employee.name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+              <EmployeeSelect
+      assignedEmployee={assignedEmployee}
+      setAssignedEmployee={setAssignedEmployee}
+      teamMembers={teamMembers}
+    />
             </div>
 
             <div className="w-full">
               <label className="block text-gray-600 font-medium mb-2">
                 Priority
               </label>
-              <Select
-                value={priority}
-                onValueChange={(value) => setPriority(value)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select Priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  {priorityLevels.map((level) => (
-                    <SelectItem key={level.value} value={level.value}>
-                      <div className="flex items-center">
-                        <span className={`mr-2 ${level.color}`}>●</span>
-                        {level.label}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <PrioritySelect 
+      priority={priority}
+      setPriority={setPriority}
+      priorityLevels={priorityLevels}
+    />
             </div>
 
             {/* Due Date */}

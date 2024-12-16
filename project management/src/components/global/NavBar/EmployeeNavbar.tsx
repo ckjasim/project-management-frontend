@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar';
-import {
-  IconArrowLeft,
-  IconBrandTabler,
-  IconCalendarUser,
-  IconMessageChatbot,
-  IconFolders,
-  IconDeviceProjector,
-} from '@tabler/icons-react';
+
+import {        
+  SquareDashedKanban,
+  MessagesSquare,
+  CalendarClock,
+  FolderTree,
+  LogOut,                  
+} from 'lucide-react';
+
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -17,18 +18,22 @@ import {
   logoutApi,
   patchTaskStatusApi,
 } from '@/services/api/api';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 
 
 export function EmployeeNavbar() {
   const [open, setOpen] = useState(false);
   const navigate=useNavigate()
+  const {userInfo}=useSelector((state:RootState)=>(state.Auth))
+
 
   const logout = async () => {
     try {
       const res = await logoutApi();
       localStorage.removeItem('user')
-      navigate('/auth/userLogin')
+      navigate('/auth/employeeLogin')
     } catch (error) {
       console.error('Logout failed:', error);
     }
@@ -39,7 +44,7 @@ export function EmployeeNavbar() {
       label: 'Projects',
       href: '/employee/projects',
       icon: (
-        <IconDeviceProjector className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+        <SquareDashedKanban className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
     
@@ -47,28 +52,28 @@ export function EmployeeNavbar() {
       label: 'Chat',
       href: '/employee/chat',
       icon: (
-        <IconMessageChatbot className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+        <MessagesSquare className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
     {
       label: 'Meeting',
       href: '/employee/meeting',
       icon: (
-        <IconCalendarUser className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+        <CalendarClock className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
     {
       label: 'Files',
       href: '/employee/files',
       icon: (
-        <IconFolders className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+        <FolderTree className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
     {
       label: 'Logout',
       onClick: logout, 
       icon: (
-        <IconArrowLeft className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+        <LogOut className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
   ];
@@ -84,6 +89,7 @@ export function EmployeeNavbar() {
         <SidebarBody className="justify-between gap-10">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {open ? <Logo /> : <LogoIcon />}
+            
             <div className="mt-8 flex flex-col gap-2">
               {links.map((link, idx) => (
                 <SidebarLink key={idx} link={link} />
@@ -93,11 +99,11 @@ export function EmployeeNavbar() {
           <div>
             <SidebarLink
               link={{
-                label: 'jasim ck',
+                label: `${userInfo?.name}`,
                 href: '#',
                 icon: (
                   <img
-                    src="https://assets.aceternity.com/manu.png"
+                    src=""
                     className="h-7 w-7 flex-shrink-0 rounded-full"
                     alt="Avatar"
                   />

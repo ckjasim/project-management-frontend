@@ -1,18 +1,21 @@
-import React from 'react';
-import { Label } from "@/components/ui/label";
+
 import { Input } from "@/components/ui/input";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/hooks/use-toast";
-import { IconBrandGoogle, IconBrandGithub } from '@tabler/icons-react';
+import { adminLoginApi } from '@/services/api/api';
+import { useDispatch } from "react-redux";
+import { SetUser } from "@/redux/features/auth/authSlice";
+import { Chrome, Github } from "lucide-react";
 
 export function AdminLoginHero() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   const validationSchema = Yup.object({
     email: Yup.string()
@@ -25,11 +28,17 @@ export function AdminLoginHero() {
 
   const handleSubmit = async (values: { email: string; password: string }) => {
     try {
-      const response = await axios.post('http://localhost:3000/api/adminLogin', {
+      const data={
         email: values.email,
         password: values.password,
-      });
+      }
+      const response = await adminLoginApi(data);
+
       console.log('Login successful:', response);
+      
+            const payload={role:response?.data.role,token:response?.data.token,_id:'',isBlock:false,email:'',name:''}
+      
+            dispatch(SetUser(payload))
       toast({
         title: "Login Successful",
         description: response?.data?.message || "Logged in successfully.",
@@ -132,14 +141,14 @@ export function AdminLoginHero() {
                     type="button"
                     className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors"
                   >
-                    <IconBrandGoogle className="h-5 w-5" />
+                    <Chrome className="h-5 w-5" />
                     <span className="text-sm font-medium">Google</span>
                   </button>
                   <button
                     type="button"
                     className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors"
                   >
-                    <IconBrandGithub className="h-5 w-5" />
+                    <Github className="h-5 w-5" />
                     <span className="text-sm font-medium">GitHub</span>
                   </button>
                 </div>

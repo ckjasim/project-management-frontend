@@ -1,28 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, PlusCircle, X } from 'lucide-react';
+import { ArrowLeftIcon, Loader2, PlusCircle } from 'lucide-react';
 import Modal from '@/components/global/Modal/Modal';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
-import { addEmployeeInvitationApi, getEmployeesByOrganizationApi } from '@/services/api/api';
+import { addEmployeeInvitationApi, getTeamMembersByTeamIdApi } from '@/services/api/api';
 import { useToast } from '@/components/hooks/use-toast';
-import { set } from 'date-fns';
+import { useNavigate, useParams } from 'react-router-dom';
 
 
-const EmployeePage = () => {
+
+const TeamList = () => {
   const { toast } = useToast();
+    const { id: id } = useParams();
   const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
-  const [employees,setEmployees]=useState([])
+  const [teamMembers,setTeamMembers]=useState([])
+  const navigate=useNavigate()
 
   useEffect(()=>{
   const fetchEmployee=async ()=>{
+if(id){
 
-    const empResponse = await getEmployeesByOrganizationApi();
-    setEmployees(empResponse?.data?.all)
+  const res = await getTeamMembersByTeamIdApi(id);
+  setTeamMembers(res.teamMembers.members)
+}
     }
     fetchEmployee()
   },[])
+
   const addEmployeeValidationSchema = Yup.object().shape({
     name: Yup.string()
       .trim()
@@ -142,7 +148,16 @@ const EmployeePage = () => {
 </Modal>
 <Card className="w-full">
   <CardHeader className="flex flex-row justify-between">
-    <CardTitle>Employees</CardTitle>
+    <div className='flex'>
+  <Button
+  onClick={()=>navigate(-1)}
+          variant="outline"
+          className="flex items-center space-x-2 mr-8"
+        >
+          <ArrowLeftIcon className="h-4 w-4" />
+        </Button>
+    <CardTitle className='text-2xl'>Team Members</CardTitle>
+    </div >
     <Button
       onClick={() => setShowAddEmployeeModal(true)}
       className="flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors"
@@ -153,7 +168,7 @@ const EmployeePage = () => {
   </CardHeader>
   <CardContent>
     <div className="grid grid-cols-5 gap-8">
-      {employees?.map((employee, index) => (
+      {teamMembers?.map((employee, index) => (
         <div
           key={index}
           className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col items-center p-4"
@@ -161,7 +176,7 @@ const EmployeePage = () => {
           {/* Profile Image */}
           <div className="relative">
             <img
-              src={employee.profileImage?.url || "https://via.placeholder.com/150"}
+              src={employee.profileImage?.url || ""}
               alt={`${employee.name || "Employee"}'s Profile`}
               className="h-40 w-40 object-cover rounded-full shadow-lg"
             />
@@ -174,7 +189,7 @@ const EmployeePage = () => {
             <div className="mt-4 space-y-2">
               <div className="flex items-center justify-center space-x-2 text-gray-600">
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns=""
                   className="h-5 w-5"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -191,7 +206,7 @@ const EmployeePage = () => {
               </div>
               <div className="flex items-center justify-center space-x-2 text-gray-600">
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns=""
                   className="h-5 w-5"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -218,4 +233,4 @@ const EmployeePage = () => {
   );
 };
 
-export default EmployeePage;
+export default TeamList;

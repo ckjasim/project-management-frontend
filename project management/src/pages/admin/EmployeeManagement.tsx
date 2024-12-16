@@ -2,18 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { Search, Filter, MoreVertical } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { employeeManageApi, getAllEmployeesApi } from '@/services/api/api';
+import { useToast } from '@/components/hooks/use-toast';
 
 type Employee = {
-  status: any;
+  isActive: any;
   dateJoined: string;
   _id: string;
   name: string;
   email: string;
   mobile: string;
   role: string;
-  organization: string;
+  organization: any;
   isBlock: boolean;
   jobRole: string; 
   projectCode: string;
@@ -22,9 +22,11 @@ type Employee = {
 };
 
 const EmployeeManagement = () => {
-  const [showAlert, setShowAlert] = useState(false);
+  const {toast} = useToast()
+
+
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
+ const [filterOrg, setFilterOrg] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
 
@@ -43,7 +45,6 @@ const EmployeeManagement = () => {
     };
     fetchEmployees();
   }, []);
-
   const handleBlock = async (employeeId: string, email: string) => {
     try {
 
@@ -62,8 +63,12 @@ const EmployeeManagement = () => {
         console.error('Error updating employee status on backend.');
       }
 
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000);
+      toast({
+        title: ' Employee status has been updated',
+        // description: 'invitaion send to employee email',
+        variant: 'success',
+      });
+
     } catch (error) {
       console.error('Error updating employee status:', error);
 
@@ -73,29 +78,21 @@ const EmployeeManagement = () => {
         )
       );
 
-      setShowAlert(true);
     }
   };
 
-  const filteredEmployees = employees.filter((employee) => {
-    const matchesSearch = employee.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesFilter =
-      filterStatus === 'all' ||
-      employee.status.toLowerCase() === filterStatus.toLowerCase();
+  const filteredEmployees = employees?.filter((employee) => {
+    const matchesSearch = employee?.name?.toLowerCase()
+      .includes(searchTerm?.toLowerCase());
+      const matchesFilter = filterOrg === 'all' || employee.organization?.name?.toLowerCase() === filterOrg.toLowerCase();
+
     return matchesSearch && matchesFilter;
   });
+ 
 
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto h-screen">
-      {showAlert && (
-        <Alert className="mb-6 bg-red-50 border-red-200">
-          <AlertDescription className="text-red-800">
-            Employee status has been updated
-          </AlertDescription>
-        </Alert>
-      )}
+    
 
       <Card className="rounded-lg shadow-md">
         <CardHeader className="border-b border-gray-200 p-6">
@@ -115,23 +112,30 @@ const EmployeeManagement = () => {
 
           {/* Filters Panel */}
           {showFilters && (
-            <div className="mt-6 p-6 bg-gray-50 rounded-lg space-y-4">
-              <div className="text-base font-medium">Status</div>
-              <div className="flex flex-wrap gap-3">
-                {['all', 'active', 'inactive'].map((status) => (
-                  <Button
-                    key={status}
-                    variant={filterStatus === status ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setFilterStatus(status)}
-                    className={filterStatus === status ? 'bg-blue-600' : ''}
-                  >
-                    {status.charAt(0).toUpperCase() + status.slice(1)}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
+  <div className="mt-6 p-6 bg-gray-50 rounded-lg space-y-4">
+    <div className="text-base font-medium">Organization</div>
+    <div className="flex flex-wrap gap-3">
+      {[
+        { organization: { _id: 'all', name: 'all' } }, // Add "All" as a default option
+        ...employees.filter(
+          (org, index, self) =>
+            self.findIndex((o) => o.organization._id === org.organization._id) === index
+        ),
+      ].map((org) => (
+        <Button
+          key={org.organization._id}
+          variant={filterOrg === org.organization.name ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setFilterOrg(org.organization.name)}
+          className={filterOrg === org.organization.name ? 'bg-blue-600' : ''}
+        >
+          {org.organization.name.charAt(0).toUpperCase() + org.organization.name.slice(1)}
+        </Button>
+      ))}
+    </div>
+  </div>
+)}
+
 
           <div className="mt-6 relative">
             <Search
@@ -184,7 +188,7 @@ const EmployeeManagement = () => {
                     <div className="font-medium text-gray-500 md:hidden">
                       Organization:
                     </div>
-                    <div>{employee.organization}</div>
+                    <div>{employee.organization?.name}</div>
 
                     <div className="font-medium text-gray-500 md:hidden">
                       Job Role:

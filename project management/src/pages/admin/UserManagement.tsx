@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Search, Filter, MoreVertical } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { getAllUsersApi, userManageApi } from '@/services/api/api';
+import { useToast } from '@/components/hooks/use-toast';
 
 
 type User = {
   _id: string;
   name: string;
   email: string;
-  organization: string;
+  organization: any;
   subscription: string;
   isBlock: boolean;
   createdAt: string;
@@ -18,7 +18,8 @@ type User = {
 };
 
 const UserManagement = () => {
-  const [showAlert, setShowAlert] = useState(false);
+
+const {toast}=useToast()
   const [searchTerm, setSearchTerm] = useState('');
   const [filterOrg, setFilterOrg] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
@@ -58,8 +59,11 @@ const UserManagement = () => {
         console.error('Error updating user status on backend.');
       }
   
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000);
+      toast({
+        title: ' Employee status has been updated',
+        // description: 'invitaion send to employee email',
+        variant: 'success',
+      });
     } catch (error) {
       console.error('Error updating user status:', error);
       
@@ -70,8 +74,8 @@ const UserManagement = () => {
         )
       );
       
-      // Show error alert if needed
-      setShowAlert(true);
+
+
     }
   };
   
@@ -79,19 +83,13 @@ const UserManagement = () => {
   // Filter and search logic
   const filteredUsers = users.filter((user) => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterOrg === 'all' || user.organization.toLowerCase() === filterOrg.toLowerCase();
+    const matchesFilter = filterOrg === 'all' || user.organization?.name?.toLowerCase() === filterOrg.toLowerCase();
     return matchesSearch && matchesFilter;
   });
 
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto h-screen">
-      {showAlert && (
-        <Alert className="mb-6 bg-red-50 border-red-200">
-          <AlertDescription className="text-red-800">
-            User status has been updated
-          </AlertDescription>
-        </Alert>
-      )}
+   
 
       <Card className="rounded-lg shadow-md">
         <CardHeader className="border-b border-gray-200 p-6">
@@ -110,23 +108,27 @@ const UserManagement = () => {
           </div>
 
           {showFilters && (
-            <div className="mt-6 p-6 bg-gray-50 rounded-lg space-y-4">
-              <div className="text-base font-medium">Organization</div>
-              <div className="flex flex-wrap gap-3">
-                {['all', 'broto', 'companyB', 'companyC'].map((org) => (
-                  <Button
-                    key={org}
-                    variant={filterOrg === org ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setFilterOrg(org)}
-                    className={filterOrg === org ? 'bg-blue-600' : ''}
-                  >
-                    {org.charAt(0).toUpperCase() + org.slice(1)}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
+  <div className="mt-6 p-6 bg-gray-50 rounded-lg space-y-4">
+    <div className="text-base font-medium">Organization</div>
+    <div className="flex flex-wrap gap-3">
+      {[
+        { organization: { _id: 'all', name: 'all' } }, 
+        ...users,
+      ].map((org) => (
+        <Button
+          key={org.organization._id}
+          variant={filterOrg === org.organization.name ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setFilterOrg(org.organization.name)}
+          className={filterOrg === org.organization.name ? 'bg-blue-600' : ''}
+        >
+          {org.organization.name.charAt(0).toUpperCase() + org.organization.name.slice(1)}
+        </Button>
+      ))}
+    </div>
+  </div>
+)}
+
 
           <div className="flex-1 max-w-xl mx-8">
             <div className="relative">
@@ -168,9 +170,9 @@ const UserManagement = () => {
                       <div className="font-medium text-gray-500">Name:</div>
                       <div>{user.name}</div>
                       <div className="font-medium text-gray-500">Organization:</div>
-                      <div>{user.organization}</div>
+                      <div>{user.organization?.name}</div>
                       <div className="font-medium text-gray-500">Subscription:</div>
-                      <div>{user.subscription}</div>
+                      <div>{user.organization?.subscriptionTier}</div>
                       <div className="font-medium text-gray-500">Date Joined:</div>
                       <div>{user.createdAt}</div>
                       <div className="font-medium text-gray-500">Status:</div>
@@ -186,8 +188,8 @@ const UserManagement = () => {
                     </div>
 
                     <div className="hidden md:block font-medium">{user.name}</div>
-                    <div className="hidden md:block">{user.organization}</div>
-                    <div className="hidden md:block">{user.subscription}</div>
+                    <div className="hidden md:block">{user?.organization?.name}</div>
+                    <div className="hidden md:block">{user.organization?.subscriptionTier}</div>
                     <div className="hidden md:block text-gray-600">{user.createdAt}</div>
                     <div className="hidden md:block">
                       <span

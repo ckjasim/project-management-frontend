@@ -8,6 +8,7 @@ import { ErrorMessage, Field, Formik ,Form} from 'formik';
 import { Employee, TeamFormValues } from '@/types';
 import { createTeamApi, getEmployeesByOrganizationApi, getTeamsApi } from '@/services/api/api';
 import * as Yup from 'yup';
+import { useNavigate } from 'react-router-dom';
 
 const TeamDashboard: React.FC = () => {
   // State Management
@@ -15,7 +16,7 @@ const TeamDashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [teams, setTeams] = useState<Array<{ id: string; name: string; color: string }>>([]);
- 
+ const navigate=useNavigate()
   // Color Palette for Team Cards
   const colors = [
     'bg-blue-500', 
@@ -126,8 +127,9 @@ console.log(values)
           <Card 
             key={team.id} 
             className="transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
+            onClick={()=>{navigate(`/user/teams/${team.id}`)}}
           >
-            <CardHeader className="relative">
+            <CardHeader className="relative" >
               <div className={`absolute inset-0 ${team.color} opacity-20 rounded-t-xl`}></div>
               <CardTitle className="z-10 flex justify-between items-center">
                 <span className="text-2xl font-semibold">{team.name}</span>

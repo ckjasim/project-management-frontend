@@ -1,17 +1,17 @@
 import React from 'react';
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { BackgroundBeams } from "@/components/ui/background-beams";
-import { cn } from "@/lib/utils";
+
 import { Link, useNavigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/hooks/use-toast";
-import sss from "@/assets/menu-3.jpg"
+
 import { useDispatch } from 'react-redux';
 import { SetUser } from '@/redux/features/auth/authSlice';
+import { employeeLoginApi } from '@/services/api/api';
 interface FormValues {
   email: string;
   password: string;
@@ -39,16 +39,14 @@ const EmployeeLoginHero: React.FC = () => {
   const handleSubmit = async (values: FormValues) => {
     try {
     
-      const response = await axios.post('http://localhost:3000/api/employeeLogin', values, 
-        { withCredentials: true });
+      const response = await employeeLoginApi(values)
       toast({
         title: "Login Successful",
         description: response.data.message || "Successfully logged in!",
         variant: 'success',
       });
- 
-      const {role,email,_id,isBlock,name}  = response?.data?.data?.user
-      const payload = {role,email,_id,isBlock,name}
+      const {role,email,_id,isBlock,name}  = response?.data?.user
+      const payload = {role,email,_id,isBlock,name,token:response?.data?.token}
 
       dispatch(SetUser(payload))
 

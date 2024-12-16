@@ -4,5 +4,6 @@ export interface TUser{
   name:string,
   role:string,
   isBlock:boolean,
+  token:any,
   // isAdmin:boolean
 }

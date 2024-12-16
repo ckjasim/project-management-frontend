@@ -1,6 +1,6 @@
-import React from 'react';
+
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { Search, Bell, ChevronDown } from 'lucide-react';
+
 import { Card, CardContent } from "@/components/ui/card";
 
 const AdminDashboard = () => {

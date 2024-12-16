@@ -135,7 +135,7 @@ const UserDashboard = () => {
           ))}
         </div>
       </div>
-      <div className="h-80"> {/* Adjusted height for the graph */}
+      <div className="h-80"> 
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={projectData}>
             <XAxis dataKey="month" />

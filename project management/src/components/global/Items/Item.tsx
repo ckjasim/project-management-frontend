@@ -74,7 +74,7 @@ const Items = ({
         await deleteTaskApi(id);
       } catch (error) {
         console.error('Error deleting task:', error);
-        alert('Failed to delete task. Please try again.');
+   
       } finally {
         setIsDeleting(false);
       }
@@ -88,7 +88,7 @@ const Items = ({
       setShowEditModal(false);
     } catch (error) {
       console.error('Error updating task:', error);
-      alert('Failed to update task. Please try again.');
+
     } finally {
       setIsUpdating(false);
     }

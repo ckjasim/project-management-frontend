@@ -1,17 +1,17 @@
-import React from 'react';
-import { Label } from "@/components/ui/label";
+
 import { Input } from "@/components/ui/input";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
 import { useToast } from "@/components/hooks/use-toast";
-import { IconBrandGoogle, IconBrandGithub } from '@tabler/icons-react';
-import { useDispatch,useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { SetUser } from '@/redux/features/auth/authSlice';
-import { RootState } from '@/redux/store';
+
+import { userLoginApi } from '@/services/api/api';
+import { Chrome, Github } from "lucide-react";
 
 
 export function UserLoginHero() {
@@ -36,20 +36,13 @@ export function UserLoginHero() {
 
   const handleSubmit = async (values: { email: string; password: string }) => {
     try {
-      const response = await axios.post(
-        'http://localhost:3000/api/userLogin',
-        {
-          email: values.email,
-          password: values.password,
-        },{
-          withCredentials:true
-        }
-      );
-      console.log(response,'kkkkkkkk122121212121')
-      const {role,email,_id,isBlock,name}  = response?.data?.data?.user
-      const payload = {role,email,_id,isBlock,name}
-      console.log(payload,'pppppppppppppppppp')
-      
+      const data= {
+        email: values.email,
+        password: values.password,
+      }
+      const response = await userLoginApi(data)
+      const {role,email,_id,isBlock,name }  = response?.data?.user
+      const payload = {role,email,_id,isBlock,name,token:response?.data?.token}
       toast({
         title: "Login Successful",
         description:"Successfully logged in!",
@@ -57,10 +50,10 @@ export function UserLoginHero() {
       });
       
       dispatch(SetUser(payload))
-      
-      
+   
       navigate('/user/dashboard');
     } catch (error: any) {
+      console.log(error)
       toast({
         title: "Login Failed",
         description: error?.response?.data?.message || "An error occurred during login.",
@@ -161,14 +154,14 @@ export function UserLoginHero() {
                     type="button"
                     className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors"
                   >
-                    <IconBrandGoogle className="h-5 w-5" />
+                    <Chrome className="h-5 w-5" />
                     <span className="text-sm font-medium">Google</span>
                   </button>
                   <button
                     type="button"
                     className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors"
                   >
-                    <IconBrandGithub className="h-5 w-5" />
+                    <Github className="h-5 w-5" />
                     <span className="text-sm font-medium">GitHub</span>
                   </button>
                 </div>

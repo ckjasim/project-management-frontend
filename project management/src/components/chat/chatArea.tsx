@@ -74,7 +74,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
           chatMode === 'private' &&
           ((msg.senderId === userInfo?._id &&
             msg.recipientId === currentRoom) ||
-            msg.senderId === currentRoom))
+            (msg.recipientId === userInfo?._id &&
+            msg.senderId === currentRoom)))
     );
     console.log(messages, currentRoom);
     return filteredMessages.map((msg) => (

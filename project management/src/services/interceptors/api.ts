@@ -1,30 +1,48 @@
 import axios from 'axios';
 
-console.log('111111111111111111111')
-console.log(import.meta.env.VITE_BACKEND_URL,'sssssssssssssss')
-console.log('2222222222222222222222222')
-const authApi = axios.create({
-  baseURL: import.meta.env.VITE_AUTH_BASE_URL,
+const baseURL = axios.create({
+  baseURL: import.meta.env.VITE_BASE_URL,
   withCredentials: true,
 });
 
-const taskApi = axios.create({
-  baseURL: import.meta.env.VITE_TASK_BASE_URL,
-  withCredentials: true,
-});
-const projectApi = axios.create({
-  baseURL: import.meta.env.VITE_PROJECT_BASE_URL,
-  withCredentials: true,
-});
-const chatApi = axios.create({
-  baseURL: import.meta.env.VITE_CHAT_BASE_URL,
-  withCredentials: true,
-});
+const addAuthToken = (config: any) => {
+  const userString = window.localStorage.getItem('user');
+  const user = userString ? JSON.parse(userString) : null;
+  const token = user?.token;
+  console.log(user, 'token');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+};
 
-authApi.interceptors.response.use(
+const handleTokenRefresh = async () => {
+  try {
+    const response = await baseURL.post('/auth/refresh');
+    console.log(response,'jassssssssssssiiiiiiiiiiiiiiiiiiiii')
+    const newToken = response.data;
+
+    const userString = window.localStorage.getItem('user');
+    const user = userString ? JSON.parse(userString) : {};
+    user.token = newToken;
+    window.localStorage.setItem('user', JSON.stringify(user));
+
+    return newToken;
+  } catch (error) {
+    console.error('Error refreshing token:', error);
+    throw error;
+  }
+};
+
+baseURL.interceptors.request.use(addAuthToken, (error) =>
+  Promise.reject(error)
+);
+
+baseURL.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
     if (
       error.response &&
       error.response.status === 401 &&
@@ -33,12 +51,13 @@ authApi.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        await authApi.post('/api/refresh');
+        const newToken = await handleTokenRefresh();
 
-        return authApi(originalRequest);
+        originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+
+        return baseURL(originalRequest);
       } catch (refreshError) {
         console.error('Error refreshing token:', refreshError);
-
         return Promise.reject(refreshError);
       }
     }
@@ -47,4 +66,4 @@ authApi.interceptors.response.use(
   }
 );
 
-export { authApi, taskApi,projectApi,chatApi };
+export { baseURL };

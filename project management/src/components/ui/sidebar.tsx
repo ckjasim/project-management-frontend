@@ -1,14 +1,14 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom"; 
-import React, { useState, createContext, useContext } from "react";
+import React, { useState, useEffect, createContext, useContext, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { IconMenu2, IconX } from "@tabler/icons-react";
+import { Menu, X } from "lucide-react";
 
 interface Links {
   onClick?: () => void;
   label: string;
-  href? : string;
+  href?: string;
   icon: React.JSX.Element | React.ReactNode;
 }
 
@@ -40,12 +40,18 @@ export const SidebarProvider = ({
   animate?: boolean;
 }) => {
   const [openState, setOpenState] = useState(false);
+  const [isFirstRender, setIsFirstRender] = useState(true);
+
+  useEffect(() => {
+    setIsFirstRender(false);
+  }, []);
 
   const open = openProp !== undefined ? openProp : openState;
   const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
+  const effectiveAnimate = !isFirstRender && animate;
 
   return (
-    <SidebarContext.Provider value={{ open, setOpen, animate }}>
+    <SidebarContext.Provider value={{ open, setOpen, animate: effectiveAnimate }}>
       {children}
     </SidebarContext.Provider>
   );
@@ -87,12 +93,12 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden  md:flex md:flex-col bg-[#0f4841f7] dark:bg-neutral-800 w-[300px] flex-shrink-0",
+        "h-full px-4 py-4 hidden md:flex md:flex-col bg-[#0f4841f7] dark:bg-neutral-800 w-[300px] flex-shrink-0",
         className
       )}
-      animate={{
-        width: animate ? (open ? "150px" : "60px") : "300px",
-      }}
+      initial={{ width: "60px" }}
+      animate={{ width: animate ? (open ? "150px" : "60px") : "300px" }}
+      transition={{ duration: 0.3 }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       {...props}
@@ -116,7 +122,7 @@ export const MobileSidebar = ({
       {...props}
     >
       <div className="flex justify-end z-20 w-full">
-        <IconMenu2
+        <Menu
           className="text-neutral-800 dark:text-neutral-200"
           onClick={() => setOpen(!open)}
         />
@@ -140,7 +146,7 @@ export const MobileSidebar = ({
               className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200"
               onClick={() => setOpen(!open)}
             >
-              <IconX />
+              <X />
             </div>
             {children}
           </motion.div>
@@ -162,6 +168,8 @@ export const SidebarLink = ({
 
   const isClickable = Boolean(link.href || link.onClick);
 
+  const memoizedLinkLabel = useMemo(() => link.label, [link.label]);
+
   return isClickable ? (
     link.href ? (
       // Render a React Router Link when href is provided
@@ -175,13 +183,14 @@ export const SidebarLink = ({
       >
         {link.icon}
         <motion.span
+          initial={{ opacity: 0 }}
           animate={{
-            display: animate ? (open ? "inline-block" : "none") : "inline-block",
             opacity: animate ? (open ? 1 : 0) : 1,
           }}
+          transition={{ duration: 0.2 }}
           className="text-lime-200 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
         >
-          {link.label}
+          {memoizedLinkLabel}
         </motion.span>
       </Link>
     ) : (
@@ -196,13 +205,14 @@ export const SidebarLink = ({
       >
         {link.icon}
         <motion.span
+          initial={{ opacity: 0 }}
           animate={{
-            display: animate ? (open ? "inline-block" : "none") : "inline-block",
             opacity: animate ? (open ? 1 : 0) : 1,
           }}
+          transition={{ duration: 0.2 }}
           className="text-lime-200 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
         >
-          {link.label}
+          {memoizedLinkLabel}
         </motion.span>
       </div>
     )
