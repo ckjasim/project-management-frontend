@@ -33,7 +33,7 @@ export function EmployeeNavbar() {
     try {
       const res = await logoutApi();
       localStorage.removeItem('user')
-      navigate('/auth/employeeLogin')
+      navigate('/auth/employeeLogin',{ replace: true })
     } catch (error) {
       console.error('Logout failed:', error);
     }

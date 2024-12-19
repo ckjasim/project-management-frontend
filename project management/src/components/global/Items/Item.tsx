@@ -12,7 +12,7 @@ import {
   MoreVertical 
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { deleteTaskApi, patchTaskApi } from '@/services/api/api';
+import { deleteTaskApi, getTeamMembersByTeamIdApi, patchTaskApi } from '@/services/api/api';
 import Modal from '@/components/global/Modal/Modal';
 import * as Yup from 'yup';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
@@ -24,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { EmployeeSelect, PrioritySelect } from '@/components/ui/select';
 
 interface ItemsProps {
   id: UniqueIdentifier;
@@ -32,6 +33,7 @@ interface ItemsProps {
   dueDate: string;
   assignedTo: string;
   priority: string;
+  selectedTeam: any;
 }
 
 const getPriorityColor = (priority: string) => {
@@ -49,12 +51,16 @@ const Items = ({
   description, 
   dueDate, 
   assignedTo, 
-  priority 
+  priority,
+  selectedTeam
 }: ItemsProps) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [currentEmployee, setCurrentEmployee] = useState(assignedTo);
+  const [currentPriority, setCurrentPriority] = useState(priority);
+
   const {
     attributes,
     listeners,
@@ -67,28 +73,49 @@ const Items = ({
     data: { type: 'item' },
   });
 
+  const priorityLevels = [
+    { value: 'low', label: 'Low Priority', color: 'text-green-600' },
+    { value: 'medium', label: 'Medium Priority', color: 'text-yellow-600' },
+    { value: 'high', label: 'High Priority', color: 'text-red-600' },
+  ];
+
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this task?')) {
       setIsDeleting(true);
       try {
         await deleteTaskApi(id);
+        // You might want to trigger a refresh of the task list here
       } catch (error) {
         console.error('Error deleting task:', error);
-   
       } finally {
         setIsDeleting(false);
       }
     }
   };
+  
+  const editTask = async () => {
+    setShowEditModal(true);
+    try {
+      const response = await getTeamMembersByTeamIdApi(selectedTeam.id);
+      setTeamMembers(response?.teamMembers?.members || []);
+    } catch (error) {
+      console.error('Error fetching team members:', error);
+    }
+  };
 
-  const handleUpdate = async (values: Omit<ItemsProps, 'id'>) => {
+  const handleUpdate = async (values: any) => {
     setIsUpdating(true);
     try {
-      await patchTaskApi(id, values);
+      const updatedTask = {
+        ...values,
+        assignedTo: currentEmployee,
+        priority: currentPriority,
+      };
+      await patchTaskApi(id, updatedTask);
       setShowEditModal(false);
+      // You might want to trigger a refresh of the task list here
     } catch (error) {
       console.error('Error updating task:', error);
-
     } finally {
       setIsUpdating(false);
     }
@@ -146,40 +173,25 @@ const Items = ({
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <h3 className="font-semibold text-xl text-gray-900 mb-1 truncate">{title}</h3>
-              
               {description && (
                 <p className="text-sm text-gray-600 line-clamp-2 mt-6">{description}</p>
               )}
             </div>
             
             <div className="flex items-center space-x-2">
-              <span 
-                className={`
-                  px-2.5 py-1 
-                  rounded-full 
-                  text-xs 
-                  font-normal 
-                  
-                  tracking-wider
-                  ${getPriorityColor(priority)}
-                `}
-              >
+              <span className={`px-2.5 py-1 rounded-full text-xs font-normal tracking-wider ${getPriorityColor(priority)}`}>
                 {priority}
               </span>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-8 w-8 p-0 hover:bg-gray-100"
-                  >
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-gray-100">
                     <MoreVertical className="h-4 w-4 text-gray-500" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem 
-                    onSelect={() => setShowEditModal(true)}
+                    onSelect={editTask}
                     className="cursor-pointer"
                   >
                     <Edit className="mr-2 h-4 w-4" />
@@ -203,30 +215,27 @@ const Items = ({
           </div>
 
           <div className="flex items-center justify-between border-t border-gray-100 pt-3">
-  {/* Left Section */}
-  <div className="flex items-center space-x-2">
-    <div className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">
-      <span className="mr-1">👤</span>
-      {assignedTo}
-    </div>
-  </div>
+            <div className="flex items-center space-x-2">
+              <div className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">
+                <span className="mr-1">👤</span>
+                {assignedTo}
+              </div>
+            </div>
 
-  {/* Right Section */}
-  <div className="flex items-center space-x-4">
-    <div className="flex items-center text-sm text-gray-500 space-x-1">
-      <Clock className="h-4 w-4 text-blue-500" />
-      <span>{formatDate(dueDate)}</span>
-    </div>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center text-sm text-gray-500 space-x-1">
+                <Clock className="h-4 w-4 text-blue-500" />
+                <span>{formatDate(dueDate)}</span>
+              </div>
 
-    {isOverdue && (
-      <div className="flex items-center text-red-500 text-sm">
-        <AlertCircle className="h-4 w-4 mr-1" />
-        <span>Overdue</span>
-      </div>
-    )}
-  </div>
-</div>
-
+              {isOverdue && (
+                <div className="flex items-center text-red-500 text-sm">
+                  <AlertCircle className="h-4 w-4 mr-1" />
+                  <span>Overdue</span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -237,9 +246,7 @@ const Items = ({
             initialValues={{
               title,
               description,
-              dueDate,
-              assignedTo,
-              priority,
+              dueDate: dueDate ? new Date(dueDate).toISOString().split('T')[0] : '',
             }}
             validationSchema={validationSchema}
             onSubmit={handleUpdate}
@@ -268,9 +275,30 @@ const Items = ({
                   </label>
                   <Field
                     name="description"
-                    as="textarea"
-                    className="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    rows={4}
+                    as={Input}
+                    className="w-full rounded-lg"
+                  />
+                </div>
+
+                <div className="w-full">
+                  <label className="block text-gray-600 font-medium mb-2">
+                    Assign Employee
+                  </label>
+                  <EmployeeSelect
+                    assignedEmployee={currentEmployee}
+                    setAssignedEmployee={setCurrentEmployee}
+                    teamMembers={teamMembers}
+                  />
+                </div>
+
+                <div className="w-full">
+                  <label className="block text-gray-600 font-medium mb-2">
+                    Priority
+                  </label>
+                  <PrioritySelect
+                    priority={currentPriority}
+                    setPriority={setCurrentPriority}
+                    priorityLevels={priorityLevels}
                   />
                 </div>
 

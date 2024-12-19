@@ -8,6 +8,8 @@ import {
   Info,
 } from 'lucide-react';
 import { deleteProjectApi, editProjectApi } from '@/services/api/api';
+  // const [showEditProjectModal, setShowEditProjectModal] = useState(false);
+
 import { Project, ProjectFormValues } from '@/types';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -49,7 +51,9 @@ const getPriorityBadge = (priority: string) => {
 export const ProjectCard: React.FC<{
   project: Project;
   setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
-}> = ({ project, setProjects }) => {
+  setShowEditProjectModal:React.Dispatch<React.SetStateAction<boolean>>;
+  setCurrentProject:React.Dispatch<React.SetStateAction<Project | undefined>>;
+}> = ({ project, setProjects ,setShowEditProjectModal,setCurrentProject}) => {
 
   const navigate= useNavigate()
   const [showOptions, setShowOptions] = useState(false);
@@ -113,33 +117,6 @@ export const ProjectCard: React.FC<{
     }
   };
 
-  // const handleEditProjectSubmit = async (
-  //   values: ProjectFormValues,
-  //   { setSubmitting }: any
-  // ) => {
-  //   try {
-  //     const res = await editProjectApi(editProject?._id, values);
-  //     console.log(editProject?._id, 'llllllllllllllllllsss');
-  //     console.log(res.editedProject, 'ddddddddddddddddddddfdfdfdfdfd');
-  //     setProjects((prev) =>
-  //       prev.map((project) =>
-  //         project._id === editProject?._id
-  //           ? {
-  //               ...project,
-  //               ...res.editedProject,
-  //               status: getProjectStatus(res.editedProject.dueDate),
-  //             }
-  //           : project
-  //       )
-  //     );
-  //     setEditProject(null);
-  //     setShowEditProjectModal(false);
-  //   } catch (error) {
-  //     console.error('Error editing project:', error);
-  //   } finally {
-  //     setSubmitting(false);
-  //   }
-  // };
 
   const statusDisplay = getStatusStyles(project.status, isOverdue);
 
@@ -153,103 +130,116 @@ export const ProjectCard: React.FC<{
 
   return (
     <div className="w-full" onClick={() => handleTask(project?._id)}>
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-300 group">
-        <div className="p-6">
-          {/* Project Header */}
-          <div className="flex justify-between items-start mb-4">
-            <div className="flex-1 min-w-0 space-y-2">
-              <h3 className="text-xl font-semibold text-gray-900 truncate">
-                {project.title}
-              </h3>
+  <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-gray-300 group">
+    <div className="p-6">
+      {/* Project Header */}
+      <div className="flex justify-between items-start mb-4">
+        <div className="flex-1 min-w-0 space-y-2">
+          <h3 className="text-xl font-semibold text-gray-900 truncate">
+            {project.title}
+          </h3>
 
-              {getPriorityBadge(project.priority)}
+          {getPriorityBadge(project.priority)}
+        </div>
+
+        <div className="relative">
+          <button
+            onClick={(e) => {
+              e.stopPropagation(); 
+              setShowOptions(!showOptions);
+            }}
+            className="text-gray-400 hover:text-gray-600 focus:outline-none"
+          >
+            <MoreVertical className="w-5 h-5" />
+          </button>
+
+          {showOptions && (
+            <div className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <div className="py-1">
+                <button
+                  className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left"
+                  onClick={(e) => {
+                    e.stopPropagation(); 
+                    setCurrentProject(project)
+              setShowOptions(!showOptions);
+
+                    setShowEditProjectModal(true)
+                  }}
+                >
+                  Edit Project
+                </button>
+                <button
+                  className="text-red-600 block px-4 py-2 text-sm hover:bg-red-50 w-full text-left"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent outer onClick
+              setShowOptions(!showOptions);
+
+                    handleDelete();
+                  }}
+                >
+                  Delete Project
+                </button>
+              </div>
             </div>
+          )}
+        </div>
+      </div>
 
-            <div className="relative">
-              <button
-                onClick={() => setShowOptions(!showOptions)}
-                className="text-gray-400 hover:text-gray-600 focus:outline-none"
-              >
-                <MoreVertical className="w-5 h-5" />
-              </button>
+      {/* Project Description */}
+      <p className="text-gray-500 text-sm mb-4 line-clamp-2">
+        {project.description}
+      </p>
 
-              {showOptions && (
-                <div className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                  <div className="py-1">
-                    <button
-                      className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left"
-                      onClick={() => {
-                        /* Edit logic */
-                      }}
-                    >
-                      Edit Project
-                    </button>
-                    <button
-                      className="text-red-600 block px-4 py-2 text-sm hover:bg-red-50 w-full text-left"
-                      onClick={handleDelete}
-                    >
-                      Delete Project
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+      {/* Project Details */}
+      <div className="space-y-3 border-t border-gray-200 pt-4">
+        {/* Due Date */}
+        <div className="flex items-center text-sm text-gray-500">
+          <Calendar className="mr-2 w-4 h-4 text-gray-400" />
+          <span>
+            {new Date(project.dueDate).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            })}
+          </span>
+        </div>
+
+        {/* Status and Team */}
+        <div className="flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            {statusDisplay.icon}
+            <span
+              className={`
+                px-3 py-1 rounded-full text-xs font-medium
+                ${statusDisplay.badge}
+              `}
+            >
+              {statusDisplay.label}
+            </span>
           </div>
 
-          {/* Project Description */}
-          <p className="text-gray-500 text-sm mb-4 line-clamp-2">
-            {project.description}
-          </p>
-
-          {/* Project Details */}
-          <div className="space-y-3 border-t border-gray-200 pt-4">
-            {/* Due Date */}
-            <div className="flex items-center text-sm text-gray-500">
-              <Calendar className="mr-2 w-4 h-4 text-gray-400" />
-              <span>
-                {new Date(project.dueDate).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
-              </span>
-            </div>
-
-            {/* Status and Team */}
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-2">
-                {statusDisplay.icon}
-                <span
-                  className={`
-                    px-3 py-1 rounded-full text-xs font-medium
-                    ${statusDisplay.badge}
-                  `}
-                >
-                  {statusDisplay.label}
-                </span>
+          <div className="flex -space-x-2">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className="
+                  w-8 h-8 rounded-full 
+                  bg-gray-200 border-2 border-white 
+                  flex items-center justify-center 
+                  text-xs font-medium text-gray-600
+                  shadow-sm
+                "
+              >
+                {String.fromCharCode(65 + i)}
               </div>
-
-              <div className="flex -space-x-2">
-                {[...Array(3)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="
-                      w-8 h-8 rounded-full 
-                      bg-gray-200 border-2 border-white 
-                      flex items-center justify-center 
-                      text-xs font-medium text-gray-600
-                      shadow-sm
-                    "
-                  >
-                    {String.fromCharCode(65 + i)}
-                  </div>
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
   );
 };
 

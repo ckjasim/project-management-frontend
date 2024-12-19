@@ -31,7 +31,7 @@ export function UserNavbar() {
         description:"Successfully logged out!",
         variant: 'success',
       });
-      navigate('/auth/userLogin')
+      navigate('/auth/userLogin',{ replace: true })
     } catch (error) {
       console.error('Logout failed:', error);
     }

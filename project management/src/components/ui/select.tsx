@@ -134,7 +134,7 @@ const PrioritySelect: React.FC<PrioritySelectProps> = ({ priority, setPriority, 
   );
 };
 
-// EmployeeSelect component types
+
 interface EmployeeSelectProps {
   assignedEmployee: string;
   setAssignedEmployee: (value: string) => void;
@@ -147,7 +147,7 @@ const EmployeeSelect: React.FC<EmployeeSelectProps> = ({ assignedEmployee, setAs
       value={assignedEmployee}
       onValueChange={setAssignedEmployee}
       placeholder="Select Employee"
-      options={teamMembers.map(employee => ({
+      options={teamMembers?.map(employee => ({
         value: employee._id,
         label: employee.name
       }))}

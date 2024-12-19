@@ -11,16 +11,20 @@ import {
 } from '@/services/api/api';
 import Container from '@/components/global/Container/Container';
 import Items from '@/components/global/Items/Item';
-import { ArrowLeftIcon, Check, CircleDashed, ClipboardList, Eye, Plus } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router-dom';
 import {
-  EmployeeSelect,
-  PrioritySelect,
-} from '@/components/ui/select';
+  ArrowLeftIcon,
+  Check,
+  CircleDashed,
+  ClipboardList,
+  Eye,
+  Plus,
+} from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { EmployeeSelect, PrioritySelect } from '@/components/ui/select';
 
 type TaskType = {
   assignedTo: string;
-  priority:string
+  priority: string;
   id: string;
   title: any;
   description: string;
@@ -37,8 +41,6 @@ interface ITeam {
   id: string;
   name: string;
 }
-
-
 
 const CONTAINER_IDS = {
   PENDING: 'pending',
@@ -64,9 +66,9 @@ const TaskDashboard = () => {
       const teams = res?.teams?.map((team: any) => ({
         id: team?._id,
         name: team?.name,
-      }))
+      }));
       setTeams(teams);
-      setSelectedTeam({name:teams[0]?.name,id:teams[0].id});
+      setSelectedTeam({ name: teams[0]?.name, id: teams[0].id });
     };
 
     fetchTeams();
@@ -90,10 +92,10 @@ const TaskDashboard = () => {
     const fetchTasks = async () => {
       setLoading(true);
       try {
-        console.log(selectedTeam)
-        const res = await getTasksByTeamApi(selectedTeam?.id,projectId);
+        console.log(selectedTeam);
+        const res = await getTasksByTeamApi(selectedTeam?.id, projectId);
         const tasks = res.tasks;
-        console.log(tasks,'tasks,--------------')
+        console.log(tasks, 'tasks,--------------');
 
         const itemsByContainerId = containers.reduce((acc, container) => {
           acc[container.id] = [];
@@ -103,7 +105,7 @@ const TaskDashboard = () => {
         tasks.forEach(
           (task: {
             assignedTo: any;
-            priority:string
+            priority: string;
             _id: string;
             title: string;
             description: string;
@@ -114,9 +116,9 @@ const TaskDashboard = () => {
               id: task._id,
               title: task.title,
               description: task.description,
-              assignedTo:task.assignedTo.name,
+              assignedTo: task.assignedTo.name,
               dueDate: task.dueDate,
-              priority:task.priority
+              priority: task.priority,
             };
             if (itemsByContainerId[task.status]) {
               itemsByContainerId[task.status].push(taskItem);
@@ -145,10 +147,10 @@ const TaskDashboard = () => {
 
     const newItem = {
       title: itemName,
-      team:selectedTeam?.id,
-      project:projectId,
+      team: selectedTeam?.id,
+      project: projectId,
       priority,
-      assignedTo:assignedEmployee,
+      assignedTo: assignedEmployee,
       description: itemDescription,
       dueDate,
       status: currentContainerId,
@@ -156,7 +158,7 @@ const TaskDashboard = () => {
 
     try {
       const res = await postTasksApi(newItem);
-      console.log(res)
+      console.log(res);
       const task = res.createdTask;
 
       setContainers((prevContainers) =>
@@ -170,10 +172,9 @@ const TaskDashboard = () => {
                     id: task._id,
                     title: itemName,
                     assignedTo: task.assignedTo.name,
-                    priority:task.priority,
+                    priority: task.priority,
                     description: itemDescription,
                     dueDate,
-                    
                   },
                 ],
               }
@@ -211,13 +212,13 @@ const TaskDashboard = () => {
     { value: 'high', label: 'High Priority', color: 'text-red-600' },
   ];
 
-  const addTask = async() => {
+  const addTask = async () => {
     setShowAddItemModal(true);
-    setCurrentContainerId(CONTAINER_IDS.PENDING);  
-    if(selectedTeam){
-      const teamMembers=await getTeamMembersByTeamIdApi(selectedTeam.id)
-      console.log(teamMembers,'teammem-----------------')
-      setTeamMembers(teamMembers?.teamMembers?.members)
+    setCurrentContainerId(CONTAINER_IDS.PENDING);
+    if (selectedTeam) {
+      const teamMembers = await getTeamMembersByTeamIdApi(selectedTeam.id);
+      console.log(teamMembers, 'teammem-----------------');
+      setTeamMembers(teamMembers?.teamMembers?.members);
     }
   };
   return (
@@ -241,7 +242,9 @@ const TaskDashboard = () => {
                     ? 'bg-blue-500 text-white'
                     : 'hover:bg-blue-100 text-gray-700'
                 }`}
-                onClick={() => setSelectedTeam({name:team.name,id:team.id})}
+                onClick={() =>
+                  setSelectedTeam({ name: team.name, id: team.id })
+                }
               >
                 {team.name}
               </button>
@@ -277,13 +280,17 @@ const TaskDashboard = () => {
               {
                 label: 'Title',
                 value: itemName,
-                onChange: (e: { target: { value: React.SetStateAction<string>; }; }) => setItemName(e.target.value),
+                onChange: (e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setItemName(e.target.value),
                 placeholder: 'Enter task title',
               },
               {
                 label: 'Description',
                 value: itemDescription,
-                onChange: (e: { target: { value: React.SetStateAction<string>; }; }) => setItemDescription(e.target.value),
+                onChange: (e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setItemDescription(e.target.value),
                 placeholder: 'Detailed task description',
               },
             ].map(({ label, value, onChange, placeholder }) => (
@@ -305,21 +312,21 @@ const TaskDashboard = () => {
                 Assign Employee
               </label>
               <EmployeeSelect
-      assignedEmployee={assignedEmployee}
-      setAssignedEmployee={setAssignedEmployee}
-      teamMembers={teamMembers}
-    />
+                assignedEmployee={assignedEmployee}
+                setAssignedEmployee={setAssignedEmployee}
+                teamMembers={teamMembers}
+              />
             </div>
 
             <div className="w-full">
               <label className="block text-gray-600 font-medium mb-2">
                 Priority
               </label>
-              <PrioritySelect 
-      priority={priority}
-      setPriority={setPriority}
-      priorityLevels={priorityLevels}
-    />
+              <PrioritySelect
+                priority={priority}
+                setPriority={setPriority}
+                priorityLevels={priorityLevels}
+              />
             </div>
 
             {/* Due Date */}
@@ -395,6 +402,7 @@ const TaskDashboard = () => {
                             priority={item.priority}
                             description={item.description}
                             dueDate={item.dueDate}
+                            selectedTeam={selectedTeam}
                           />
                         </motion.div>
                       ))}

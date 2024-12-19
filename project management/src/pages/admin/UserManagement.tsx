@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Filter, MoreVertical } from 'lucide-react';
+import { Search, Filter, MoreVertical, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getAllUsersApi, userManageApi } from '@/services/api/api';
 import { useToast } from '@/components/hooks/use-toast';
-
 
 type User = {
   _id: string;
@@ -18,12 +17,15 @@ type User = {
 };
 
 const UserManagement = () => {
-
-const {toast}=useToast()
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterOrg, setFilterOrg] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage] = useState(10);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -43,14 +45,12 @@ const {toast}=useToast()
 
   const handleBlock = async (userId: string, email: string) => {
     try {
-     
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user._id === userId ? { ...user, isBlock: !user.isBlock } : user
         )
       );
-  
-      
+
       const res = await userManageApi(email);
       
       if (res && res.status === 200) {
@@ -58,39 +58,39 @@ const {toast}=useToast()
       } else {
         console.error('Error updating user status on backend.');
       }
-  
+
       toast({
-        title: ' Employee status has been updated',
-        // description: 'invitaion send to employee email',
+        title: 'User status has been updated',
         variant: 'success',
       });
     } catch (error) {
       console.error('Error updating user status:', error);
-      
-      
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user._id === userId ? { ...user, isBlock: !user.isBlock } : user
         )
       );
-      
-
-
     }
   };
-  
 
-  // Filter and search logic
   const filteredUsers = users.filter((user) => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterOrg === 'all' || user.organization?.name?.toLowerCase() === filterOrg.toLowerCase();
     return matchesSearch && matchesFilter;
   });
 
+  // Pagination logic
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+
+  const paginate = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto h-screen">
-   
-
       <Card className="rounded-lg shadow-md">
         <CardHeader className="border-b border-gray-200 p-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 py-5">
@@ -108,27 +108,26 @@ const {toast}=useToast()
           </div>
 
           {showFilters && (
-  <div className="mt-6 p-6 bg-gray-50 rounded-lg space-y-4">
-    <div className="text-base font-medium">Organization</div>
-    <div className="flex flex-wrap gap-3">
-      {[
-        { organization: { _id: 'all', name: 'all' } }, 
-        ...users,
-      ].map((org) => (
-        <Button
-          key={org.organization._id}
-          variant={filterOrg === org.organization.name ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setFilterOrg(org.organization.name)}
-          className={filterOrg === org.organization.name ? 'bg-blue-600' : ''}
-        >
-          {org.organization.name.charAt(0).toUpperCase() + org.organization.name.slice(1)}
-        </Button>
-      ))}
-    </div>
-  </div>
-)}
-
+            <div className="mt-6 p-6 bg-gray-50 rounded-lg space-y-4">
+              <div className="text-base font-medium">Organization</div>
+              <div className="flex flex-wrap gap-3">
+                {[
+                  { organization: { _id: 'all', name: 'all' } },
+                  ...users,
+                ].map((org) => (
+                  <Button
+                    key={org.organization._id}
+                    variant={filterOrg === org.organization.name ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setFilterOrg(org.organization.name)}
+                    className={filterOrg === org.organization.name ? 'bg-blue-600' : ''}
+                  >
+                    {org.organization.name.charAt(0).toUpperCase() + org.organization.name.slice(1)}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="flex-1 max-w-xl mx-8">
             <div className="relative">
@@ -156,12 +155,12 @@ const {toast}=useToast()
                 <div>Actions</div>
               </div>
 
-              {filteredUsers.length === 0 ? (
+              {currentUsers.length === 0 ? (
                 <div className="p-12 text-center text-gray-500">
                   No users match your search criteria
                 </div>
               ) : (
-                filteredUsers.map((user) => (
+                currentUsers.map((user) => (
                   <div
                     key={user._id}
                     className="flex flex-col md:grid md:grid-cols-6 gap-4 md:gap-8 px-6 py-6 border-b hover:bg-gray-50 transition-colors"
@@ -177,11 +176,9 @@ const {toast}=useToast()
                       <div>{user.createdAt}</div>
                       <div className="font-medium text-gray-500">Status:</div>
                       <div>
-                        <span
-                          className={`px-3 py-1 rounded-full text-sm ${
-                            user.isBlock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                          }`}
-                        >
+                        <span className={`px-3 py-1 rounded-full text-sm ${
+                          user.isBlock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                        }`}>
                           {user.isBlock ? 'Blocked' : 'Active'}
                         </span>
                       </div>
@@ -192,11 +189,9 @@ const {toast}=useToast()
                     <div className="hidden md:block">{user.organization?.subscriptionTier}</div>
                     <div className="hidden md:block text-gray-600">{user.createdAt}</div>
                     <div className="hidden md:block">
-                      <span
-                        className={`px-3 py-1 rounded-full text-sm ${
-                          user.isBlock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                        }`}
-                      >
+                      <span className={`px-3 py-1 rounded-full text-sm ${
+                        user.isBlock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                      }`}>
                         {user.isBlock ? 'Blocked' : 'Active'}
                       </span>
                     </div>
@@ -205,7 +200,7 @@ const {toast}=useToast()
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => handleBlock(user._id,user.email)}
+                        onClick={() => handleBlock(user._id, user.email)}
                         className={`${user.isBlock ? 'bg-green-600' : 'bg-red-600'} hover:${
                           user.isBlock ? 'bg-green-700' : 'bg-red-700'
                         }`}
@@ -218,6 +213,58 @@ const {toast}=useToast()
                     </div>
                   </div>
                 ))
+              )}
+
+              {/* Pagination Controls */}
+              {filteredUsers.length > 0 && (
+                <div className="flex items-center justify-between px-6 py-4 border-t">
+                  <div className="text-sm text-gray-500">
+                    Showing {indexOfFirstUser + 1} to {Math.min(indexOfLastUser, filteredUsers.length)} of {filteredUsers.length} users
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => paginate(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft size={16} />
+                    </Button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter(page => {
+                        const shouldShow = 
+                          page === 1 || 
+                          page === totalPages || 
+                          Math.abs(page - currentPage) <= 1;
+                        return shouldShow;
+                      })
+                      .map((page, index, array) => (
+                        <>
+                          {index > 0 && array[index - 1] !== page - 1 && (
+                            <span key={`ellipsis-${page}`} className="px-2">...</span>
+                          )}
+                          <Button
+                            key={page}
+                            variant={currentPage === page ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => paginate(page)}
+                            className={currentPage === page ? "bg-blue-600" : ""}
+                          >
+                            {page}
+                          </Button>
+                        </>
+                      ))
+                    }
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => paginate(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      <ChevronRight size={16} />
+                    </Button>
+                  </div>
+                </div>
               )}
             </div>
           </div>

@@ -71,6 +71,8 @@ const ProjectDashboard: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [editProject, setEditProject] = useState<Project | null>();
+  const [selectedProject,setSelectedProject]=useState<string>('')
+  const [currentProject,setCurrentProject]=useState<Project>({})
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -119,7 +121,10 @@ const ProjectDashboard: React.FC = () => {
       setIsLoading(true);
       try {
         const res = await getEmployeesByOrganizationApi();
-        setEmployees(res?.employees || []);
+        if(res){
+
+          setEmployees(res?.data.all || []);
+        }
       } catch (error) {
         console.error('Error fetching employees:', error);
       } finally {
@@ -129,7 +134,6 @@ const ProjectDashboard: React.FC = () => {
       setIsAddingNewTeam(true);
       setIsOpen(false);
     };
-
     return (
       <div className="space-y-2">
         <label
@@ -239,22 +243,26 @@ const ProjectDashboard: React.FC = () => {
     );
   };
 
-  const handleAddProject = useCallback(async () => {
-    try {
-      const res = await getTeamsApi();
-      console.log();
-      const formattedTeams = res.teams.map(
-        (team: { _id: string; name: string }) => ({
-          name: team.name,
-          id: team._id,
-        })
-      );
-      setTeams(formattedTeams);
-      setShowAddProjectModal(true);
-    } catch (error) {
-      console.error('Error fetching teams:', error);
-    }
-  }, []);
+  useEffect(() => {
+    const fetchTeam=async()=>{
+        try {
+
+        const res = await getTeamsApi();
+        console.log();
+        const formattedTeams = res.teams.map(
+          (team: { _id: string; name: string }) => ({
+            name: team.name,
+            id: team._id,
+          })
+        );
+        setTeams(formattedTeams);
+        // setShowAddProjectModal(true);
+      } catch (error) {
+        console.error('Error fetching teams:', error);
+      }
+      }
+      fetchTeam()
+  }, [setShowAddProjectModal,setShowEditProjectModal]);
 
   const handleProjectSubmit = async (
     values: ProjectFormValues,
@@ -272,7 +280,7 @@ const ProjectDashboard: React.FC = () => {
           expiry: getProjectStatus(newProject.createdProject.dueDate),
         },
       ]);
-      console.log(projects, 'ljfsfsdfdsf=----------------------');
+     
       setShowAddProjectModal(false);
     } catch (error) {
       console.error('Error creating project:', error);
@@ -304,8 +312,144 @@ const ProjectDashboard: React.FC = () => {
     }
   };
 
+  const handleEditProjectSubmit = async (
+    values: ProjectFormValues,
+    { setSubmitting }: any
+  ) => {
+    try {
+      const res = await editProjectApi(currentProject?._id, values);
+      console.log(currentProject?._id, 'llllllllllllllllllsss');
+      console.log(res.editedProject, 'ddddddddddddddddddddfdfdfdfdfd');
+      setProjects((prev) =>
+        prev.map((project) =>
+          project._id === currentProject?._id
+            ? {
+                ...project,
+                ...res.editedProject,
+                status: getProjectStatus(res.editedProject.dueDate),
+              }
+            : project
+        )
+      );
+      // setEditProject(null);
+      setShowEditProjectModal(false);
+    } catch (error) {
+      console.error('Error editing project:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-8">
+      <Modal
+        showModal={showEditProjectModal}
+        setShowModal={setShowEditProjectModal}
+      >
+        <Formik
+          initialValues={{
+          title: currentProject.title,
+            description:  currentProject.description,
+            dueDate: currentProject.dueDate ? new Date(currentProject.dueDate).toISOString().split('T')[0] : '',
+            teams: currentProject.teams ,
+            priority:  currentProject.priority,
+
+          }}
+          validationSchema={projectValidationSchema}
+          onSubmit={handleEditProjectSubmit}
+        >
+          {({ values, setFieldValue, isSubmitting }) => (
+            <Form className="bg-white rounded-xl p-8 w-full max-w-md mx-auto shadow-xl">
+              <h1 className="text-2xl font-bold text-gray-800 mb-6">
+              Update Project
+              </h1>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Title
+                  </label>
+                  <Field
+                    name="title"
+                    type="text"
+                    placeholder="Enter project title"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <ErrorMessage
+                    name="title"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Description
+                  </label>
+                  <Field
+                    name="description"
+                    as="textarea"
+                    placeholder="Detailed project description"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24"
+                  />
+                  <ErrorMessage
+                    name="description"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+                <TeamSelect values={values} setFieldValue={setFieldValue} />
+                <ErrorMessage
+                  name="teams"
+                  component="div"
+                  className="text-red-500 text-sm mt-1"
+                />
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Priority
+                  </label>
+                  <Field
+                    name="priority"
+                    as="select"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Select priority...</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </Field>
+                  <ErrorMessage
+                    name="priority"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Due Date
+                  </label>
+                  <Field
+                    name="dueDate"
+                    type="date"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <ErrorMessage
+                    name="dueDate"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+              </div>
+              <div className="mt-8">
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                >
+                  {isSubmitting ? 'Updating...' : 'Update Project'}
+                </Button>
+              </div>
+            </Form>
+          )}
+        </Formik>
+      </Modal>
       <Modal
         showModal={showAddProjectModal}
         setShowModal={setShowAddProjectModal}
@@ -525,7 +669,7 @@ const ProjectDashboard: React.FC = () => {
             </p>
           </div>
           <Button
-            onClick={handleAddProject}
+            onClick={()=>{setShowAddProjectModal(true)}}
             className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <PlusCircle className="w-5 h-5" />
@@ -544,6 +688,8 @@ const ProjectDashboard: React.FC = () => {
                 key={project._id}
                 project={project}
                 setProjects={setProjects}
+                setShowEditProjectModal={setShowEditProjectModal}
+                setCurrentProject={setCurrentProject}
               />
             ))}
           </div>

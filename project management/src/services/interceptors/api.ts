@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+
 const baseURL = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
   withCredentials: true,
@@ -19,7 +20,7 @@ const addAuthToken = (config: any) => {
 const handleTokenRefresh = async () => {
   try {
     const response = await baseURL.post('/auth/refresh');
-    console.log(response,'jassssssssssssiiiiiiiiiiiiiiiiiiiii')
+
     const newToken = response.data;
 
     const userString = window.localStorage.getItem('user');
@@ -41,13 +42,21 @@ baseURL.interceptors.request.use(addAuthToken, (error) =>
 baseURL.interceptors.response.use(
   (response) => response,
   async (error) => {
+    
     const originalRequest = error.config;
-
     if (
       error.response &&
       error.response.status === 401 &&
-      !originalRequest._retry
+      !originalRequest._retry && error.response.data.errorType === 'NO_TOKEN'
     ) {
+      console.log('no token')
+      window.location.replace('/auth/userLogin');
+    }else if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry && error.response.data.errorType === 'TOKEN_EXPIRED'
+    ) {
+      console.log('token expoired')
       originalRequest._retry = true;
 
       try {
@@ -60,6 +69,13 @@ baseURL.interceptors.response.use(
         console.error('Error refreshing token:', refreshError);
         return Promise.reject(refreshError);
       }
+    }else if( error.response &&
+      error.response.status === 403 &&
+      !originalRequest._retry && error.response.data.errorType === 'BLOCKED'){
+        console.log('blocked')
+        window.location.replace('/error');
+
+
     }
 
     return Promise.reject(error);

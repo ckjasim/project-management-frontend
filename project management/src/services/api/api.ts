@@ -271,7 +271,7 @@ export const getAllProjectApi = async () => {
 }
 export const editProjectApi = async (id:string | undefined,data: any) => {
   try {
-    const response = await  baseURL.patch('/project',{id,data});
+    const response = await  baseURL.patch('/project/project',{id,data});
     const teams = response.data;
     return teams;
   } catch (error) {

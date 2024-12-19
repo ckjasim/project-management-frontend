@@ -27,6 +27,7 @@ import TeamDashboard from '@/pages/user/teamManagement';
 import EmployeesPage from '@/pages/user/employeesList';
 import { ProtectedRoute } from '@/services/authGuard/AuthGuard';
 import TeamList from '@/pages/user/teamList';
+import ErrorPage from '@/pages/error/errorPage';
 
 const router = createBrowserRouter([
   {
@@ -84,6 +85,14 @@ const router = createBrowserRouter([
       { path: 'employees', element: <EmployeesPage /> },
     ],
   },
+  {
+    path: '/error',
+    element: (
+        <ErrorPage />
+    ),
+    
+  },
+  
 ]);
 
 export default router;

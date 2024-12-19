@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Search, Filter, MoreVertical } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Search, Filter, MoreVertical, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { employeeManageApi, getAllEmployeesApi } from '@/services/api/api';
@@ -15,20 +15,22 @@ type Employee = {
   role: string;
   organization: any;
   isBlock: boolean;
-  jobRole: string; 
+  jobRole: string;
   projectCode: string;
   createdAt: string;
   updatedAt: string;
 };
 
 const EmployeeManagement = () => {
-  const {toast} = useToast()
-
-
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
- const [filterOrg, setFilterOrg] = useState('all');
+  const [filterOrg, setFilterOrg] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [employeesPerPage] = useState(10);
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -45,15 +47,14 @@ const EmployeeManagement = () => {
     };
     fetchEmployees();
   }, []);
+
   const handleBlock = async (employeeId: string, email: string) => {
     try {
-
       setEmployees((prevEmployees) =>
         prevEmployees.map((employee) =>
           employee._id === employeeId ? { ...employee, isBlock: !employee.isBlock } : employee
         )
       );
-
 
       const res = await employeeManageApi(email);
       
@@ -64,36 +65,38 @@ const EmployeeManagement = () => {
       }
 
       toast({
-        title: ' Employee status has been updated',
-        // description: 'invitaion send to employee email',
+        title: 'Employee status has been updated',
         variant: 'success',
       });
-
     } catch (error) {
       console.error('Error updating employee status:', error);
-
       setEmployees((prevEmployees) =>
         prevEmployees.map((employee) =>
           employee._id === employeeId ? { ...employee, isBlock: !employee.isBlock } : employee
         )
       );
-
     }
   };
 
   const filteredEmployees = employees?.filter((employee) => {
     const matchesSearch = employee?.name?.toLowerCase()
       .includes(searchTerm?.toLowerCase());
-      const matchesFilter = filterOrg === 'all' || employee.organization?.name?.toLowerCase() === filterOrg.toLowerCase();
-
+    const matchesFilter = filterOrg === 'all' || employee.organization?.name?.toLowerCase() === filterOrg.toLowerCase();
     return matchesSearch && matchesFilter;
   });
+
  
+  const indexOfLastEmployee = currentPage * employeesPerPage;
+  const indexOfFirstEmployee = indexOfLastEmployee - employeesPerPage;
+  const currentEmployees = filteredEmployees.slice(indexOfFirstEmployee, indexOfLastEmployee);
+  const totalPages = Math.ceil(filteredEmployees.length / employeesPerPage);
+
+  const paginate = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto h-screen">
-    
-
       <Card className="rounded-lg shadow-md">
         <CardHeader className="border-b border-gray-200 p-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 py-5">
@@ -110,32 +113,30 @@ const EmployeeManagement = () => {
             </Button>
           </div>
 
-          {/* Filters Panel */}
           {showFilters && (
-  <div className="mt-6 p-6 bg-gray-50 rounded-lg space-y-4">
-    <div className="text-base font-medium">Organization</div>
-    <div className="flex flex-wrap gap-3">
-      {[
-        { organization: { _id: 'all', name: 'all' } }, // Add "All" as a default option
-        ...employees.filter(
-          (org, index, self) =>
-            self.findIndex((o) => o.organization._id === org.organization._id) === index
-        ),
-      ].map((org) => (
-        <Button
-          key={org.organization._id}
-          variant={filterOrg === org.organization.name ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setFilterOrg(org.organization.name)}
-          className={filterOrg === org.organization.name ? 'bg-blue-600' : ''}
-        >
-          {org.organization.name.charAt(0).toUpperCase() + org.organization.name.slice(1)}
-        </Button>
-      ))}
-    </div>
-  </div>
-)}
-
+            <div className="mt-6 p-6 bg-gray-50 rounded-lg space-y-4">
+              <div className="text-base font-medium">Organization</div>
+              <div className="flex flex-wrap gap-3">
+                {[
+                  { organization: { _id: 'all', name: 'all' } },
+                  ...employees.filter(
+                    (org, index, self) =>
+                      self.findIndex((o) => o.organization._id === org.organization._id) === index
+                  ),
+                ].map((org) => (
+                  <Button
+                    key={org.organization._id}
+                    variant={filterOrg === org.organization.name ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setFilterOrg(org.organization.name)}
+                    className={filterOrg === org.organization.name ? 'bg-blue-600' : ''}
+                  >
+                    {org.organization.name.charAt(0).toUpperCase() + org.organization.name.slice(1)}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="mt-6 relative">
             <Search
@@ -155,7 +156,6 @@ const EmployeeManagement = () => {
         <CardContent className="p-0 md:p-8">
           <div className="overflow-x-auto">
             <div className="min-w-full">
-              {/* Header */}
               <div className="hidden md:grid grid-cols-6 gap-8 px-6 py-4 bg-gray-50 rounded-t-lg font-semibold text-gray-600">
                 <div>Name</div>
                 <div>Email</div>
@@ -165,41 +165,26 @@ const EmployeeManagement = () => {
                 <div>Actions</div>
               </div>
 
-              {/* Mobile and Desktop Rows */}
-              {filteredEmployees.length === 0 ? (
+              {currentEmployees.length === 0 ? (
                 <div className="p-12 text-center text-gray-500">
                   No employees match your search criteria
                 </div>
               ) : (
-                filteredEmployees.map((employee) => (
+                currentEmployees.map((employee) => (
                   <div
                     key={employee._id}
                     className="flex flex-col md:grid md:grid-cols-6 gap-4 md:gap-8 px-6 py-6 border-b hover:bg-gray-50 transition-colors"
                   >
-                    <div className="font-medium text-gray-500 md:hidden">
-                      Name:
-                    </div>
+                    <div className="font-medium text-gray-500 md:hidden">Name:</div>
                     <div>{employee.name}</div>
-                    <div className="font-medium text-gray-500 md:hidden">
-                      Email:
-                    </div>
+                    <div className="font-medium text-gray-500 md:hidden">Email:</div>
                     <div>{employee.email}</div>
-
-                    <div className="font-medium text-gray-500 md:hidden">
-                      Organization:
-                    </div>
+                    <div className="font-medium text-gray-500 md:hidden">Organization:</div>
                     <div>{employee.organization?.name}</div>
-
-                    <div className="font-medium text-gray-500 md:hidden">
-                      Job Role:
-                    </div>
+                    <div className="font-medium text-gray-500 md:hidden">Job Role:</div>
                     <div>{employee.jobRole}</div>
-
-                    <div className="font-medium text-gray-500 md:hidden">
-                      Date Joined:
-                    </div>
+                    <div className="font-medium text-gray-500 md:hidden">Date Joined:</div>
                     <div>{employee.dateJoined}</div>
-
                     <div className="flex items-center gap-4 justify-end md:justify-start">
                       <Button
                         variant="destructive"
@@ -219,6 +204,58 @@ const EmployeeManagement = () => {
                     </div>
                   </div>
                 ))
+              )}
+
+              {/* Pagination Controls */}
+              {filteredEmployees.length > 0 && (
+                <div className="flex items-center justify-between px-6 py-4 border-t">
+                  <div className="text-sm text-gray-500">
+                    Showing {indexOfFirstEmployee + 1} to {Math.min(indexOfLastEmployee, filteredEmployees.length)} of {filteredEmployees.length} employees
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => paginate(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft size={16} />
+                    </Button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter(page => {
+                        const shouldShow = 
+                          page === 1 || 
+                          page === totalPages || 
+                          Math.abs(page - currentPage) <= 1;
+                        return shouldShow;
+                      })
+                      .map((page, index, array) => (
+                        <>
+                          {index > 0 && array[index - 1] !== page - 1 && (
+                            <span key={`ellipsis-${page}`} className="px-2">...</span>
+                          )}
+                          <Button
+                            key={page}
+                            variant={currentPage === page ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => paginate(page)}
+                            className={currentPage === page ? "bg-blue-600" : ""}
+                          >
+                            {page}
+                          </Button>
+                        </>
+                      ))
+                    }
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => paginate(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      <ChevronRight size={16} />
+                    </Button>
+                  </div>
+                </div>
               )}
             </div>
           </div>
