@@ -11,6 +11,7 @@ export interface Message {
   type: string | undefined;
   roomId?: string;
   recipientId?: string;
+  isImage?:boolean
 }
 
 export type ChatAreaProps = {
@@ -21,7 +22,7 @@ export type ChatAreaProps = {
 };
 export type UserSideBarProps = {
   serverRef:MutableRefObject<Socket<DefaultEventsMap, DefaultEventsMap> | undefined>,
-
+  messages: Message[],
 };
 // export interface Team {
 //   name: string;

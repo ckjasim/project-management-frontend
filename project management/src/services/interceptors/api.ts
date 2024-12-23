@@ -54,7 +54,7 @@ baseURL.interceptors.response.use(
     }else if (
       error.response &&
       error.response.status === 401 &&
-      !originalRequest._retry && error.response.data.errorType === 'TOKEN_EXPIRED'
+      !originalRequest._retry 
     ) {
       console.log('token expoired')
       originalRequest._retry = true;

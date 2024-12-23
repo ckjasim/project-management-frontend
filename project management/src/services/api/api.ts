@@ -249,6 +249,16 @@ export const createTeamApi = async (data: any) => {
     throw error;
   }
 }
+export const addTeamMemberApi = async (id:string,data: any) => {
+  try {
+    const response = await  baseURL.post('/project/project/addTeamMember',{id,data});
+    const teams = response.data;
+    return teams;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+}
 export const createProjectApi = async (data: any) => {
   try {
     const response = await  baseURL.post('/project/project',{data});

@@ -45,6 +45,10 @@ useEffect(() => {
       console.log('new message:', data);
       setMessages((prev)=>[...prev,data])
     });
+    socketRef.current.on('new_file', (data) => {
+      console.log('new file:', data);
+      setMessages((prev)=>[...prev,data])
+    });
   };
 
 
@@ -83,11 +87,11 @@ useEffect(() => {
  
 
   const members = ['Novita', 'Millie Nose', 'Ikhsan SD', 'Aditya'];
+  console.log(messages,'============================-----------')
 
   return (
     <div className="flex h-screen">
-      <UserSideBar serverRef={socketRef} />
-  
+      <UserSideBar serverRef={socketRef} messages={messages} />
       <ChatArea serverRef={socketRef} messages={messages} setMessages={setMessages}/>
       <DetailsSidebar attachments={attachments} members={members}  />
     </div>

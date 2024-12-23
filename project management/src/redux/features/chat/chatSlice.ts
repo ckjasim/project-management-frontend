@@ -6,10 +6,12 @@ const initialState: {
   currentRoom: string | undefined;
   chatMode: string | undefined;
   name: string | undefined;
+  url:any | undefined
 } = {
   currentRoom: undefined,
   chatMode: undefined,
   name: undefined,
+  url:undefined
 };
 
 const chatSlice = createSlice({

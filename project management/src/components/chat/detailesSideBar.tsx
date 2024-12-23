@@ -2,8 +2,8 @@ import { Attachment } from '@/types';
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FiDownload } from 'react-icons/fi';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ArrowDownToLine } from 'lucide-react';
 
 interface DetailsSidebarProps {
   attachments: Attachment[];
@@ -30,7 +30,7 @@ const DetailsSidebar: React.FC<DetailsSidebarProps> = ({ attachments, members })
                   <p className="text-sm text-gray-500">{attachment.size}</p>
                 </div>
                 <Button variant="secondary" className="rounded-full">
-                  <FiDownload className="text-gray-500" />
+                  <ArrowDownToLine className="text-gray-500" />
                 </Button>
               </li>
             ))}

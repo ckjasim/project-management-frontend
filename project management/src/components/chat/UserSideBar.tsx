@@ -16,9 +16,12 @@ import {  UserSideBarProps } from '@/types';
 interface ITeam {
   groupName: string;
   _id: string;
+  profileImage:any;
+
 }
 
 interface IPersonal {
+  url:any;
   name: string;
   _id: string;
 }
@@ -41,9 +44,13 @@ const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef }) => {
             ?.filter(
               (val: { _id: string | undefined }) => val._id !== userInfo?._id
             )
-            .map((val: { name: any; _id: any }) => ({
+            .map((val: {
+              profileImage: any;
+              url: any; name: any; _id: any ;
+}) => ({
               name: val.name,
               _id: val._id,
+              url:val?.profileImage?.url
             })) || [];
         setPersonal(personals);
 
@@ -87,13 +94,15 @@ const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef }) => {
   const filteredPersonal = personal.filter((person) =>
     person.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  console.log(filteredPersonal,'--------------------------')
 
   const handleItemClick = (
     id: string,
     chatMode: 'group' | 'private',
-    name: string
+    name: string,
+    url:any
   ) => {
-    dispatch(SetChat({ currentRoom: id, chatMode, name }));
+    dispatch(SetChat({ currentRoom: id, chatMode, name ,url}));
 
     if (chatMode === 'group') {
       serverRef?.current?.emit('joinRoom',id)
@@ -122,9 +131,9 @@ const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef }) => {
             {filteredGroups.map((team) => (
               <div
                 key={team._id}
-                className="bg-white p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                className="bg-white p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer mb-1"
                 onClick={() =>
-                  handleItemClick(team._id, 'group', team.groupName)
+                  handleItemClick(team._id, 'group', team.groupName,"")
                 }
               >
                 <div className="flex items-center space-x-4">
@@ -155,17 +164,15 @@ const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef }) => {
             {filteredPersonal.map((person) => (
               <div
                 key={person._id}
-                className="bg-white p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                className="bg-white p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer mb-1"
                 onClick={() =>
-                  handleItemClick(person._id, 'private', person.name)
+                  handleItemClick(person._id, 'private', person.name,person.url)
                 }
               >
                 <div className="flex items-center space-x-4">
                   <Avatar>
                     <AvatarImage
-                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                        person.name
-                      )}`}
+                      src={person?.url}
                     />
                     <AvatarFallback>{person.name.charAt(0)}</AvatarFallback>
                   </Avatar>
