@@ -68,7 +68,7 @@ export function UserNavbar() {
     },
     {
       label: 'Meeting',
-      href: '/user/meeting',
+      href: '/user/meet',
       icon: (
         <CalendarClock  className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),

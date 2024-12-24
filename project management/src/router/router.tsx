@@ -28,6 +28,8 @@ import EmployeesPage from '@/pages/user/employeesList';
 import { ProtectedRoute } from '@/services/authGuard/AuthGuard';
 import TeamList from '@/pages/user/teamList';
 import ErrorPage from '@/pages/error/errorPage';
+import Meeting from '@/pages/meeting/meeting';
+import App from '@/pages/meeting/joinPage';
 
 const router = createBrowserRouter([
   {
@@ -53,6 +55,9 @@ const router = createBrowserRouter([
       { path: 'projects', element: <TeamProjectDashboard /> },
       { path: 'task/:projectId', element: <TaskManagement /> },
       { path: 'chat', element: <MessagesPage /> },
+      { path: 'meet', element: <Meeting /> },
+      { path: 'meet/join', element: <App /> },
+
     ],
   },
   {
@@ -66,6 +71,7 @@ const router = createBrowserRouter([
       { path: 'dashboard', element: <AdminDashboard /> },
       { path: 'userManagement', element: <UserManagement /> },
       { path: 'employeeManagement', element: <EmployeeManagement /> },
+
     ],
   },
   {
@@ -83,6 +89,9 @@ const router = createBrowserRouter([
       { path: 'teams/:id', element: <TeamList /> },
       { path: 'chat', element: <MessagesPage /> },
       { path: 'employees', element: <EmployeesPage /> },
+      { path: 'meet', element: <Meeting /> },
+      { path: 'meet/join', element: <App /> },
+
     ],
   },
   {

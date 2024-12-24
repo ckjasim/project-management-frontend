@@ -558,7 +558,7 @@ const ProjectDashboard: React.FC = () => {
           )}
         </Formik>
       </Modal>
-      ;
+      
       <Modal showModal={isAddingNewTeam} setShowModal={setIsAddingNewTeam}>
         <Formik
           initialValues={{
@@ -659,7 +659,7 @@ const ProjectDashboard: React.FC = () => {
           )}
         </Formik>
       </Modal>
-      ;
+
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>

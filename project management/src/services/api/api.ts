@@ -378,3 +378,45 @@ export const getTasksByProjectApi = async (projectId:any) => {
         throw error;
       }
     }
+
+    //------Meeting---------
+    export const createMeetingApi = async (data: any) => {
+      try {
+        const response = await  baseURL.post('/meeting/meeting',{data});
+        const teams = response.data;
+        return teams;
+      } catch (error) {
+        console.error("Error logging out:", error);
+        throw error;
+      }
+    }
+    export const getMeetingsApi = async () => {
+      try {
+        const response = await baseURL.get('/meeting/meeting');
+        const teams = response.data;
+        return teams;
+      } catch (error) {
+        console.error("Error logging out:", error);
+        throw error;
+      }
+    }
+    export const deleteMeetingApi = async () => {
+      try {
+        const response = await baseURL.get('/meeting/meeting');
+        const teams = response.data;
+        return teams;
+      } catch (error) {
+        console.error("Error logging out:", error);
+        throw error;
+      }
+    }
+    export const updateMeetingApi = async () => {
+      try {
+        const response = await baseURL.get('/meeting/meeting');
+        const teams = response.data;
+        return teams;
+      } catch (error) {
+        console.error("Error logging out:", error);
+        throw error;
+      }
+    }

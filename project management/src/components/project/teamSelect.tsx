@@ -1,127 +1,78 @@
-// import { Users } from "lucide-react";
-// import { useState } from "react";
+import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useEffect, useState } from 'react';
+import { Label } from '@/components/ui/label';
+import { ChevronDown, Loader2, Users, X } from 'lucide-react';
+import { getTeamsApi } from '@/services/api/api';
 
-// export const TeamSelect: React.FC<{ 
-//   values: any; 
-//   setFieldValue: (field: string, value: any) => void 
-// }> = ({
-//   values,
-//   setFieldValue,
-// }) => {
-//   const [isOpen, setIsOpen] = useState(false);
+export const TeamSelect: React.FC<{
+  values: any;
+  setFieldValue: any;
+  teams:any
+  setTeams: React.Dispatch<React.SetStateAction<never[]>>
+}>  = ({ values, setFieldValue,teams ,setTeams}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-//   const handleTeamChange = (teamId: string) => {
-//     const currentTeams = values?.teams || [];
-//     const updatedTeams = currentTeams.includes(teamId)
-//       ? currentTeams.filter((id: string) => id !== teamId)
-//       : [...currentTeams, teamId];
-    
-//     setFieldValue('teams', updatedTeams);
-//   };
+  useEffect(() => {
+    const fetchTeams = async () => {
+      setIsLoading(true);
+      try {
+        const res = await getTeamsApi();
+        const formattedTeams = res.teams.map((team: { name: any; _id: any; }) => ({
+          name: team.name,
+          id: team._id,
+        }));
+        setTeams(formattedTeams);
+      } catch (error) {
+        console.error('Error fetching teams:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-//   const removeTeam = (teamId: string) => {
-//     const updatedTeams = (values?.teams || []).filter((id: string) => id !== teamId);
-//     setFieldValue('teams', updatedTeams);
-//   };
+    fetchTeams();
+  }, []);
 
-//   return (
-//     <div className="space-y-2">
-//       <label
-//         htmlFor="team-select"
-//         className="flex items-center gap-2 text-sm font-semibold text-gray-700"
-//       >
-//         <Users size={18} className="text-gray-500" />
-//         Select Teams
-//       </label>
+  const handleTeamChange = (teamId: any) => {
+    const updatedTeams = values.teams.includes(teamId)
+      ? values.teams.filter((id: any) => id !== teamId)
+      : [...values.teams, teamId];
+    setFieldValue('teams', updatedTeams);
+  };
 
-//       <div className="relative">
-//         {/* Selected Teams Chips */}
-//         {values?.teams?.length > 0 && (
-//           <div className="flex flex-wrap gap-2 mb-2">
-//             {values.teams.map((teamId: string) => {
-//               const team = teams.find(t => t.id === teamId);
-//               return team ? (
-//                 <div 
-//                   key={teamId} 
-//                   className="flex items-center bg-blue-100 text-blue-800 rounded-full px-2 py-1 text-xs"
-//                 >
-//                   {team.name}
-//                   <button 
-//                     type="button"
-//                     onClick={() => removeTeam(teamId)}
-//                     className="ml-1 hover:text-blue-600"
-//                   >
-//                     <X size={12} />
-//                   </button>
-//                 </div>
-//               ) : null;
-//             })}
-//           </div>
-//         )}
-//         <div 
-//           onClick={() => !isLoading && setIsOpen(!isOpen)}
-//           className={`
-//             w-full rounded-lg border-2 bg-white px-4 py-3 pr-10 text-gray-700 
-//             flex items-center justify-between cursor-pointer
-//             ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}
-//             ${isOpen ? 'border-blue-500 ring-2 ring-blue-500/20' : ''}
-//           `}
-//         >
-//           {values?.teams?.length > 0 
-//             ? `${values.teams.length} team(s) selected` 
-//             : 'Choose your teams...'}
-          
-//           <div className="flex items-center">
-//             {isLoading ? (
-//               <Loader2 className="animate-spin text-blue-500 w-5 h-5" />
-//             ) : (
-//               <ChevronDown className={`text-gray-400 w-5 h-5 ${isOpen ? 'rotate-180' : ''}`} />
-//             )}
-//           </div>
-//         </div>
-
-//         {/* Dropdown Menu */}
-//         {isOpen && !isLoading && (
-//           <div className="absolute z-10 w-full mt-1 bg-white border-2 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-//             {teams.map((team) => (
-//               <div 
-//                 key={team.id}
-//                 onClick={() => handleTeamChange(team.id)}
-//                 className={`
-//                   px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center
-//                   ${(values?.teams || []).includes(team.id) ? 'bg-blue-100' : ''}
-//                 `}
-//               >
-//                 <input 
-//                   type="checkbox"
-//                   checked={(values?.teams || []).includes(team.id)}
-//                   readOnly
-//                   className="mr-2 pointer-events-none"
-//                 />
-//                 {team.name}
-//               </div>
-//             ))}
-//             <div 
-//               onClick={() => {
-//                 setFieldValue('teams', []);
-//                 setIsOpen(false);
-//               }}
-//               className="px-4 py-2 text-center text-gray-500 hover:bg-gray-50 cursor-pointer border-t"
-//             >
-//               Clear Selection
-//             </div>
-//             <div 
-//               onClick={() => {
-//                 setIsAddingNewTeam(true);
-//                 setIsOpen(false);
-//               }}
-//               className="px-4 py-2 text-center text-blue-600 hover:bg-blue-50 cursor-pointer border-t"
-//             >
-//               + Create New Team
-//             </div>
-//           </div>
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
+  return (
+    <div>
+      <Label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+        <Users size={18} className="text-gray-500" />
+        Select Teams
+      </Label>
+      <div className="relative">
+        <div
+          onClick={() => !isLoading && setIsOpen(!isOpen)}
+          className="cursor-pointer px-4 py-3 border rounded-xl bg-white flex justify-between items-center"
+        >
+          <span>{values.teams.length ? `${values.teams.length} selected` : 'Choose teams'}</span>
+          {isLoading ? <Loader2 className="animate-spin" /> : <ChevronDown />}
+        </div>
+        {isOpen && (
+          <div className="absolute w-full bg-white border mt-2 rounded shadow">
+            {teams.map((team: { id: Key | null | undefined; name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }) => (
+              <div
+                key={team.id}
+                onClick={() => handleTeamChange(team.id)}
+                className="p-2 cursor-pointer hover:bg-gray-200"
+              >
+                <input
+                  type="checkbox"
+                  checked={values.teams.includes(team.id)}
+                  readOnly
+                  className="mr-2"
+                />
+                {team.name}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
