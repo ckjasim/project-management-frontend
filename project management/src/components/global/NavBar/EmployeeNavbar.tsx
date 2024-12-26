@@ -6,7 +6,9 @@ import {
   MessagesSquare,
   CalendarClock,
   FolderTree,
-  LogOut,                  
+  LogOut,
+
+  BellRing,                  
 } from 'lucide-react';
 
 import { Link, useNavigate } from 'react-router-dom';
@@ -97,6 +99,15 @@ export function EmployeeNavbar() {
             </div>
           </div>
           <div>
+          <SidebarLink
+              link={{
+                label: 'Notifications',
+                href: '/user/notification',
+                icon:(
+                  <BellRing className="text-yellow-100 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+                ),
+              }}
+            />
             <SidebarLink
               link={{
                 label: `${userInfo?.name}`,

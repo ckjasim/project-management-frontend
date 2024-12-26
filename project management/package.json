@@ -21,6 +21,7 @@
     "@radix-ui/react-tabs": "^1.1.2",
     "@radix-ui/react-toast": "^1.2.2",
     "@reduxjs/toolkit": "^2.3.0",
+    "@stripe/stripe-js": "^5.4.0",
     "@types/react-router-dom": "^5.3.3",
     "@zegocloud/zego-uikit-prebuilt": "^2.14.0",
     "axios": "^1.7.7",

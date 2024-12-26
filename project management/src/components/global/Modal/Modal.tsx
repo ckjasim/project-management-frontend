@@ -49,7 +49,7 @@ export default function Modal({
             >
               <div
                 className={clsx(
-                  `overflow-y-auto relative w-full max-w-lg  max-h-[650px] transform rounded-xl border border-gray-200 bg-white p-6 text-left shadow-2xl transition-all`,
+                  `overflow-y-auto relative  max-h-[650px] transform rounded-xl border border-gray-200 bg-white p-6 text-left shadow-2xl transition-all`,
                   containerClasses,
                 )}
               >

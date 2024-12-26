@@ -93,11 +93,11 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-[#0f4841f7] dark:bg-neutral-800 w-[300px] flex-shrink-0",
+        "h-full rounded-lg px-4 py-4 hidden md:flex md:flex-col bg-gradient-to-br  from-stone-900 via-stone-800 to-stone-800 dark:bg-neutral-800 w-[300px] flex-shrink-0",
         className
       )}
       initial={{ width: "60px" }}
-      animate={{ width: animate ? (open ? "150px" : "60px") : "300px" }}
+      animate={{ width: animate ? (open ? "200px" : "60px") : "300px" }}
       transition={{ duration: 0.3 }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
@@ -156,7 +156,7 @@ export const MobileSidebar = ({
   );
 };
 
-export const SidebarLink = ({
+export const  SidebarLink = ({
   link,
   className,
   ...props
@@ -188,7 +188,7 @@ export const SidebarLink = ({
             opacity: animate ? (open ? 1 : 0) : 1,
           }}
           transition={{ duration: 0.2 }}
-          className="text-lime-200 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+          className="text-yellow-100 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
         >
           {memoizedLinkLabel}
         </motion.span>
@@ -210,7 +210,7 @@ export const SidebarLink = ({
             opacity: animate ? (open ? 1 : 0) : 1,
           }}
           transition={{ duration: 0.2 }}
-          className="text-lime-200 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+          className="text-yellow-100 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
         >
           {memoizedLinkLabel}
         </motion.span>

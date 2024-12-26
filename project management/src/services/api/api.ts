@@ -420,3 +420,16 @@ export const getTasksByProjectApi = async (projectId:any) => {
         throw error;
       }
     }
+
+    //filess
+
+    export const getPremiumApi = async () => {
+      try {
+        const response = await baseURL.get('/meeting/payment');
+        const teams = response.data;
+        return teams;
+      } catch (error) {
+        console.error("Error logging out:", error);
+        throw error;
+      }
+    }

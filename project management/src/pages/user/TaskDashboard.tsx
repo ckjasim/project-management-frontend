@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Modal from '@/components/global/Modal/Modal';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,15 +19,23 @@ import {
   Plus,
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { EmployeeSelect, PrioritySelect } from '@/components/ui/select';
+import TaskModal from '@/components/global/Modal/AddTaskModal';
+import TaskDetailModal from '@/components/global/Modal/taskDetailsModal';
 
 type TaskType = {
   assignedTo: string;
   priority: string;
   id: string;
-  title: any;
+  title: string;
   description: string;
   dueDate: string;
+  status: string;
+  attachments: Array<{
+    name: string;
+    size: string;
+    url: string;
+  }>;
+  members: string[];
 };
 
 type ContainerType = {
@@ -47,11 +54,11 @@ const CONTAINER_IDS = {
   PROGRESSING: 'progressing',
   COMPLETED: 'completed',
   REVIEW: 'review',
-};
+} as const;
 
 const TaskDashboard = () => {
-  const { projectId: projectId } = useParams();
-
+  const { projectId } = useParams<{ projectId: string }>();
+  const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
   const [containers, setContainers] = useState<ContainerType[]>([
     { id: CONTAINER_IDS.PENDING, title: 'Pending', items: [] },
     { id: CONTAINER_IDS.PROGRESSING, title: 'Progressing', items: [] },
@@ -60,78 +67,57 @@ const TaskDashboard = () => {
   ]);
 
   const [teams, setTeams] = useState<ITeam[]>([]);
+  const [showDetail, setShowDetail] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState<ITeam>();
+  const [currentContainerId, setCurrentContainerId] = useState<string>(CONTAINER_IDS.PENDING);
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [showAddItemModal, setShowAddItemModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [files, setFiles] = useState<File[]>([]);
+
   useEffect(() => {
     const fetchTeams = async () => {
+      if (!projectId) return;
       const res = await getTeamsByProject(projectId);
       const teams = res?.teams?.map((team: any) => ({
         id: team?._id,
         name: team?.name,
       }));
       setTeams(teams);
-      setSelectedTeam({ name: teams[0]?.name, id: teams[0].id });
+      if (teams.length > 0) {
+        setSelectedTeam({ name: teams[0]?.name, id: teams[0].id });
+      }
     };
 
     fetchTeams();
-  }, []);
-
-  const [selectedTeam, setSelectedTeam] = useState<ITeam>();
-  const [currentContainerId, setCurrentContainerId] = useState<string>(
-    CONTAINER_IDS.PENDING
-  );
-  const [itemName, setItemName] = useState('');
-  const [teamMembers, setTeamMembers] = useState<any>([]);
-
-  const [itemDescription, setItemDescription] = useState('');
-  const [assignedEmployee, setAssignedEmployee] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [priority, setPriority] = useState('');
-  const [showAddItemModal, setShowAddItemModal] = useState(false);
-  const [loading, setLoading] = useState(true);
+  }, [projectId]);
 
   useEffect(() => {
     const fetchTasks = async () => {
+      if (!selectedTeam?.id || !projectId) return;
+      
       setLoading(true);
       try {
-        console.log(selectedTeam);
-        const res = await getTasksByTeamApi(selectedTeam?.id, projectId);
+        const res = await getTasksByTeamApi(selectedTeam.id, projectId);
         const tasks = res.tasks;
-        console.log(tasks, 'tasks,--------------');
 
-        const itemsByContainerId = containers.reduce((acc, container) => {
-          acc[container.id] = [];
-          return acc;
-        }, {} as Record<string, TaskType[]>);
-
-        tasks.forEach(
-          (task: {
-            assignedTo: any;
-            priority: string;
-            _id: string;
-            title: string;
-            description: string;
-            dueDate: string;
-            status: string;
-          }) => {
-            const taskItem = {
+        const updatedContainers = containers.map(container => ({
+          ...container,
+          items: tasks.filter((task: TaskType) => task.status === container.id)
+            .map((task: any) => ({
               id: task._id,
               title: task.title,
               description: task.description,
-              assignedTo: task.assignedTo.name,
+              assignedTo: task.assignedTo?.name,
               dueDate: task.dueDate,
               priority: task.priority,
-            };
-            if (itemsByContainerId[task.status]) {
-              itemsByContainerId[task.status].push(taskItem);
-            }
-          }
-        );
+              status: task.status,
+              attachments: task.attachments || [],
+              members: task.members || []
+            }))
+        }));
 
-        setContainers(
-          containers.map((container) => ({
-            ...container,
-            items: itemsByContainerId[container.id] || [],
-          }))
-        );
+        setContainers(updatedContainers);
       } catch (error) {
         console.error('Error fetching tasks:', error);
       } finally {
@@ -140,29 +126,44 @@ const TaskDashboard = () => {
     };
 
     fetchTasks();
-  }, [selectedTeam]);
-
-  const onAddItem = async () => {
-    if (!itemName) return;
-
+  }, [selectedTeam, projectId]);
+  
+  function fileToBase64(file: Blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file); // Read the file as a Data URL (Base64 encoded string)
+      reader.onload = () => resolve(reader.result); // Resolve with the Base64 string
+      reader.onerror = (error) => reject(error);
+    });
+  }
+  const onAddItem = async (formData: {
+    title: string;
+    description: string;
+    priority: string;
+    assignedTo: string;
+    dueDate: string;
+  }) => {
+    console.log(formData)
+    if (!formData.title || !selectedTeam?.id || !projectId) return;
+    const base64Files = await Promise.all(
+      files.map(async (file) => ({name:file.name,file:await fileToBase64(file)}))
+    );
+  
+console.log(files)
     const newItem = {
-      title: itemName,
-      team: selectedTeam?.id,
+      ...formData,
+      team: selectedTeam.id,
       project: projectId,
-      priority,
-      assignedTo: assignedEmployee,
-      description: itemDescription,
-      dueDate,
       status: currentContainerId,
+      attachments: base64Files
     };
 
     try {
       const res = await postTasksApi(newItem);
-      console.log(res);
       const task = res.createdTask;
 
-      setContainers((prevContainers) =>
-        prevContainers.map((container) =>
+      setContainers(prevContainers =>
+        prevContainers.map(container =>
           container.id === currentContainerId
             ? {
                 ...container,
@@ -170,11 +171,14 @@ const TaskDashboard = () => {
                   ...container.items,
                   {
                     id: task._id,
-                    title: itemName,
-                    assignedTo: task.assignedTo.name,
+                    title: task.title,
+                    assignedTo: task.assignedTo?.name,
                     priority: task.priority,
-                    description: itemDescription,
-                    dueDate,
+                    description: task.description,
+                    dueDate: task.dueDate,
+                    status: task.status,
+                    attachments: task.attachments || [],
+                    members: task.members || []
                   },
                 ],
               }
@@ -182,16 +186,10 @@ const TaskDashboard = () => {
         )
       );
       setShowAddItemModal(false);
-      resetForm();
+      setFiles([]);
     } catch (error) {
       console.error('Error adding item:', error);
     }
-  };
-
-  const resetForm = () => {
-    setItemName('');
-    setItemDescription('');
-    setDueDate('');
   };
 
   const containerIcons = {
@@ -200,53 +198,67 @@ const TaskDashboard = () => {
     [CONTAINER_IDS.COMPLETED]: <Check className="text-green-500" />,
     [CONTAINER_IDS.REVIEW]: <Eye className="text-purple-500" />,
   };
+
   const navigate = useNavigate();
 
   const handleBack = () => {
     navigate(-1);
   };
 
-  const priorityLevels = [
-    { value: 'low', label: 'Low Priority', color: 'text-green-600' },
-    { value: 'medium', label: 'Medium Priority', color: 'text-yellow-600' },
-    { value: 'high', label: 'High Priority', color: 'text-red-600' },
-  ];
-
   const addTask = async () => {
     setShowAddItemModal(true);
     setCurrentContainerId(CONTAINER_IDS.PENDING);
     if (selectedTeam) {
-      const teamMembers = await getTeamMembersByTeamIdApi(selectedTeam.id);
-      console.log(teamMembers, 'teammem-----------------');
-      setTeamMembers(teamMembers?.teamMembers?.members);
+      const response = await getTeamMembersByTeamIdApi(selectedTeam.id);
+      console.log(response)
+      setTeamMembers(response?.teamMembers?.members || []);
     }
   };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      setFiles(prev => [...prev, ...newFiles]);
+    }
+  };
+
+  const removeFile = (indexToRemove: number) => {
+    setFiles(prev => prev.filter((_, index) => index !== indexToRemove));
+  };
+
   return (
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen py-10">
+      <TaskDetailModal
+        show={showDetail}
+        onClose={() => setShowDetail(false)}
+        task={selectedTask}
+        onEdit={() => {/* Implement edit functionality */}}
+        onDelete={() => {/* Implement delete functionality */}}
+      />
+      
       <div className="container mx-auto max-w-7xl px-4">
-        {/* Team Selection */}
         <Button
           variant="outline"
           onClick={handleBack}
-          className="flex items-center space-x-2"
+          className="flex items-center space-x-2 mb-6"
         >
           <ArrowLeftIcon className="h-4 w-4" />
+          <span>Back</span>
         </Button>
+
         <div className="flex justify-center mb-8">
           <div className="bg-white shadow-lg rounded-full p-2 flex space-x-2">
             {teams.map((team) => (
               <button
                 key={team.id}
                 className={`px-4 py-2 rounded-full transition-all duration-300 ${
-                  selectedTeam?.name === team.name
+                  selectedTeam?.id === team.id
                     ? 'bg-blue-500 text-white'
                     : 'hover:bg-blue-100 text-gray-700'
                 }`}
-                onClick={() =>
-                  setSelectedTeam({ name: team.name, id: team.id })
-                }
+                onClick={() => setSelectedTeam(team)}
               >
-                {team.name}
+                {team?.name}
               </button>
             ))}
           </div>
@@ -260,112 +272,37 @@ const TaskDashboard = () => {
           <h2 className="text-2xl font-bold text-gray-800">
             {selectedTeam?.name} Tasks
           </h2>
-          <button
-            onClick={() => {
-              addTask();
-            }}
+          <Button
+            onClick={addTask}
             className="bg-blue-500 text-white p-3 rounded-full hover:bg-blue-600 transition-colors shadow-lg"
           >
-            <Plus />
-          </button>
+            <Plus className="h-5 w-5" />
+          </Button>
         </motion.div>
 
-        <Modal showModal={showAddItemModal} setShowModal={setShowAddItemModal}>
-          <div className="flex flex-col w-full items-center p-8 gap-y-6 bg-white rounded-xl">
-            <h1 className="text-3xl font-bold text-gray-800 mb-4">
-              Create Task
-            </h1>
+        {showAddItemModal && (
+          <TaskModal
+            showAddItemModal={showAddItemModal}
+            setShowAddItemModal={setShowAddItemModal}
+            teamMembers={teamMembers}
+            priorityLevels={[
+              { value: 'low', label: 'Low Priority', color: 'text-green-600' },
+              { value: 'medium', label: 'Medium Priority', color: 'text-yellow-600' },
+              { value: 'high', label: 'High Priority', color: 'text-red-600' },
+            ]}
+            onAddItem={onAddItem}
+            onFileChange={handleFileChange}
+            onFileRemove={removeFile}
+            files={files}
+          />
+        )}
 
-            {[
-              {
-                label: 'Title',
-                value: itemName,
-                onChange: (e: {
-                  target: { value: React.SetStateAction<string> };
-                }) => setItemName(e.target.value),
-                placeholder: 'Enter task title',
-              },
-              {
-                label: 'Description',
-                value: itemDescription,
-                onChange: (e: {
-                  target: { value: React.SetStateAction<string> };
-                }) => setItemDescription(e.target.value),
-                placeholder: 'Detailed task description',
-              },
-            ].map(({ label, value, onChange, placeholder }) => (
-              <div key={label} className="w-full">
-                <label className="block text-gray-600 font-medium mb-2">
-                  {label}
-                </label>
-                <Input
-                  type="text"
-                  placeholder={placeholder}
-                  value={value}
-                  onChange={onChange}
-                  className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-blue-500 transition-colors"
-                />
-              </div>
-            ))}
-            <div className="w-full">
-              <label className="block text-gray-600 font-medium mb-2">
-                Assign Employee
-              </label>
-              <EmployeeSelect
-                assignedEmployee={assignedEmployee}
-                setAssignedEmployee={setAssignedEmployee}
-                teamMembers={teamMembers}
-              />
-            </div>
-
-            <div className="w-full">
-              <label className="block text-gray-600 font-medium mb-2">
-                Priority
-              </label>
-              <PrioritySelect
-                priority={priority}
-                setPriority={setPriority}
-                priorityLevels={priorityLevels}
-              />
-            </div>
-
-            {/* Due Date */}
-            <div className="w-full">
-              <label
-                htmlFor="duedate"
-                className="block text-gray-600 font-medium mb-2"
-              >
-                Due Date
-              </label>
-              <Input
-                type="date"
-                id="duedate"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-blue-500"
-              />
-            </div>
-
-            {/* Priority Selection */}
-
-            {/* Employee Assignment */}
-
-            <Button
-              onClick={onAddItem}
-              className="mt-6 w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md"
-            >
-              Create Task
-            </Button>
-          </div>
-        </Modal>
-
-        {/* Task Containers */}
         <AnimatePresence>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ staggerChildren: 0.1 }}
-            className="grid grid-cols-4 gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
           >
             {containers.map((container) => (
               <motion.div
@@ -386,7 +323,7 @@ const TaskDashboard = () => {
                     </div>
                   }
                 >
-                  <div className="space-y-4 ">
+                  <div className="space-y-4">
                     <AnimatePresence>
                       {container.items.map((item) => (
                         <motion.div
@@ -394,14 +331,13 @@ const TaskDashboard = () => {
                           initial={{ opacity: 0, scale: 0.95 }}
                           animate={{ opacity: 1, scale: 1 }}
                           exit={{ opacity: 0, scale: 0.95 }}
+                          onClick={() => {
+                            setSelectedTask(item);
+                            setShowDetail(true);
+                          }}
                         >
                           <Items
-                            title={item.title}
-                            id={item.id}
-                            assignedTo={item.assignedTo}
-                            priority={item.priority}
-                            description={item.description}
-                            dueDate={item.dueDate}
+                            {...item}
                             selectedTeam={selectedTeam}
                           />
                         </motion.div>

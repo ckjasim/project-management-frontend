@@ -2,6 +2,37 @@ import { MutableRefObject } from "react";
 import { Socket } from "socket.io-client";
 import { DefaultEventsMap } from '@socket.io/component-emitter';
 
+export interface TaskType {
+  id: string;
+  title: string;
+  description: string;
+  assignedTo: string;
+  priority: string;
+  dueDate: string;
+  status: string;
+}
+
+export interface ContainerType {
+  id: string;
+  title: string;
+  items: TaskType[];
+}
+
+export interface TeamMember {
+  id: string;
+  name: string;
+}
+
+export interface Team {
+  id: string;
+  name: string;
+}
+
+export interface PriorityLevel {
+  value: string;
+  label: string;
+  color: string;
+}
 export interface Message {
   id: string;
   senderId: string;

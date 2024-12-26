@@ -30,6 +30,10 @@ import TeamList from '@/pages/user/teamList';
 import ErrorPage from '@/pages/error/errorPage';
 import Meeting from '@/pages/meeting/meeting';
 import App from '@/pages/meeting/joinPage';
+import PremiumPage from '@/pages/user/premiumPage';
+import PaymentSuccess from '@/pages/user/paymentSucess';
+import PaymentFailure from '@/pages/user/paymentFailure';
+import { NotificationsPage } from '@/pages/notifications/Notification';
 
 const router = createBrowserRouter([
   {
@@ -57,6 +61,8 @@ const router = createBrowserRouter([
       { path: 'chat', element: <MessagesPage /> },
       { path: 'meet', element: <Meeting /> },
       { path: 'meet/join', element: <App /> },
+
+
 
     ],
   },
@@ -91,6 +97,10 @@ const router = createBrowserRouter([
       { path: 'employees', element: <EmployeesPage /> },
       { path: 'meet', element: <Meeting /> },
       { path: 'meet/join', element: <App /> },
+      { path: 'premium', element: <PremiumPage /> },
+      { path: 'success', element: <PaymentSuccess /> }, 
+      { path: 'cancel', element: <PaymentFailure /> },  
+      { path: 'notification', element: <NotificationsPage /> },  
 
     ],
   },
