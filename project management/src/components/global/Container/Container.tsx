@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -6,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface ContainerProps {
   id: string;
-  title: string ;
+  title: string;
   children: React.ReactNode;
   className?: string;
 }
@@ -18,6 +17,7 @@ const Container = ({ id, title, children, className }: ContainerProps) => {
     transform,
     transition,
     isDragging,
+    isOver,
   } = useSortable({
     id,
     data: { type: 'container' },
@@ -30,7 +30,10 @@ const Container = ({ id, title, children, className }: ContainerProps) => {
       className={`
         transition-all
         duration-200
-        
+        h-[calc(100vh-10rem)]
+        flex
+        flex-col
+        relative
         ${className}
         ${isDragging ? 'opacity-50 scale-105' : ''}
       `}
@@ -40,10 +43,27 @@ const Container = ({ id, title, children, className }: ContainerProps) => {
       }}
     >
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg font-semibold">{title}</CardTitle>
+        <CardTitle className="text-lg font-semibold flex items-center">
+          {title}
+          
+        </CardTitle>
       </CardHeader>
-      <CardContent className="min-h-[calc(100vh-20rem)] pt-0">
-        {children}
+      <CardContent className="flex-1 overflow-y-auto pt-0 pb-96">
+        {/* Drop area indicator */}
+        <div 
+          className={`
+            absolute 
+            inset-0
+            pointer-events-none
+            transition-colors 
+            duration-200
+            ${isOver ? 'bg-blue-100/50 border-2 border-dashed border-blue-400 rounded-lg' : ''}
+          `}
+        />
+        {/* Task items */}
+        <div className="space-y-4 relative min-h-full">
+          {children}
+        </div>
       </CardContent>
     </Card>
   );

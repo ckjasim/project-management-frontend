@@ -26,17 +26,24 @@ const MeetingScheduler = () => {
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [dltLoading, setDltLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     const fetchMeetings = async () => {
       try {
         const res = await getMeetingsApi();
         setMeetings(res.meetings || []);
       } catch (error) {
         console.error('Failed to fetch meetings:', error);
+      }finally{
+        setLoading(false);
       }
     };
     fetchMeetings();
+  
+
   }, []);
 
   const formatDate = (date: string | number | Date) => {
@@ -72,14 +79,17 @@ const MeetingScheduler = () => {
   };
 
   const deleteMeeting = async (meetingId: any) => {
-    if (window.confirm('Are you sure you want to delete this meeting?')) {
       try {
+        setDltLoading(true)
         await deleteMeetingApi(meetingId);
         setMeetings(meetings.filter(m => m._id !== meetingId));
       } catch (error) {
         console.error('Failed to delete meeting:', error);
+      }finally{
+        setDltLoading(false)
+
       }
-    }
+  
   };
 
   const handleReschedule = async (newDate: any, newTime: any) => {
@@ -130,12 +140,17 @@ const MeetingScheduler = () => {
               >
                 <Edit className="w-4 h-4" />
               </button>
-              <button
-                onClick={() => deleteMeeting(meeting._id)}
-                className="p-1 text-red-600 hover:text-red-800 transition-colors"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+             { dltLoading ? (
+                    <div className="flex justify-center items-center h-32">
+                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-500" />
+                    </div>
+                  ):( <button
+                    onClick={() => deleteMeeting(meeting._id)}
+                    className="p-1 text-red-600 hover:text-red-800 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>)}
+             
             </div>
           )}
         </div>
@@ -230,17 +245,22 @@ const MeetingScheduler = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {upcomingMeetings
-                .sort((a, b) => new Date(a.date) - new Date(b.date))
-                .map((meeting) => (
-                  <MeetingCard
-                    key={meeting._id}
-                    meeting={meeting}
-                    isBacklog={false}
-                  />
-                ))}
-            </div>
+      {loading ? (
+                <div className="flex justify-center items-center h-32">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+                </div>
+              ):( <div className="space-y-4">
+                {upcomingMeetings
+                  .sort((a, b) => new Date(a.date) - new Date(b.date))
+                  .map((meeting) => (
+                    <MeetingCard
+                      key={meeting._id}
+                      meeting={meeting}
+                      isBacklog={false}
+                    />
+                  ))}
+              </div>)}
+           
           </CardContent>
         </Card>
 
@@ -253,7 +273,11 @@ const MeetingScheduler = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+            {loading ? (
+                <div className="flex justify-center items-center h-32">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+                </div>
+              ):( <div className="space-y-4">
                 {backlogMeetings
                   .sort((a, b) => new Date(b.date) - new Date(a.date))
                   .map((meeting) => (
@@ -261,9 +285,11 @@ const MeetingScheduler = () => {
                       key={meeting._id}
                       meeting={meeting}
                       isBacklog={true}
+                      
                     />
                   ))}
-              </div>
+              </div>)}
+             
             </CardContent>
           </Card>
         )}

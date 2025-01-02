@@ -28,7 +28,9 @@ import {
   Eye,
   Plus,
   Search,
-  SortAsc,
+  Calendar,
+  AlertTriangle,
+
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import TaskModal from '@/components/global/Modal/AddTaskModal';
@@ -71,13 +73,29 @@ const TaskDashboard = () => {
 
   // Search, sort, and filter state
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<'dueDate' | 'priority' | 'title'>(
-    'dueDate'
-  );
+  const [sortByDueDate, setSortByDueDate] = useState<'asc' | 'desc'>('asc');
+  const [sortByPriority, setSortByPriority] = useState<'asc' | 'desc'>('desc');
   const [filterPriority, setFilterPriority] = useState<string>('all');
+  const [filterAssignee, setFilterAssignee] = useState<string>('all');
   const [filteredContainers, setFilteredContainers] = useState<ContainerType[]>(
     []
   );
+  const [assignedMembers, setAssignedMembers] = useState<Set<string>>(new Set());
+
+  // Update assigned members whenever containers change
+  useEffect(() => {
+    const uniqueAssignees = new Set<string>();
+    
+    containers.forEach(container => {
+      container.items.forEach(item => {
+        if (item.assignedTo) {
+          uniqueAssignees.add(item.assignedTo);
+        }
+      });
+    });
+    
+    setAssignedMembers(uniqueAssignees);
+  }, [containers]);
 
   // Icons for container types
   const containerIcons = {
@@ -87,7 +105,7 @@ const TaskDashboard = () => {
     [CONTAINER_IDS.REVIEW]: <Eye className="text-purple-500" />,
   };
 
-  // Initial data fetching
+
   useEffect(() => {
     const fetchTeams = async () => {
       if (!projectId) return;
@@ -104,6 +122,21 @@ const TaskDashboard = () => {
 
     fetchTeams();
   }, [projectId]);
+
+  // Fetch team members when team changes
+  useEffect(() => {
+    const fetchTeamMembers = async () => {
+      if (!selectedTeam?.id) return;
+      try {
+        const response = await getTeamMembersByTeamIdApi(selectedTeam.id);
+        setTeamMembers(response?.teamMembers?.members || []);
+      } catch (error) {
+        console.error('Error fetching team members:', error);
+      }
+    };
+
+    fetchTeamMembers();
+  }, [selectedTeam]);
 
   // Fetch tasks when team changes
   useEffect(() => {
@@ -123,7 +156,7 @@ const TaskDashboard = () => {
               id: task._id,
               title: task.title,
               description: task.description,
-              assignedTo: task.assignedTo?.name,
+              assignedTo: task.assignedTo?.name || '',
               dueDate: task.dueDate,
               priority: task.priority,
               status: task.status,
@@ -153,13 +186,17 @@ const TaskDashboard = () => {
       items: container.items.filter((item) => {
         const matchesSearch =
           item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.assignedTo?.toLowerCase().includes(searchQuery.toLowerCase());
+          item.description.toLowerCase().includes(searchQuery.toLowerCase());
 
         const matchesPriority =
           filterPriority === 'all' || item.priority === filterPriority;
 
-        return matchesSearch && matchesPriority;
+        const matchesAssignee =
+          filterAssignee === 'all' || 
+          (item.assignedTo && 
+           item.assignedTo.toLowerCase() === filterAssignee.toLowerCase());
+
+        return matchesSearch && matchesPriority && matchesAssignee;
       }),
     }));
 
@@ -167,28 +204,36 @@ const TaskDashboard = () => {
     filtered = filtered.map((container) => ({
       ...container,
       items: container.items.sort((a, b) => {
-        switch (sortBy) {
-          case 'dueDate':
-            return (
-              new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-            );
-          case 'priority': {
-            const priorityWeight = { low: 0, medium: 1, high: 2 };
-            return (
-              priorityWeight[b.priority as keyof typeof priorityWeight] -
-              priorityWeight[a.priority as keyof typeof priorityWeight]
-            );
-          }
-          case 'title':
-            return a.title.localeCompare(b.title);
-          default:
-            return 0;
-        }
+        // Priority sorting
+        const priorityWeight = { low: 0, medium: 1, high: 2 };
+        const priorityCompare =
+          (priorityWeight[b.priority as keyof typeof priorityWeight] || 0) -
+          (priorityWeight[a.priority as keyof typeof priorityWeight] || 0);
+
+        // Due date sorting
+        const dateA = new Date(a.dueDate).getTime();
+        const dateB = new Date(b.dueDate).getTime();
+        const dateCompare = dateA - dateB;
+
+        // Apply sort direction
+        const priorityResult =
+          sortByPriority === 'asc' ? -priorityCompare : priorityCompare;
+        const dateResult = sortByDueDate === 'asc' ? dateCompare : -dateCompare;
+
+        // Combine both sorts with priority taking precedence
+        return priorityResult || dateResult;
       }),
     }));
 
     setFilteredContainers(filtered);
-  }, [containers, searchQuery, sortBy, filterPriority]);
+  }, [
+    containers,
+    searchQuery,
+    sortByDueDate,
+    sortByPriority,
+    filterPriority,
+    filterAssignee,
+  ]);
 
   // File handling functions
   const fileToBase64 = (file: Blob): Promise<string | ArrayBuffer | null> => {
@@ -250,7 +295,7 @@ const TaskDashboard = () => {
                   {
                     id: task._id,
                     title: task.title,
-                    assignedTo: task.assignedTo?.name,
+                    assignedTo: task.assignedTo?.name || '',
                     priority: task.priority,
                     description: task.description,
                     dueDate: task.dueDate,
@@ -273,15 +318,12 @@ const TaskDashboard = () => {
   const addTask = async () => {
     setShowAddItemModal(true);
     setCurrentContainerId(CONTAINER_IDS.PENDING);
-    if (selectedTeam) {
-      const response = await getTeamMembersByTeamIdApi(selectedTeam.id);
-      setTeamMembers(response?.teamMembers?.members || []);
-    }
   };
 
   const handleBack = () => {
     navigate(-1);
   };
+
   const handleAddComment = async (comment: string) => {
     if (!selectedTask?.id || !comment.trim()) return;
 
@@ -291,7 +333,6 @@ const TaskDashboard = () => {
         taskId: selectedTask.id,
       };
       const res = await addCommentApi(data);
-      console.log(res);
       setContainers((prevContainers) => {
         return prevContainers.map((container) => ({
           ...container,
@@ -318,16 +359,13 @@ const TaskDashboard = () => {
         onClose={() => setShowDetail(false)}
         task={selectedTask}
         onAddComment={handleAddComment}
-        onEdit={() => {
-          /* Implement edit functionality */
-        }}
-        onDelete={() => {
-          /* Implement delete functionality */
-        }}
+        selectedTeam={selectedTeam}
       />
 
       <div className="container mx-auto max-w-7xl px-4">
         {/* Navigation */}
+        <div className='flex items-center'>
+        <div className='mr-96'>
         <Button
           variant="outline"
           onClick={handleBack}
@@ -336,7 +374,7 @@ const TaskDashboard = () => {
           <ArrowLeftIcon className="h-4 w-4" />
           <span>Back</span>
         </Button>
-
+        </div>
         {/* Team Selection */}
         <div className="flex justify-center mb-8">
           <div className="bg-white shadow-lg rounded-full p-2 flex space-x-2">
@@ -355,7 +393,7 @@ const TaskDashboard = () => {
             ))}
           </div>
         </div>
-
+        </div>
         {/* Header with Controls */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -374,8 +412,8 @@ const TaskDashboard = () => {
             </Button>
           </div>
 
-          {/* Search, Sort, and Filter Controls */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Updated Search, Sort, and Filter Controls */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <div className="relative">
               <Input
                 placeholder="Search tasks..."
@@ -386,20 +424,27 @@ const TaskDashboard = () => {
               <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
             </div>
 
-            <Select
-              value={sortBy}
-              onValueChange={(value) => setSortBy(value as typeof sortBy)}
+            <Button
+              onClick={() =>
+                setSortByDueDate((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+              }
+              variant="outline"
+              className="flex items-center gap-2"
             >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Sort by..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="dueDate">Due Date</SelectItem>
-                <SelectItem value="priority">Priority</SelectItem>
-                <SelectItem value="title">Title</SelectItem>
-              </SelectContent>
-            </Select>
+              <Calendar className="h-4 w-4  text-blue-500" />
+              Due Date {sortByDueDate === 'asc' ? '↑' : '↓'}
+            </Button>
 
+            <Button
+              onClick={() =>
+                setSortByPriority((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+              }
+              variant="outline"
+              className="flex items-center gap-2 "
+            >
+              <AlertTriangle className="h-4 w-4 text-yellow-500" />
+              Priority {sortByPriority === 'asc' ? '↑' : '↓'}
+            </Button>
             <Select value={filterPriority} onValueChange={setFilterPriority}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Filter by priority..." />
@@ -411,6 +456,20 @@ const TaskDashboard = () => {
                 <SelectItem value="high">High Priority</SelectItem>
               </SelectContent>
             </Select>
+
+            <Select value={filterAssignee} onValueChange={setFilterAssignee}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Filter by assignee..." />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Assignees</SelectItem>
+          {Array.from(assignedMembers).sort().map((assignee) => (
+            <SelectItem key={assignee} value={assignee}>
+              {assignee}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
           </div>
         </motion.div>
 
@@ -461,10 +520,11 @@ const TaskDashboard = () => {
                         <span className="font-semibold text-gray-800">
                           {container.title}
                         </span>
-                      </div>
                       <span className="text-sm text-gray-500">
                         {container.items.length}
                       </span>
+                      </div>
+                      
                     </div>
                   }
                 >

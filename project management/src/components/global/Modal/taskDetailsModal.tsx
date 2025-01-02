@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
+import * as Yup from 'yup';
 import {
   AlertCircle,
   ArrowDownToLine,
@@ -8,6 +9,7 @@ import {
   Clock,
   Edit,
   FileIcon,
+  Loader2,
   MessageSquare,
   Send,
   Tag,
@@ -17,44 +19,17 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import Modal from './Modal';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-
-interface Attachment {
-  name: string;
-  size: string;
-  url: string;
-}
-
-interface Comment {
-  _id: string;
-  author: string;
-  content: string;
-  timestamp: string;
-}
-
-interface TaskDetailModalProps {
-  show: boolean;
-  onClose: () => void;
-  task: {
-    id: string;
-    title: string;
-    description: string;
-    priority: string;
-    assignedTo: string;
-    dueDate: string;
-    attachments: Attachment[];
-    members: string[];
-    status: string;
-    comments?: Comment[];
-  } | null;
-  onEdit: () => void;
-  onDelete: () => void;
-  onAddComment?: (comment: string) => void;
-}
+import { TaskDetailModalProps } from '@/types';
+import { deleteTaskApi, patchTaskApi } from '@/services/api/taskApi';
+import { getTeamMembersByTeamIdApi } from '@/services/api/projectApi';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { Input } from '@/components/ui/input';
+import { EmployeeSelect, PrioritySelect } from '@/components/ui/select';
 
 const getPriorityColor = (priority: string) => {
   switch (priority.toLowerCase()) {
@@ -77,26 +52,104 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   show,
   onClose,
   task,
-  onEdit,
-  onDelete,
-  onAddComment
+  onAddComment,
+  selectedTeam
 }) => {
   const [newComment, setNewComment] = useState('');
-      const {userInfo} = useSelector((state:RootState)=>state.Auth)
-  
+  const { userInfo } = useSelector((state: RootState) => state.Auth);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [currentEmployee, setCurrentEmployee] = useState(task?.assignedTo);
+  const [currentPriority, setCurrentPriority] = useState(task?.priority);
+
   if (!task) return null;
 
   const isOverdue = new Date(task.dueDate) < new Date();
 
+  const priorityLevels = [
+    { value: 'low', label: 'Low Priority', color: 'text-green-600' },
+    { value: 'medium', label: 'Medium Priority', color: 'text-yellow-600' },
+    { value: 'high', label: 'High Priority', color: 'text-red-900' },
+  ];
+
   const handleSubmitComment = () => {
     if (newComment.trim() && onAddComment) {
+      const comment = {
+        _id: Math.random().toString(),
+        author: {
+          name: userInfo.name,
+          profileImage: { url: userInfo.profileImage || null },
+        },
+        createdAt: new Date().toISOString(),
+        content: newComment.trim(),
+      };
+
+      if (task.comments) {
+        task.comments.push(comment);
+      } else {
+        task.comments = [comment];
+      }
       onAddComment(newComment);
       setNewComment('');
     }
   };
 
+  const onDelete = async () => {
+
+      setIsDeleting(true);
+      try {
+        await deleteTaskApi(task.id);
+        // You might want to trigger a refresh of the task list here
+      } catch (error) {
+        console.error('Error deleting task:', error);
+      } finally {
+        setIsDeleting(false);
+      }
+  
+  };
+  const validationSchema = Yup.object().shape({
+    title: Yup.string()
+      .trim()
+      .matches(/^(?!\s*$).+/, 'Enter a valid title')
+      .required('Title is required'),
+    description: Yup.string(),
+    dueDate: Yup.date().required('Due date is required').nullable(),
+  });
+  const onEdit = async () => {
+    setShowEditModal(true);
+    try {
+      const response = await getTeamMembersByTeamIdApi(selectedTeam?.id);
+      setTeamMembers(response?.teamMembers?.members || []);
+    } catch (error) {
+      console.error('Error fetching team members:', error);
+    }
+  };
+
+  const handleUpdate = async (values: any) => {
+    setIsUpdating(true);
+    try {
+      const updatedTask = {
+        ...values,
+        assignedTo: currentEmployee,
+        priority: currentPriority,
+      };
+      await patchTaskApi(task?.id, updatedTask);
+      setShowEditModal(false);
+      // You might want to trigger a refresh of the task list here
+    } catch (error) {
+      console.error('Error updating task:', error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
   return (
+    <div>
+
+         
     <AnimatePresence>
+      
       {show && (
         <Modal showModal={show} setShowModal={onClose}>
           <motion.div
@@ -105,7 +158,6 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
             exit={{ opacity: 0, scale: 0.95 }}
             className="flex flex-col w-full max-w-5xl bg-white rounded-xl shadow-lg overflow-hidden"
           >
-            {/* Header Section */}
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
               <div className="flex justify-between items-start p-6">
                 <div className="space-y-3">
@@ -144,7 +196,11 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Button
+                  {userInfo.role==="project manager"?(
+                    <div className='space-x-2'>
+
+
+                    <Button
                     variant="outline"
                     size="sm"
                     onClick={onEdit}
@@ -162,6 +218,9 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                     <Trash2 className="h-4 w-4 mr-2" />
                     Delete
                   </Button>
+                    </div>
+                ):('')}
+                  
                   <Button
                     variant="ghost"
                     size="icon"
@@ -193,44 +252,67 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                     <MessageSquare className="h-5 w-5 mr-2" />
                     Comments
                   </h3>
-                  
+
                   <div className="space-y-4">
                     {task.comments?.map((comment) => (
-                      <div key={comment._id} className="flex space-x-3 p-3 bg-gray-50 rounded-lg">
+                      <div
+                        key={comment._id}
+                        className="flex space-x-3 p-3 bg-gray-50 rounded-lg"
+                      >
                         <Avatar className="h-8 w-8">
-                          {(comment.author?.profileImage?.url)?(<div><img src={comment.author?.profileImage?.url} alt="" /></div>):(<AvatarFallback>{comment.author?.name[0]}</AvatarFallback>)}
-                          
-
+                          {comment.author?.profileImage?.url ? (
+                            <div>
+                              <img
+                                src={comment.author?.profileImage?.url}
+                                alt=""
+                              />
+                            </div>
+                          ) : (
+                            <AvatarFallback>
+                              {comment.author?.name[0]}
+                            </AvatarFallback>
+                          )}
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium text-gray-900">{comment.author?.name}</p>
+                            <p className="text-sm font-medium text-gray-900">
+                              {comment.author?.name}
+                            </p>
                             <span className="text-xs text-gray-500">
-                              {format(new Date(comment.createdAt), 'MMM d, yyyy h:mm a')}
+                              {format(
+                                new Date(comment.createdAt),
+                                'MMM d, yyyy h:mm a'
+                              )}
                             </span>
                           </div>
-                          <p className="mt-1 text-sm text-gray-600">{comment.content}</p>
+                          <p className="mt-1 text-sm text-gray-600">
+                            {comment.content}
+                          </p>
                         </div>
                       </div>
                     ))}
-          {(userInfo.name===task.assignedTo || userInfo.role==='project manager')?(  <div className="mt-4">
-                      <Textarea
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Add a comment..."
-                        className="min-h-[80px]"
-                      />
-                      <div className="mt-2 flex justify-end">
-                        <Button
-                          onClick={handleSubmitComment}
-                          disabled={!newComment.trim()}
-                        >
-                          <Send className="h-4 w-4 mr-2" />
-                          Send
-                        </Button>
+                    {userInfo.name === task.assignedTo ||
+                    userInfo.role === 'project manager' ? (
+                      <div className="mt-4">
+                        <Textarea
+                          value={newComment}
+                          onChange={(e) => setNewComment(e.target.value)}
+                          placeholder="Add a comment..."
+                          className="min-h-[80px]"
+                        />
+                        <div className="mt-2 flex justify-end">
+                          <Button
+                            onClick={handleSubmitComment}
+                            disabled={!newComment.trim()}
+                          >
+                            <Send className="h-4 w-4 mr-2" />
+                            Send
+                          </Button>
+                        </div>
                       </div>
-                    </div>):''}
-                  
+                    ) : (
+                      ''
+                    )}
                   </div>
                 </div>
               </div>
@@ -296,6 +378,122 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
         </Modal>
       )}
     </AnimatePresence>
+    <Modal showModal={showEditModal} setShowModal={setShowEditModal} >
+      
+          <h2 className="text-2xl font-bold mb-6 pl-3 text-gray-900">Edit Task</h2>
+          <Formik
+            initialValues={{
+              title: task.title,
+              description: task.description,
+              dueDate: task.dueDate
+                ? new Date(task.dueDate).toISOString().split('T')[0]
+                : '',
+            }}
+            validationSchema={validationSchema}
+            onSubmit={handleUpdate}
+          >
+            {({ isSubmitting }) => ( 
+              <Form className="space-y-6 min-w-80 px-3">
+                <div>
+                  <label
+                    htmlFor="title"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Title
+                  </label>
+                  <Field
+                    name="title"
+                    as={Input}
+                    className="w-full rounded-lg"
+                  />
+                  <ErrorMessage
+                    name="title"
+                    component="div"
+                    className="mt-1 text-sm text-red-600"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="description"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Description
+                  </label>
+                  <Field
+                    name="description"
+                    as={Input}
+                    className="w-full rounded-lg"
+                  />
+                </div>
+
+                <div className="w-full">
+                  <label className="block text-gray-600 font-medium mb-2">
+                    Assign Employee 
+                  </label>
+                  <EmployeeSelect
+                    assignedEmployee={currentEmployee}
+                    setAssignedEmployee={setCurrentEmployee}
+                    teamMembers={teamMembers}
+                  />
+                </div>
+
+                <div className="w-full">
+                  <label className="block text-gray-600 font-medium mb-2">
+                    Priority
+                  </label>
+                  <PrioritySelect
+                    priority={currentPriority}
+                    setPriority={setCurrentPriority}
+                    priorityLevels={priorityLevels}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="dueDate"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Due Date
+                  </label>
+                  <Field
+                    name="dueDate"
+                    type="date"
+                    as={Input}
+                    className="w-full rounded-lg"
+                  />
+                  <ErrorMessage
+                    name="dueDate"
+                    component="div"
+                    className="mt-1 text-sm text-red-600"
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowEditModal(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isSubmitting || isUpdating}>
+                    {isSubmitting || isUpdating ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Updating...
+                      </>
+                    ) : (
+                      'Update Task'
+                    )}
+                  </Button>
+                </div>
+              </Form>
+            )}
+          </Formik>
+    
+      </Modal>
+    </div>
   );
 };
 

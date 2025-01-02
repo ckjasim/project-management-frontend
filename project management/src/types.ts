@@ -1,6 +1,7 @@
 import { MutableRefObject } from "react";
 import { Socket } from "socket.io-client";
 import { DefaultEventsMap } from '@socket.io/component-emitter';
+import { UniqueIdentifier } from "@dnd-kit/core";
 
 // export interface TaskType {
 //   id: string;
@@ -56,7 +57,20 @@ export interface Message {
   isImage?:boolean
   isRead?:boolean
 }
+export type DNDType = {
+  id: UniqueIdentifier;
+  title: string;
+  items: TaskItem[];
+};
 
+export type TaskItem = {
+  id: UniqueIdentifier;
+  title: string;
+  description: string;
+  assignedTo: string;
+  priority: string;
+  dueDate: string;
+};
 export type ChatAreaProps = {
   serverRef:MutableRefObject<Socket<DefaultEventsMap, DefaultEventsMap> | undefined>,
   messages: Message[],
@@ -92,12 +106,12 @@ export interface IFile {
   name: string;
   file: string | ArrayBuffer | null;
 }
-export interface Attachment {
-  name: string;
-  type: string;
-  size: string;
-  timestamp: string;
-}
+// export interface Attachment {
+//   name: string;
+//   type: string;
+//   size: string;
+//   timestamp: string;
+// }
 
 export interface Employee {
   _id: string;
@@ -133,4 +147,36 @@ export interface ProjectFormValues {
 export interface TeamFormValues {
   name: string;
   employees: string[];
+}
+
+export interface Attachment {
+  name: string;
+  size: string;
+  url: string;
+}
+
+export interface Comment {
+  _id: string;
+  author: string;
+  content: string;
+  timestamp: string;
+}
+
+export interface TaskDetailModalProps {
+  show: boolean;
+  onClose: () => void;
+  task: {
+    id: string;
+    title: string;
+    description: string;
+    priority: string;
+    assignedTo: string;
+    dueDate: string;
+    attachments: Attachment[];
+    members: string[];
+    status: string;
+    comments?: Comment[];
+  } | null;
+  selectedTeam:any;
+  onAddComment?: (comment: string) => void;
 }

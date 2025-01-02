@@ -1,30 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, KeyboardSensor, PointerSensor, UniqueIdentifier, closestCorners, useSensor, useSensors } from '@dnd-kit/core';
-import { SortableContext, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { Loader2, Search, SortAsc, SortDesc } from 'lucide-react';
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  KeyboardSensor,
+  PointerSensor,
+  UniqueIdentifier,
+  closestCorners,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable';
+import { Filter, Loader2, Search, SortAsc, SortDesc } from 'lucide-react';
 import Container from '@/components/global/Container/Container';
 import Items from '@/components/global/Items/Item';
-import { patchTaskStatusApi, getTasksByProjectApi, addCommentApi } from '@/services/api/taskApi';
+
+import {
+  patchTaskStatusApi,
+  getTasksByProjectApi,
+  addCommentApi,
+} from '@/services/api/taskApi';
 import { useParams } from 'react-router-dom';
 import TaskDetailModal from '@/components/global/Modal/taskDetailsModal';
-import { TaskType } from '@/types';
+import { DNDType, TaskItem, TaskType } from '@/types';
 import { motion } from 'framer-motion';
-
-
-type DNDType = {
-  id: UniqueIdentifier;
-  title: string;
-  items: TaskItem[];
-};
-
-type TaskItem = {
-  id: UniqueIdentifier;
-  title: string;
-  description: string;
-  assignedTo: string;
-  priority: string;
-  dueDate: string;
-};
 
 const CONTAINER_IDS = {
   PENDING: 'pending',
@@ -56,8 +59,8 @@ export const TaskManagement = () => {
   const [selectedPriority, setSelectedPriority] = useState<string>('');
   const [selectedAssignee, setSelectedAssignee] = useState<string>('');
   const [assigneesList, setAssigneesList] = useState<string[]>([]);
-    const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
-  
+  const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
+const [options,setOptions]=useState(false)
   const [sortConfig, setSortConfig] = useState<{
     key: keyof TaskItem;
     direction: 'asc' | 'desc';
@@ -75,48 +78,49 @@ export const TaskManagement = () => {
     try {
       const res = await getTasksByProjectApi(projectId);
       const tasks = res?.tasks;
-console.log(tasks)
+      console.log(tasks);
       const itemsByContainerId = containers.reduce((acc, container) => {
         acc[container.id] = [];
         return acc;
       }, {} as Record<string, DNDType['items']>);
       const uniqueAssignees = new Set<string>();
 
-      tasks.forEach((task: {
-        priority: string;
-        assignedTo: { name: string };
-        _id: UniqueIdentifier;
-        title: string;
-        description: string;
-        dueDate: string;
-        status: string;
-        attachments: Array<{
-          name: string;
-          size: string;
-          url: string;
-        }>;
-        comments: Array<{
-          author: string;
-          content: string;
-          timestamp: string;
-        }>;
-      }) => {
-        const taskItem = {
-          id: task._id,
-          title: task.title,
-          assignedTo: task.assignedTo.name,
-          priority: task.priority,
-          description: task.description,
-          dueDate: task.dueDate,
-          attachments: task.attachments || [],
-          comments:task.comments || []
-
-        };
-        if (itemsByContainerId[task.status]) {
-          itemsByContainerId[task.status].push(taskItem);
+      tasks.forEach(
+        (task: {
+          priority: string;
+          assignedTo: { name: string };
+          _id: UniqueIdentifier;
+          title: string;
+          description: string;
+          dueDate: string;
+          status: string;
+          attachments: Array<{
+            name: string;
+            size: string;
+            url: string;
+          }>;
+          comments: Array<{
+            author: string;
+            content: string;
+            timestamp: string;
+          }>;
+        }) => {
+          const taskItem = {
+            id: task._id,
+            title: task.title,
+            assignedTo: task.assignedTo.name,
+            priority: task.priority,
+            description: task.description,
+            dueDate: task.dueDate,
+            attachments: task.attachments || [],
+            comments: task.comments || [],
+          };
+          if (itemsByContainerId[task.status]) {
+            itemsByContainerId[task.status].push(taskItem);
+          }
+          uniqueAssignees.add(task.assignedTo.name);
         }
-        uniqueAssignees.add(task.assignedTo.name);
-      });
+      );
 
       const newContainers = containers.map((container) => ({
         ...container,
@@ -146,16 +150,18 @@ console.log(tasks)
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
-    
+
     if (!over || active.id === over.id) {
       setActiveId(null);
       return;
     }
-    
+
     const sourceContainer = containers.find((container) =>
       container.items.some((item) => item.id === active.id)
     );
-    const targetContainer = containers.find((container) => container.id === over.id);
+    const targetContainer = containers.find(
+      (container) => container.id === over.id
+    );
 
     if (!sourceContainer || !targetContainer) return;
 
@@ -166,11 +172,16 @@ console.log(tasks)
         const newContainers = [...prev];
         const sourceIndex = prev.findIndex((c) => c.id === sourceContainer.id);
         const targetIndex = prev.findIndex((c) => c.id === targetContainer.id);
-        const itemIndex = sourceContainer.items.findIndex((item) => item.id === active.id);
-        
-        const [movedItem] = newContainers[sourceIndex].items.splice(itemIndex, 1);
+        const itemIndex = sourceContainer.items.findIndex(
+          (item) => item.id === active.id
+        );
+
+        const [movedItem] = newContainers[sourceIndex].items.splice(
+          itemIndex,
+          1
+        );
         newContainers[targetIndex].items.push(movedItem);
-        
+
         return newContainers;
       });
     } catch (error) {
@@ -182,11 +193,13 @@ console.log(tasks)
 
   const handleSort = (key: keyof TaskItem) => {
     setSortConfig((currentSort) => {
-      const newDirection = 
-        currentSort?.key === key && currentSort.direction === 'asc' ? 'desc' : 'asc';
-      
+      const newDirection =
+        currentSort?.key === key && currentSort.direction === 'asc'
+          ? 'desc'
+          : 'asc';
+
       const newSort = { key, direction: newDirection };
-      
+
       setContainers((prev) => {
         return prev.map((container) => ({
           ...container,
@@ -198,7 +211,7 @@ console.log(tasks)
           }),
         }));
       });
-      
+
       return newSort;
     });
   };
@@ -210,8 +223,9 @@ console.log(tasks)
     if (selectedPriority) {
       filteredContainers = filteredContainers.map((container: DNDType) => ({
         ...container,
-        items: container.items.filter((item) => 
-          item.priority.toLowerCase() === selectedPriority.toLowerCase()
+        items: container.items.filter(
+          (item) =>
+            item.priority.toLowerCase() === selectedPriority.toLowerCase()
         ),
       }));
     }
@@ -220,8 +234,8 @@ console.log(tasks)
     if (selectedAssignee) {
       filteredContainers = filteredContainers.map((container: DNDType) => ({
         ...container,
-        items: container.items.filter((item) => 
-          item.assignedTo === selectedAssignee
+        items: container.items.filter(
+          (item) => item.assignedTo === selectedAssignee
         ),
       }));
     }
@@ -231,10 +245,11 @@ console.log(tasks)
       const searchLower = searchTerm.toLowerCase();
       filteredContainers = filteredContainers.map((container: DNDType) => ({
         ...container,
-        items: container.items.filter((item) =>
-          item.title.toLowerCase().includes(searchLower) ||
-          item.description.toLowerCase().includes(searchLower) ||
-          item.assignedTo.toLowerCase().includes(searchLower)
+        items: container.items.filter(
+          (item) =>
+            item.title.toLowerCase().includes(searchLower) ||
+            item.description.toLowerCase().includes(searchLower) ||
+            item.assignedTo.toLowerCase().includes(searchLower)
         ),
       }));
     }
@@ -248,48 +263,55 @@ console.log(tasks)
 
   const handleAddComment = async (comment: string) => {
     if (!selectedTask?.id || !comment.trim()) return;
-  
+
     try {
       const data = {
         content: comment,
-        taskId: selectedTask.id
+        taskId: selectedTask.id,
       };
       const res = await addCommentApi(data);
-console.log(res)
-      setContainers(prevContainers => {
-        return prevContainers.map(container => ({
+      console.log(res);
+      setContainers((prevContainers) => {
+        return prevContainers.map((container) => ({
           ...container,
-          items: container.items.map(item => {
+          items: container.items.map((item) => {
             if (item.id === selectedTask.id) {
               return {
                 ...item,
-                comments: res.comment?.comments
+                comments: res.comment?.comments,
               };
             }
             return item;
-          })
-        }))
+          }),
+        }));
       });
     } catch (error) {
       console.error('Error adding comment:', error);
     }
   };
-  
+const handleOptions = ()=>{
+  setOptions((prevOptions) => !prevOptions);
+}
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
-       <TaskDetailModal
+      <TaskDetailModal
         show={showDetail}
         onClose={() => setShowDetail(false)}
         task={selectedTask}
         onAddComment={handleAddComment}
-        onEdit={() => {/* Implement edit functionality */}}
-        onDelete={() => {/* Implement delete functionality */}}
       />
       <div className="flex flex-col gap-6 mb-8">
+        <div className='flex justify-between'>
         <h1 className="text-3xl font-bold text-gray-900">Task Management</h1>
-        
-        <div className="flex flex-wrap gap-4 items-center">
+        <div 
+  onClick={handleOptions} 
+  className={`${options ? "text-gray-900" : "text-gray-500"}`}
+>
+  <Filter />
+</div>
+</div>
+{options && ( <div className="flex flex-wrap gap-4 items-center">
           {/* Search Input */}
           <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -337,7 +359,11 @@ console.log(res)
               className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50"
             >
               {sortConfig?.key === 'dueDate' ? (
-                sortConfig.direction === 'asc' ? <SortAsc /> : <SortDesc />
+                sortConfig.direction === 'asc' ? (
+                  <SortAsc />
+                ) : (
+                  <SortDesc />
+                )
               ) : null}
               Due Date
             </button>
@@ -346,18 +372,23 @@ console.log(res)
               className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50"
             >
               {sortConfig?.key === 'priority' ? (
-                sortConfig.direction === 'asc' ? <SortAsc /> : <SortDesc />
+                sortConfig.direction === 'asc' ? (
+                  <SortAsc />
+                ) : (
+                  <SortDesc />
+                )
               ) : null}
               Priority
             </button>
           </div>
-        </div>
+        </div>)}
+       
       </div>
 
       {loading ? (
-         <div className="flex justify-center items-center h-32">
-         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
-       </div>
+        <div className="flex justify-center items-center h-32">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+        </div>
       ) : (
         <DndContext
           sensors={sensors}
@@ -371,24 +402,27 @@ console.log(res)
                 key={container.id}
                 id={container.id}
                 title={container.title}
-                className={CONTAINER_COLORS[container.id as keyof typeof CONTAINER_COLORS]}
-               
+                className={
+                  CONTAINER_COLORS[
+                    container.id as keyof typeof CONTAINER_COLORS
+                  ]
+                }
               >
                 <SortableContext items={container.items.map((item) => item.id)}>
                   <div className="space-y-4">
                     {container.items.map((item) => (
-                       <motion.div
-                       key={item.id}
-                       initial={{ opacity: 0, scale: 0.95 }}
-                       animate={{ opacity: 1, scale: 1 }}
-                       exit={{ opacity: 0, scale: 0.95 }}
-                       className="cursor-pointer"
-                       onClick={() => {
-                         setSelectedTask(item);
-                         setShowDetail(true);
-                       }}
-                     >
-                      <Items key={item.id} {...item} />
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="cursor-pointer"
+                        onClick={() => {
+                          setSelectedTask(item);
+                          setShowDetail(true);
+                        }}
+                      >
+                        <Items key={item.id} {...item} />
                       </motion.div>
                     ))}
                   </div>
@@ -400,9 +434,11 @@ console.log(res)
             {activeId && (
               <Items
                 id={activeId}
-                title={containers
-                  .flatMap((c) => c.items)
-                  .find((item) => item.id === activeId)?.title || ''}
+                title={
+                  containers
+                    .flatMap((c) => c.items)
+                    .find((item) => item.id === activeId)?.title || ''
+                }
                 description=""
                 dueDate=""
                 assignedTo={''}
@@ -417,4 +453,3 @@ console.log(res)
 };
 
 export default TaskManagement;
-

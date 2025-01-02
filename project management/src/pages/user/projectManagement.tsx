@@ -338,7 +338,7 @@ const ProjectDashboard: React.FC = () => {
     }
   };
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-stone-50  to-yellow-50 p-8">
       <Modal
         showModal={showEditProjectModal}
         setShowModal={setShowEditProjectModal}
@@ -659,7 +659,7 @@ const ProjectDashboard: React.FC = () => {
         </Formik>
       </Modal>
 
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-full mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-800">Projects</h1>
@@ -679,11 +679,11 @@ const ProjectDashboard: React.FC = () => {
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center h-64">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-          </div>
+          <div className="flex justify-center items-center h-32">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+        </div>
         ) : projects.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {projects.map((project) => (
               <ProjectCard
                 key={project._id}
