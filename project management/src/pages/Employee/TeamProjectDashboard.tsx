@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2, FolderPlus } from 'lucide-react';
 
-import { getAllProjectApi, getProjectByTeamApi } from '@/services/api/api';
+import { getAllProjectApi, getProjectByTeamApi } from '@/services/api/projectApi';
 import { ProjectCard } from '@/components/project/projectCard';
 import { Project } from '@/types';
 import { useNotificationService } from '@/services/notificationService';

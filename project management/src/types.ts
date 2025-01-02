@@ -54,6 +54,7 @@ export interface Message {
   roomId?: string;
   recipientId?: string;
   isImage?:boolean
+  isRead?:boolean
 }
 
 export type ChatAreaProps = {
@@ -65,6 +66,7 @@ export type ChatAreaProps = {
 export type UserSideBarProps = {
   serverRef:MutableRefObject<Socket<DefaultEventsMap, DefaultEventsMap> | undefined>,
   messages: Message[],
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>
 };
 // export interface Team {
 //   name: string;

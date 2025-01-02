@@ -1,7 +1,7 @@
 import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useEffect, useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { ChevronDown, Loader2, Users, X } from 'lucide-react';
-import { getTeamsApi } from '@/services/api/api';
+import { getTeamsApi } from '@/services/api/projectApi';
 
 export const TeamSelect: React.FC<{
   values: any;

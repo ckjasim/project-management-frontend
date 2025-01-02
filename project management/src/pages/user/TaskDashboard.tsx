@@ -8,14 +8,16 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select1";
+} from '@/components/ui/select1';
 import {
   postTasksApi,
   getTasksByTeamApi,
+  addCommentApi,
+} from '@/services/api/taskApi';
+import {
   getTeamsByProject,
   getTeamMembersByTeamIdApi,
-  addCommentApi,
-} from '@/services/api/api';
+} from '@/services/api/projectApi';
 import Container from '@/components/global/Container/Container';
 import Items from '@/components/global/Items/Item';
 import {
@@ -32,8 +34,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import TaskModal from '@/components/global/Modal/AddTaskModal';
 import TaskDetailModal from '@/components/global/Modal/taskDetailsModal';
 import { ContainerType, ITeam, TaskType } from '@/types';
-
-
 
 const CONTAINER_IDS = {
   PENDING: 'pending',
@@ -60,18 +60,24 @@ const TaskDashboard = () => {
   const [selectedTeam, setSelectedTeam] = useState<ITeam>();
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
 
-  // UI state 
+  // UI state
   const [showDetail, setShowDetail] = useState(false);
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [currentContainerId, setCurrentContainerId] = useState<string>(CONTAINER_IDS.PENDING);
+  const [currentContainerId, setCurrentContainerId] = useState<string>(
+    CONTAINER_IDS.PENDING
+  );
   const [files, setFiles] = useState<File[]>([]);
 
   // Search, sort, and filter state
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<'dueDate' | 'priority' | 'title'>('dueDate');
+  const [sortBy, setSortBy] = useState<'dueDate' | 'priority' | 'title'>(
+    'dueDate'
+  );
   const [filterPriority, setFilterPriority] = useState<string>('all');
-  const [filteredContainers, setFilteredContainers] = useState<ContainerType[]>([]);
+  const [filteredContainers, setFilteredContainers] = useState<ContainerType[]>(
+    []
+  );
 
   // Icons for container types
   const containerIcons = {
@@ -103,15 +109,16 @@ const TaskDashboard = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       if (!selectedTeam?.id || !projectId) return;
-      
+
       setLoading(true);
       try {
         const res = await getTasksByTeamApi(selectedTeam.id, projectId);
         const tasks = res.tasks;
 
-        const updatedContainers = containers.map(container => ({
+        const updatedContainers = containers.map((container) => ({
           ...container,
-          items: tasks.filter((task: TaskType) => task.status === container.id)
+          items: tasks
+            .filter((task: TaskType) => task.status === container.id)
             .map((task: any) => ({
               id: task._id,
               title: task.title,
@@ -122,8 +129,8 @@ const TaskDashboard = () => {
               status: task.status,
               attachments: task.attachments || [],
               members: task.members || [],
-              comments:task.comments || []
-            }))
+              comments: task.comments || [],
+            })),
         }));
 
         setContainers(updatedContainers);
@@ -141,37 +148,43 @@ const TaskDashboard = () => {
   useEffect(() => {
     if (!containers) return;
 
-    let filtered = containers.map(container => ({
+    let filtered = containers.map((container) => ({
       ...container,
-      items: container.items.filter(item => {
-        const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            item.assignedTo?.toLowerCase().includes(searchQuery.toLowerCase());
-        
-        const matchesPriority = filterPriority === 'all' || item.priority === filterPriority;
+      items: container.items.filter((item) => {
+        const matchesSearch =
+          item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.assignedTo?.toLowerCase().includes(searchQuery.toLowerCase());
+
+        const matchesPriority =
+          filterPriority === 'all' || item.priority === filterPriority;
 
         return matchesSearch && matchesPriority;
-      })
+      }),
     }));
 
     // Sort items in each container
-    filtered = filtered.map(container => ({
+    filtered = filtered.map((container) => ({
       ...container,
       items: container.items.sort((a, b) => {
         switch (sortBy) {
           case 'dueDate':
-            return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+            return (
+              new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+            );
           case 'priority': {
             const priorityWeight = { low: 0, medium: 1, high: 2 };
-            return priorityWeight[b.priority as keyof typeof priorityWeight] - 
-                   priorityWeight[a.priority as keyof typeof priorityWeight];
+            return (
+              priorityWeight[b.priority as keyof typeof priorityWeight] -
+              priorityWeight[a.priority as keyof typeof priorityWeight]
+            );
           }
           case 'title':
             return a.title.localeCompare(b.title);
           default:
             return 0;
         }
-      })
+      }),
     }));
 
     setFilteredContainers(filtered);
@@ -190,12 +203,12 @@ const TaskDashboard = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
-      setFiles(prev => [...prev, ...newFiles]);
+      setFiles((prev) => [...prev, ...newFiles]);
     }
   };
 
   const removeFile = (indexToRemove: number) => {
-    setFiles(prev => prev.filter((_, index) => index !== indexToRemove));
+    setFiles((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
 
   // Task management functions
@@ -207,11 +220,11 @@ const TaskDashboard = () => {
     dueDate: string;
   }) => {
     if (!formData.title || !selectedTeam?.id || !projectId) return;
-    
+
     const base64Files = await Promise.all(
       files.map(async (file) => ({
         name: file.name,
-        file: await fileToBase64(file)
+        file: await fileToBase64(file),
       }))
     );
 
@@ -220,15 +233,15 @@ const TaskDashboard = () => {
       team: selectedTeam.id,
       project: projectId,
       status: currentContainerId,
-      attachments: base64Files
+      attachments: base64Files,
     };
 
     try {
       const res = await postTasksApi(newItem);
       const task = res.createdTask;
 
-      setContainers(prevContainers =>
-        prevContainers.map(container =>
+      setContainers((prevContainers) =>
+        prevContainers.map((container) =>
           container.id === currentContainerId
             ? {
                 ...container,
@@ -243,7 +256,7 @@ const TaskDashboard = () => {
                     dueDate: task.dueDate,
                     status: task.status,
                     attachments: task.attachments || [],
-                    members: task.members || []
+                    members: task.members || [],
                   },
                 ],
               }
@@ -269,46 +282,50 @@ const TaskDashboard = () => {
   const handleBack = () => {
     navigate(-1);
   };
-   const handleAddComment = async (comment: string) => {
-      if (!selectedTask?.id || !comment.trim()) return;
-    
-      try {
-        const data = {
-          content: comment,
-          taskId: selectedTask.id
-        };
-        const res = await addCommentApi(data);
-  console.log(res)
-        setContainers(prevContainers => {
-          return prevContainers.map(container => ({
-            ...container,
-            items: container.items.map(item => {
-              if (item.id === selectedTask.id) {
-                return {
-                  ...item,
-                  comments: res.comment?.comments
-                };
-              }
-              return item;
-            })
-          }))
-        });
-      } catch (error) {
-        console.error('Error adding comment:', error);
-      }
-    };
+  const handleAddComment = async (comment: string) => {
+    if (!selectedTask?.id || !comment.trim()) return;
+
+    try {
+      const data = {
+        content: comment,
+        taskId: selectedTask.id,
+      };
+      const res = await addCommentApi(data);
+      console.log(res);
+      setContainers((prevContainers) => {
+        return prevContainers.map((container) => ({
+          ...container,
+          items: container.items.map((item) => {
+            if (item.id === selectedTask.id) {
+              return {
+                ...item,
+                comments: res.comment?.comments,
+              };
+            }
+            return item;
+          }),
+        }));
+      });
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
+  };
 
   return (
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen py-10">
-         <TaskDetailModal
+      <TaskDetailModal
         show={showDetail}
         onClose={() => setShowDetail(false)}
         task={selectedTask}
         onAddComment={handleAddComment}
-        onEdit={() => {/* Implement edit functionality */}}
-        onDelete={() => {/* Implement delete functionality */}}
+        onEdit={() => {
+          /* Implement edit functionality */
+        }}
+        onDelete={() => {
+          /* Implement delete functionality */
+        }}
       />
-      
+
       <div className="container mx-auto max-w-7xl px-4">
         {/* Navigation */}
         <Button
@@ -383,10 +400,7 @@ const TaskDashboard = () => {
               </SelectContent>
             </Select>
 
-            <Select
-              value={filterPriority}
-              onValueChange={setFilterPriority}
-            >
+            <Select value={filterPriority} onValueChange={setFilterPriority}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Filter by priority..." />
               </SelectTrigger>
@@ -408,7 +422,11 @@ const TaskDashboard = () => {
             teamMembers={teamMembers}
             priorityLevels={[
               { value: 'low', label: 'Low Priority', color: 'text-green-600' },
-              { value: 'medium', label: 'Medium Priority', color: 'text-yellow-600' },
+              {
+                value: 'medium',
+                label: 'Medium Priority',
+                color: 'text-yellow-600',
+              },
               { value: 'high', label: 'High Priority', color: 'text-red-600' },
             ]}
             onAddItem={onAddItem}
@@ -425,7 +443,8 @@ const TaskDashboard = () => {
             animate={{ opacity: 1 }}
             transition={{ staggerChildren: 0.1 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-          >{filteredContainers.map((container) => (
+          >
+            {filteredContainers.map((container) => (
               <motion.div
                 key={container.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -477,10 +496,7 @@ const TaskDashboard = () => {
                                 setShowDetail(true);
                               }}
                             >
-                              <Items
-                                {...item}
-                                selectedTeam={selectedTeam}
-                              />
+                              <Items {...item} selectedTeam={selectedTeam} />
                             </motion.div>
                           ))
                         )}

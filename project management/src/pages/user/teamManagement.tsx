@@ -6,7 +6,8 @@ import Modal from '@/components/global/Modal/Modal';
 import { ErrorMessage, Field, Formik ,Form} from 'formik';
 
 import { Employee, TeamFormValues } from '@/types';
-import { createTeamApi, getEmployeesByOrganizationApi, getTeamsApi } from '@/services/api/api';
+import { createTeamApi, getTeamsApi } from '@/services/api/projectApi';
+import {  getEmployeesByOrganizationApi } from '@/services/api/authApi';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 

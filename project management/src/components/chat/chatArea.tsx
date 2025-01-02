@@ -80,6 +80,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         roomId: chatMode === 'group' ? currentRoom : undefined,
         recipientId: chatMode === 'private' ? currentRoom : undefined,
         isImage: true
+  
       };
 
       if (chatMode === 'private') {

@@ -7,7 +7,7 @@ import {
   Clock,
   Info,
 } from 'lucide-react';
-import { deleteProjectApi, editProjectApi } from '@/services/api/api';
+import { deleteProjectApi, editProjectApi } from '@/services/api/projectApi';
   // const [showEditProjectModal, setShowEditProjectModal] = useState(false);
 
 import { Project, ProjectFormValues } from '@/types';

@@ -18,9 +18,9 @@ import {
   createTeamApi,
   editProjectApi,
   getAllProjectApi,
-  getEmployeesByOrganizationApi,
   getTeamsApi,
-} from '@/services/api/api';
+} from '@/services/api/projectApi';
+import { getEmployeesByOrganizationApi } from '@/services/api/authApi';
 import { ProjectCard } from '@/components/project/projectCard';
 import {
   Employee,
@@ -71,8 +71,8 @@ const ProjectDashboard: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [editProject, setEditProject] = useState<Project | null>();
-  const [selectedProject,setSelectedProject]=useState<string>('')
-  const [currentProject,setCurrentProject]=useState<Project>({})
+  const [selectedProject, setSelectedProject] = useState<string>('');
+  const [currentProject, setCurrentProject] = useState<Project>({});
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -121,8 +121,7 @@ const ProjectDashboard: React.FC = () => {
       setIsLoading(true);
       try {
         const res = await getEmployeesByOrganizationApi();
-        if(res){
-
+        if (res) {
           setEmployees(res?.data.all || []);
         }
       } catch (error) {
@@ -244,9 +243,8 @@ const ProjectDashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    const fetchTeam=async()=>{
-        try {
-
+    const fetchTeam = async () => {
+      try {
         const res = await getTeamsApi();
         console.log();
         const formattedTeams = res.teams.map(
@@ -260,9 +258,9 @@ const ProjectDashboard: React.FC = () => {
       } catch (error) {
         console.error('Error fetching teams:', error);
       }
-      }
-      fetchTeam()
-  }, [setShowAddProjectModal,setShowEditProjectModal]);
+    };
+    fetchTeam();
+  }, [setShowAddProjectModal, setShowEditProjectModal]);
 
   const handleProjectSubmit = async (
     values: ProjectFormValues,
@@ -280,7 +278,7 @@ const ProjectDashboard: React.FC = () => {
           expiry: getProjectStatus(newProject.createdProject.dueDate),
         },
       ]);
-     
+
       setShowAddProjectModal(false);
     } catch (error) {
       console.error('Error creating project:', error);
@@ -347,12 +345,13 @@ const ProjectDashboard: React.FC = () => {
       >
         <Formik
           initialValues={{
-          title: currentProject.title,
-            description:  currentProject.description,
-            dueDate: currentProject.dueDate ? new Date(currentProject.dueDate).toISOString().split('T')[0] : '',
-            teams: currentProject.teams ,
-            priority:  currentProject.priority,
-
+            title: currentProject.title,
+            description: currentProject.description,
+            dueDate: currentProject.dueDate
+              ? new Date(currentProject.dueDate).toISOString().split('T')[0]
+              : '',
+            teams: currentProject.teams,
+            priority: currentProject.priority,
           }}
           validationSchema={projectValidationSchema}
           onSubmit={handleEditProjectSubmit}
@@ -360,7 +359,7 @@ const ProjectDashboard: React.FC = () => {
           {({ values, setFieldValue, isSubmitting }) => (
             <Form className="bg-white rounded-xl p-8 w-full max-w-md mx-auto shadow-xl">
               <h1 className="text-2xl font-bold text-gray-800 mb-6">
-              Update Project
+                Update Project
               </h1>
               <div className="space-y-6">
                 <div>
@@ -558,7 +557,7 @@ const ProjectDashboard: React.FC = () => {
           )}
         </Formik>
       </Modal>
-      
+
       <Modal showModal={isAddingNewTeam} setShowModal={setIsAddingNewTeam}>
         <Formik
           initialValues={{
@@ -669,7 +668,9 @@ const ProjectDashboard: React.FC = () => {
             </p>
           </div>
           <Button
-            onClick={()=>{setShowAddProjectModal(true)}}
+            onClick={() => {
+              setShowAddProjectModal(true);
+            }}
             className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <PlusCircle className="w-5 h-5" />

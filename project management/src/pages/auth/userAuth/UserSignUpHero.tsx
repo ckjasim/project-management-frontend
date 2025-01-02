@@ -5,7 +5,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/hooks/use-toast";
-import { userSignupApi } from '@/services/api/api';
+import { userSignupApi } from '@/services/api/authApi';
 import { Chrome, Github } from 'lucide-react';
 
 export function UserSignUpHero() {

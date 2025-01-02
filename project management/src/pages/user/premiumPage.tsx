@@ -9,7 +9,7 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
-import { getPremiumApi } from '@/services/api/api';
+import { getPremiumApi } from '@/services/api/meetingApi';
 import { loadStripe } from '@stripe/stripe-js';
 const PremiumPage = () => {
   const features = [

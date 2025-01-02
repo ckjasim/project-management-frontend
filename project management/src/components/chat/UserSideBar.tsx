@@ -6,11 +6,17 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { SetChat } from '@/redux/features/chat/chatSlice';
 import {
-  getEmployeesByOrganizationApi,
   getTeamByEmployeeApi,
-  getTeamsApi,
   markMessagesAsReadApi,
-} from '@/services/api/api';
+} from '@/services/api/chatApi';
+import {
+  getEmployeesByOrganizationApi,
+
+} from '@/services/api/authApi';
+import {
+  getTeamsApi,
+
+} from '@/services/api/projectApi';
 import { RootState } from '@/redux/store';
 import { UserSideBarProps } from '@/types';
 
@@ -26,7 +32,7 @@ interface IChat {
   isRead?: boolean;
 }
 
-const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef, messages }) => {
+const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef, messages,setMessages }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [chats, setChats] = useState<IChat[]>([]);
   const dispatch = useDispatch();
@@ -122,7 +128,7 @@ const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef, messages }) => {
     if (chatMode === 'group') {
       serverRef?.current?.emit('joinRoom', id);
     }
-     // Find all unread messages for this chat
+
   const unreadMessages = messages.filter(msg => 
     !msg.isRead && 
     msg.senderId !== userInfo?._id && 
@@ -130,10 +136,12 @@ const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef, messages }) => {
      (chatMode === 'group' && msg.roomId === id))
   );
 
+
   if (unreadMessages.length > 0) {
+    console.log(unreadMessages)
     try {
 
-      await markMessagesAsReadApi(unreadMessages.map(msg => msg._id));
+      const res = await markMessagesAsReadApi(unreadMessages.map(msg => msg._id));
       
       // Update local messages state
       const updatedMessages = messages.map(msg => 
@@ -141,9 +149,8 @@ const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef, messages }) => {
           ? { ...msg, isRead: true }
           : msg
       );
-      
-      // // Update your messages state - you'll need to implement this dispatch
-      // dispatch(updateMessages(updatedMessages));
+      setMessages(updatedMessages)
+
     } catch (error) {
       console.error('Error marking messages as read:', error);
     }

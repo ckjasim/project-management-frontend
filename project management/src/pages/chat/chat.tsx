@@ -8,7 +8,7 @@ import { DefaultEventsMap } from '@socket.io/component-emitter';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';   
 import { Message } from '@/types';
-import { getChats } from '@/services/api/api';
+import { getChats } from '@/services/api/chatApi';
 
 const MessagesPage = () => {
   const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap>>();
@@ -91,7 +91,7 @@ useEffect(() => {
 
   return (
     <div className="flex h-screen">
-      <UserSideBar serverRef={socketRef} messages={messages} />
+      <UserSideBar serverRef={socketRef} messages={messages} setMessages={setMessages} />
       <ChatArea serverRef={socketRef} messages={messages} setMessages={setMessages}/>
       <DetailsSidebar attachments={attachments} members={members}  />
     </div>

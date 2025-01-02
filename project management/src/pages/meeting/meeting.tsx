@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { RescheduleModal } from '@/components/global/Modal/RescheduleModal';
-import { createMeetingApi, getMeetingsApi, updateMeetingApi, deleteMeetingApi } from '@/services/api/api';
+import { createMeetingApi, getMeetingsApi, updateMeetingApi, deleteMeetingApi } from '@/services/api/meetingApi';
 import MeetingSheduleForm from '@/components/global/Forms/meetingSheduleForm';
 
 const MeetingScheduler = () => {

@@ -10,7 +10,7 @@ import { useToast } from "@/components/hooks/use-toast";
 import { useDispatch } from 'react-redux';
 import { SetUser } from '@/redux/features/auth/authSlice';
 
-import { userLoginApi } from '@/services/api/api';
+import { userLoginApi } from '@/services/api/authApi';
 import { Chrome, Github } from "lucide-react";
 
 

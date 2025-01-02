@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { SetUser } from '@/redux/features/auth/authSlice';
-import { otpApi, resendOtpApi } from '@/services/api/api';
+import { otpApi, resendOtpApi } from '@/services/api/authApi';
 import { BackgroundBeams } from '@/components/ui/background-beams';
 
 export function InputOTPForm() {

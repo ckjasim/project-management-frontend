@@ -62,6 +62,7 @@ const router = createBrowserRouter([
       { path: 'chat', element: <MessagesPage /> },
       { path: 'meet', element: <Meeting /> },
       { path: 'meet/join', element: <App /> },
+      { path: 'notification', element: <NotificationsPage /> },  
 
 
 

@@ -11,7 +11,7 @@ import { useToast } from "@/components/hooks/use-toast";
 
 import { useDispatch } from 'react-redux';
 import { SetUser } from '@/redux/features/auth/authSlice';
-import { employeeLoginApi } from '@/services/api/api';
+import { employeeLoginApi } from '@/services/api/authApi';
 interface FormValues {
   email: string;
   password: string;

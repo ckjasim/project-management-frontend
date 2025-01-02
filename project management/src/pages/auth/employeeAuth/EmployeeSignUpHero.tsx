@@ -11,7 +11,7 @@ import { useSearchParams } from "react-router-dom";
 import { UploadCloud, X } from "lucide-react";
 import { SetUser } from '@/redux/features/auth/authSlice';
 import { useDispatch } from 'react-redux';
-import { employeeSignupApi } from '@/services/api/api';
+import { employeeSignupApi } from '@/services/api/authApi';
 
 export function EmployeeSignUpHero() {
   const { toast } = useToast();

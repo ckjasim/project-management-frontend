@@ -6,11 +6,10 @@ import Modal from '@/components/global/Modal/Modal';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import {
-  addEmployeeInvitationApi,
   addTeamMemberApi,
-  getEmployeesByOrganizationApi,
   getTeamMembersByTeamIdApi,
-} from '@/services/api/api';
+} from '@/services/api/projectApi';
+import { getEmployeesByOrganizationApi } from '@/services/api/authApi';
 import { useToast } from '@/components/hooks/use-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Employee, TeamFormValues } from '@/types';
@@ -48,10 +47,10 @@ const TeamList = () => {
   ) => {
     try {
       console.log(values);
-       const newMember = await addTeamMemberApi(id,values);
-       console.log(newMember)
-       setTeamMembers(newMember.createdTeam.members);
-       setShowAddEmployeeModal(false);
+      const newMember = await addTeamMemberApi(id, values);
+      console.log(newMember);
+      setTeamMembers(newMember.createdTeam.members);
+      setShowAddEmployeeModal(false);
 
       //  setFieldValue('team', [...values.name, newTeam.createdTeam._id]);
     } catch (error) {
@@ -61,7 +60,7 @@ const TeamList = () => {
     }
   };
   const createNewTeam = async () => {
-     setIsLoading(true);
+    setIsLoading(true);
     try {
       const res = await getEmployeesByOrganizationApi();
       if (res) {
@@ -76,7 +75,7 @@ const TeamList = () => {
     } catch (error) {
       console.error('Error fetching employees:', error);
     } finally {
-       setIsLoading(false);
+      setIsLoading(false);
     }
 
     setShowAddEmployeeModal(true);
@@ -91,50 +90,47 @@ const TeamList = () => {
       >
         <Formik
           initialValues={{
-           employees: [],
+            employees: [],
           }}
           validationSchema={teamValidationSchema}
           onSubmit={handleTeamSubmit}
         >
           {({ values, setFieldValue, isSubmitting }) => (
             <Form className="bg-white rounded-xl p-8 w-full max-w-2xl mx-auto">
-             <div className='flex justify-between'>
-              <div>
-                
-              <h1 className="text-2xl font-bold text-gray-800 mb-6">
-                Add Members
-              </h1>
-              </div>
-              <div className=" flex justify-end space-x-4">
-                {/* <Button
+              <div className="flex justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-800 mb-6">
+                    Add Members
+                  </h1>
+                </div>
+                <div className=" flex justify-end space-x-4">
+                  {/* <Button
                   type="button"
                   onClick={() => setShowAddEmployeeModal(false)}
                   className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </Button> */}
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-                >
-                  {isSubmitting ? 'Adding...' : 'Add Members'}
-                </Button>
-                
-              </div>
-             
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  >
+                    {isSubmitting ? 'Adding...' : 'Add Members'}
+                  </Button>
+                </div>
               </div>
               <div className="space-y-6">
-              <ErrorMessage
-                    name="employees"
-                    component="div"
-                    className="text-red-500 text-sm mt-2"
-                  />
+                <ErrorMessage
+                  name="employees"
+                  component="div"
+                  className="text-red-500 text-sm mt-2"
+                />
                 <div>
                   <label className="block text-gray-700 font-medium mb-4">
                     Team Members
                   </label>
-                  
+
                   {newMembers.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {newMembers.map((employee) => (
@@ -173,10 +169,8 @@ const TeamList = () => {
                       <p>No employees available</p>
                     </div>
                   )}
-                 
                 </div>
               </div>
-             
             </Form>
           )}
         </Formik>

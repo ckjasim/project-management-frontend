@@ -11,17 +11,21 @@ import {
   BellRing,                  
 } from 'lucide-react';
 
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import {  useNavigate } from 'react-router-dom';
+
 import { cn } from '@/lib/utils';
 
 import {
-  postTasksApi,
+  checkPremiumApi,
+  // postTasksApi,
   logoutApi,
-  patchTaskStatusApi,
-} from '@/services/api/api';
+  // patchTaskStatusApi,
+} from '@/services/api/authApi';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
+import { Logo, LogoIcon } from './logo';
+
+
 
 
 
@@ -30,7 +34,17 @@ export function EmployeeNavbar() {
   const navigate=useNavigate()
   const {userInfo}=useSelector((state:RootState)=>(state.Auth))
 
-
+  const [isPremium, setIsPremium] = useState(false);
+useEffect(() => {
+    const checkPremium = async () => {
+      const res = await checkPremiumApi();
+      console.log(res, 'jkjkjkjkjk');
+      if (res.premium === true) {
+        setIsPremium(true);
+      }
+    };
+    checkPremium();
+  }, []);
   const logout = async () => {
     try {
       const res = await logoutApi();
@@ -57,20 +71,20 @@ export function EmployeeNavbar() {
         <MessagesSquare className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
-    {
+    isPremium &&{
       label: 'Meeting',
       href: '/employee/meet',
       icon: (
         <CalendarClock className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
-    {
-      label: 'Files',
-      href: '/employee/files',
-      icon: (
-        <FolderTree className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
-      ),
-    },
+    // {
+    //   label: 'Files',
+    //   href: '/employee/files',
+    //   icon: (
+    //     <FolderTree className="text-lime-200 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+    //   ),
+    // },
     {
       label: 'Logout',
       onClick: logout, 
@@ -83,8 +97,8 @@ export function EmployeeNavbar() {
   return (
     <div
       className={cn(
-        'rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 overflow-hidden',
-        'h-screen' // for your use case, use `h-screen` instead of `h-[60vh]`
+        ' p-3 flex flex-col md:flex-row bg-gray-50 dark:bg-neutral-800  overflow-hidden',
+        'h-screen'// for your use case, use `h-screen` instead of `h-[60vh]`
       )}
     >
       <Sidebar open={open} setOpen={setOpen}>
@@ -102,7 +116,7 @@ export function EmployeeNavbar() {
           <SidebarLink
               link={{
                 label: 'Notifications',
-                href: '/user/notification',
+                href: '/employee/notification',
                 icon:(
                   <BellRing className="text-yellow-100 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
                 ),
@@ -128,31 +142,4 @@ export function EmployeeNavbar() {
   );
 }
 
-export const Logo = () => {
-  return (
-    <Link
-      to="#"
-      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
-    >
-      <div className="h-5 w-5 bg-lime-200 dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
-      <motion.span
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="font-medium text-lime-200 dark:text-white whitespace-pre"
-      >
-        Acet Labs
-      </motion.span>
-    </Link>
-  );
-};
 
-export const LogoIcon = () => {
-  return (
-    <Link
-      to="#"
-      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
-    >
-      <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
-    </Link>
-  );
-};

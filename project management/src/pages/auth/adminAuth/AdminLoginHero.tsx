@@ -7,7 +7,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/hooks/use-toast";
-import { adminLoginApi } from '@/services/api/api';
+import { adminLoginApi } from '@/services/api/authApi';
 import { useDispatch } from "react-redux";
 import { SetUser } from "@/redux/features/auth/authSlice";
 import { Chrome, Github } from "lucide-react";

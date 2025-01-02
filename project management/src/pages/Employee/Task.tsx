@@ -4,7 +4,7 @@ import { SortableContext, sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import { Loader2, Search, SortAsc, SortDesc } from 'lucide-react';
 import Container from '@/components/global/Container/Container';
 import Items from '@/components/global/Items/Item';
-import { patchTaskStatusApi, getTasksByProjectApi, addCommentApi } from '@/services/api/api';
+import { patchTaskStatusApi, getTasksByProjectApi, addCommentApi } from '@/services/api/taskApi';
 import { useParams } from 'react-router-dom';
 import TaskDetailModal from '@/components/global/Modal/taskDetailsModal';
 import { TaskType } from '@/types';

@@ -1,41 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Filter, MoreVertical, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { getAllUsersApi, userManageApi } from '@/services/api/api';
-import { useToast } from '@/components/hooks/use-toast';
 
-type User = {
-  _id: string;
-  name: string;
-  email: string;
-  organization: any;
-  subscription: string;
-  isBlock: boolean;
-  createdAt: string;
-  updatedAt: string;
-};
+import { getAllUsersApi, userManageApi } from '@/services/api/authApi';
+import { useToast } from '@/components/hooks/use-toast';
+import ManagementTable from '@/components/table/table';
 
 const UserManagement = () => {
   const { toast } = useToast();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterOrg, setFilterOrg] = useState('all');
-  const [showFilters, setShowFilters] = useState(false);
-  const [users, setUsers] = useState<User[]>([]);
-
-  // Pagination states
-  const [currentPage, setCurrentPage] = useState(1);
-  const [usersPerPage] = useState(10);
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const res = await getAllUsersApi();
-        const users = res.users.map((user: User) => ({
+        const usersData = res.users.map((user: any) => ({
           ...user,
           createdAt: new Date(user.createdAt).toLocaleDateString('en-GB'),
         }));
-        setUsers(users);
+        setUsers(usersData);
       } catch (error) {
         console.error('Error fetching users:', error);
       }
@@ -52,17 +33,12 @@ const UserManagement = () => {
       );
 
       const res = await userManageApi(email);
-      
-      if (res && res.status === 200) {
-        console.log('User status updated:', res.data);
-      } else {
-        console.error('Error updating user status on backend.');
+      if (res?.status === 200) {
+        toast({
+          title: 'User status has been updated',
+          variant: 'success',
+        });
       }
-
-      toast({
-        title: 'User status has been updated',
-        variant: 'success',
-      });
     } catch (error) {
       console.error('Error updating user status:', error);
       setUsers((prevUsers) =>
@@ -73,205 +49,47 @@ const UserManagement = () => {
     }
   };
 
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterOrg === 'all' || user.organization?.name?.toLowerCase() === filterOrg.toLowerCase();
-    return matchesSearch && matchesFilter;
-  });
+  const columns = [
+    { key: 'name', label: 'Name' },
+    { 
+      key: 'organization', 
+      label: 'Organization',
+      render: (user: any) => user.organization?.name 
+    },
+    { 
+      key: 'subscription', 
+      label: 'Subscription',
+      render: (user: any) => user.organization?.subscriptionTier 
+    },
+    { key: 'createdAt', label: 'Date Joined' },
+    { 
+      key: 'status', 
+      label: 'Status',
+      render: (user: any) => (
+        <span className={`px-3 py-1 rounded-full text-sm ${
+          user.isBlock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+        }`}>
+          {user.isBlock ? 'Blocked' : 'Active'}
+        </span>
+      )
+    }
+  ];
 
-  // Pagination logic
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
-
-  const paginate = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
+  const organizations = Array.from(
+    new Set(users.map(user => user.organization))
+  ).filter(Boolean);
 
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto h-screen">
-      <Card className="rounded-lg shadow-md">
-        <CardHeader className="border-b border-gray-200 p-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 py-5">
-            <CardTitle className="text-2xl md:text-3xl font-semibold">
-              User Management
-            </CardTitle>
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 w-full md:w-auto"
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <Filter size={18} />
-              Filter
-            </Button>
-          </div>
-
-          {showFilters && (
-            <div className="mt-6 p-6 bg-gray-50 rounded-lg space-y-4">
-              <div className="text-base font-medium">Organization</div>
-              <div className="flex flex-wrap gap-3">
-                {[
-                  { organization: { _id: 'all', name: 'all' } },
-                  ...users,
-                ].map((org) => (
-                  <Button
-                    key={org.organization._id}
-                    variant={filterOrg === org.organization.name ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setFilterOrg(org.organization.name)}
-                    className={filterOrg === org.organization.name ? 'bg-blue-600' : ''}
-                  >
-                    {org.organization.name.charAt(0).toUpperCase() + org.organization.name.slice(1)}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="flex-1 max-w-xl mx-8">
-            <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search by name or organization..."
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-lg border-none focus:ring-2 focus:ring-blue-500"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-        </CardHeader>
-
-        <CardContent className="p-0 md:p-8">
-          <div className="overflow-x-auto">
-            <div className="min-w-full">
-              <div className="hidden md:grid grid-cols-6 gap-8 px-6 py-4 bg-gray-50 rounded-t-lg font-semibold text-gray-600">
-                <div>Name</div>
-                <div>Organization</div>
-                <div>Subscription</div>
-                <div>Date Joined</div>
-                <div>Status</div>
-                <div>Actions</div>
-              </div>
-
-              {currentUsers.length === 0 ? (
-                <div className="p-12 text-center text-gray-500">
-                  No users match your search criteria
-                </div>
-              ) : (
-                currentUsers.map((user) => (
-                  <div
-                    key={user._id}
-                    className="flex flex-col md:grid md:grid-cols-6 gap-4 md:gap-8 px-6 py-6 border-b hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="md:hidden grid grid-cols-2 gap-4">
-                      <div className="font-medium text-gray-500">Name:</div>
-                      <div>{user.name}</div>
-                      <div className="font-medium text-gray-500">Organization:</div>
-                      <div>{user.organization?.name}</div>
-                      <div className="font-medium text-gray-500">Subscription:</div>
-                      <div>{user.organization?.subscriptionTier}</div>
-                      <div className="font-medium text-gray-500">Date Joined:</div>
-                      <div>{user.createdAt}</div>
-                      <div className="font-medium text-gray-500">Status:</div>
-                      <div>
-                        <span className={`px-3 py-1 rounded-full text-sm ${
-                          user.isBlock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                        }`}>
-                          {user.isBlock ? 'Blocked' : 'Active'}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="hidden md:block font-medium">{user.name}</div>
-                    <div className="hidden md:block">{user?.organization?.name}</div>
-                    <div className="hidden md:block">{user.organization?.subscriptionTier}</div>
-                    <div className="hidden md:block text-gray-600">{user.createdAt}</div>
-                    <div className="hidden md:block">
-                      <span className={`px-3 py-1 rounded-full text-sm ${
-                        user.isBlock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                      }`}>
-                        {user.isBlock ? 'Blocked' : 'Active'}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-4 justify-end md:justify-start">
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleBlock(user._id, user.email)}
-                        className={`${user.isBlock ? 'bg-green-600' : 'bg-red-600'} hover:${
-                          user.isBlock ? 'bg-green-700' : 'bg-red-700'
-                        }`}
-                      >
-                        {user.isBlock ? 'Unblock' : 'Block'}
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-10 w-10">
-                        <MoreVertical size={18} />
-                      </Button>
-                    </div>
-                  </div>
-                ))
-              )}
-
-              {/* Pagination Controls */}
-              {filteredUsers.length > 0 && (
-                <div className="flex items-center justify-between px-6 py-4 border-t">
-                  <div className="text-sm text-gray-500">
-                    Showing {indexOfFirstUser + 1} to {Math.min(indexOfLastUser, filteredUsers.length)} of {filteredUsers.length} users
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => paginate(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      <ChevronLeft size={16} />
-                    </Button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1)
-                      .filter(page => {
-                        const shouldShow = 
-                          page === 1 || 
-                          page === totalPages || 
-                          Math.abs(page - currentPage) <= 1;
-                        return shouldShow;
-                      })
-                      .map((page, index, array) => (
-                        <>
-                          {index > 0 && array[index - 1] !== page - 1 && (
-                            <span key={`ellipsis-${page}`} className="px-2">...</span>
-                          )}
-                          <Button
-                            key={page}
-                            variant={currentPage === page ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => paginate(page)}
-                            className={currentPage === page ? "bg-blue-600" : ""}
-                          >
-                            {page}
-                          </Button>
-                        </>
-                      ))
-                    }
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => paginate(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      <ChevronRight size={16} />
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <ManagementTable
+      title="User Management"
+      data={users}
+      columns={columns}
+      onBlock={handleBlock}
+      organizations={organizations}
+      filterKey="organization"
+      searchPlaceholder="Search by name or organization..."
+    />
   );
 };
 
-export default UserManagement;
+export default UserManagement

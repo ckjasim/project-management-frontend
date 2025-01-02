@@ -4,7 +4,7 @@ import React from 'react'
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import * as Yup from 'yup';
-import { createMeetingApi } from '@/services/api/api';
+import { createMeetingApi } from '@/services/api/meetingApi';
 
 const MeetingSheduleForm = ({meetings,setMeetings,setTeams ,teams}) => {
     function randomID(len) {

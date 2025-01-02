@@ -12,7 +12,8 @@ import {
   MoreVertical 
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { deleteTaskApi, getTeamMembersByTeamIdApi, patchTaskApi } from '@/services/api/api';
+import { deleteTaskApi, patchTaskApi } from '@/services/api/taskApi';
+import {  getTeamMembersByTeamIdApi,  } from '@/services/api/projectApi';
 import Modal from '@/components/global/Modal/Modal';
 import * as Yup from 'yup';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
@@ -171,17 +172,30 @@ const Items = ({
 
         <div className="p-4 space-y-3">
           <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <h3 className="font-semibold text-xl text-gray-900 mb-1 truncate">{title}</h3>
-              {description && (
-                <p className="text-sm text-gray-600 line-clamp-2 mt-6">{description}</p>
-              )}
-            </div>
+          <div className="flex-1">
+          <span 
+      className={`absolute top-0 left-0 w-full  ${getPriorityColor(priority)}`}
+    ></span>
+  <h3 
+    className={`font-semibold text-xl text-gray-900 mb-1 truncate relative`}
+  >
+    {title}
+   
+  </h3>
+  {description && (
+    <p className="text-sm text-gray-600 line-clamp-2 mt-6">{description}</p>
+  )}
+</div>
+
             
             <div className="flex items-center space-x-2">
-              <span className={`px-2.5 py-1 rounded-full text-xs font-normal tracking-wider ${getPriorityColor(priority)}`}>
-                {priority}
-              </span>
+             
+            {isOverdue && (
+                <div className="flex items-center text-red-500 text-xs">
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  <span>Overdue</span>
+                </div>
+              )}
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -223,19 +237,15 @@ const Items = ({
             </div>
 
             <div className="flex items-center space-x-4">
-              <div className="flex items-center text-sm text-gray-500 space-x-1">
+              <div className="flex items-center text-xs text-gray-500 space-x-1">
                 <Clock className="h-4 w-4 text-blue-500" />
                 <span>{formatDate(dueDate)}</span>
               </div>
 
-              {isOverdue && (
-                <div className="flex items-center text-red-500 text-sm">
-                  <AlertCircle className="h-4 w-4 mr-1" />
-                  <span>Overdue</span>
-                </div>
-              )}
+             
             </div>
           </div>
+           
         </div>
       </div>
 

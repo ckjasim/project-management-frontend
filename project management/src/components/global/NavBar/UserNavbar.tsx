@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-import { checkPremiumApi, logoutApi } from '@/services/api/api';
+import { checkPremiumApi, logoutApi } from '@/services/api/authApi';
 import { useToast } from '@/components/hooks/use-toast';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
@@ -20,6 +20,7 @@ import {
   SquareDashedKanban,
   Users,
 } from 'lucide-react';
+import { Logo, LogoIcon } from './logo';
 
 export function UserNavbar() {
   const [open, setOpen] = useState(false);
@@ -28,7 +29,7 @@ export function UserNavbar() {
   const { toast } = useToast();
   const { userInfo } = useSelector((state: RootState) => state.Auth);
 
-  useEffect(() => {
+useEffect(() => {
     const checkPremium = async () => {
       const res = await checkPremiumApi();
       console.log(res, 'jkjkjkjkjk');
@@ -86,20 +87,20 @@ export function UserNavbar() {
         <MessagesSquare className="text-yellow-100 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
-    {
+    isPremium &&{
       label: 'Meeting',
       href: '/user/meet',
       icon: (
         <CalendarClock className="text-yellow-100 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
-    isPremium && {
-      label: 'Files',
-      onClick: googleAuth,
-      icon: (
-        <FolderTree className="text-yellow-100 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
-      ),
-    },
+    // isPremium && {
+    //   label: 'Files',
+    //   onClick: googleAuth,
+    //   icon: (
+    //     <FolderTree className="text-yellow-100 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+    //   ),
+    // },
     {
       label: 'Employees',
       href: '/user/employees',
@@ -184,44 +185,5 @@ export function UserNavbar() {
   );
 }
 
-export const Logo = () => {
-  return (
-    <Link
-      to="#"
-      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
-    >
-       <div className="h-5 w-6 bg-yellow-100 dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0">
-    <img
-      src="../../../../public/bird_2.jpg"
-      alt="description"
-      className="w-full h-full object-contain rounded-lg"
-    />
-  </div>
-      <motion.span
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="font-medium text-yellow-100 dark:text-white whitespace-pre"
-      >
-        projectease
-      </motion.span>
-    </Link>
-  );
-};
 
-export const LogoIcon = () => {
-  return (
-    <Link
-  to="#"
-  className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
->
-  <div className="h-5 w-6 bg-yellow-100 dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0">
-    <img
-      src="../../../../public/bird_2.jpg"
-      alt="description"
-      className="w-full h-full object-contain rounded-lg"
-    />
-  </div>
-</Link>
 
-  );
-};

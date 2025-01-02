@@ -5,10 +5,10 @@ import { Loader2, PlusCircle, X } from 'lucide-react';
 import Modal from '@/components/global/Modal/Modal';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
-import { addEmployeeInvitationApi, getEmployeesByOrganizationApi } from '@/services/api/api';
+import { addEmployeeInvitationApi, getEmployeesByOrganizationApi } from '@/services/api/authApi';
 import { useToast } from '@/components/hooks/use-toast';
 import { set } from 'date-fns';
-
+   
 
 const EmployeePage = () => {
   const { toast } = useToast();

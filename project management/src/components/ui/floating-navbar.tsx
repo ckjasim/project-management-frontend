@@ -9,7 +9,7 @@ import {
 } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Link, useNavigate } from "react-router-dom";
-import { logoutApi } from "@/services/api/api";
+import { logoutApi } from "@/services/api/authApi";
 
 type NavItem = {
   name: string;
