@@ -1,41 +1,60 @@
-import React, {  useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-import {
-
-  logoutApi,
- 
-} from '@/services/api/api';
+import { checkPremiumApi, logoutApi } from '@/services/api/api';
 import { useToast } from '@/components/hooks/use-toast';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-import {  BellRing, CalendarClock, FolderTree, Group, LayoutDashboard, LogOut, MessagesSquare, Sparkles, SquareDashedKanban, Users} from 'lucide-react';
-
+import {
+  BellRing,
+  CalendarClock,
+  FolderTree,
+  Group,
+  LayoutDashboard,
+  LogOut,
+  MessagesSquare,
+  Sparkles,
+  SquareDashedKanban,
+  Users,
+} from 'lucide-react';
 
 export function UserNavbar() {
   const [open, setOpen] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const navigate=useNavigate()
-  const{toast}=useToast()
-  const {userInfo}=useSelector((state:RootState)=>(state.Auth))
+  const [isPremium, setIsPremium] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { userInfo } = useSelector((state: RootState) => state.Auth);
 
+  useEffect(() => {
+    const checkPremium = async () => {
+      const res = await checkPremiumApi();
+      console.log(res, 'jkjkjkjkjk');
+      if (res.premium === true) {
+        setIsPremium(true);
+      }
+    };
+    checkPremium();
+  }, []);
   const logout = async () => {
     try {
       const res = await logoutApi();
       console.log(res, 'logout successfully');
-      localStorage.removeItem('user')
+      localStorage.removeItem('user');
       toast({
-        title: "Logout Successful",
-        description:"Successfully logged out!",
+        title: 'Logout Successful',
+        description: 'Successfully logged out!',
         variant: 'success',
       });
-      navigate('/auth/userLogin',{ replace: true })
+      navigate('/auth/userLogin', { replace: true });
     } catch (error) {
       console.error('Logout failed:', error);
     }
+  };
+  const googleAuth = () => {
+    window.location.href = 'http://localhost:3000/drive';
   };
 
   const links = [
@@ -71,12 +90,12 @@ export function UserNavbar() {
       label: 'Meeting',
       href: '/user/meet',
       icon: (
-        <CalendarClock  className="text-yellow-100 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
+        <CalendarClock className="text-yellow-100 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
-    {
+    isPremium && {
       label: 'Files',
-      href: '/user/files',
+      onClick: googleAuth,
       icon: (
         <FolderTree className="text-yellow-100 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
@@ -90,7 +109,7 @@ export function UserNavbar() {
     },
     {
       label: 'Logout',
-      onClick: logout, 
+      onClick: logout,
       icon: (
         <LogOut className="text-yellow-100 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
@@ -104,16 +123,15 @@ export function UserNavbar() {
   return (
     <div
       className={cn(
-        ' py-3 pl-3 flex flex-col md:flex-row bg-gray-50 dark:bg-neutral-800  overflow-hidden',
-        'h-screen' 
+        ' p-3 flex flex-col md:flex-row bg-gray-50 dark:bg-neutral-800  overflow-hidden',
+        'h-screen'
       )}
     >
       <Sidebar open={open} setOpen={setOpen}>
         <SidebarBody className="justify-between gap-10">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-
             {open ? <Logo /> : <LogoIcon />}
-           
+
             <div className="mt-8 flex flex-col gap-2">
               {links.map((link, idx) => (
                 <SidebarLink key={idx} link={link} />
@@ -121,29 +139,31 @@ export function UserNavbar() {
             </div>
           </div>
           <div>
-          <SidebarLink
+            <SidebarLink
               link={{
                 label: 'Notifications',
                 href: '/user/notification',
-                icon:(
+                icon: (
                   <BellRing className="text-yellow-100 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
                 ),
               }}
             />
-            <SidebarLink
+            {(isPremium ===false && <SidebarLink
               link={{
                 label: 'Upgrade to Premium',
                 href: '/user/premium',
-                icon:<div
-                // onClick={handleUpgrade}
-                className="p-2 bg-gradient-to-r from-amber-200 to-yellow-400 hover:from-amber-300 hover:to-yellow-500 text-black font-medium flex items-center justify-center rounded-lg"
-              >
-                <Sparkles className="h-4 w-4" />
-    
-              </div>
+                icon: (
+                  <div
+                    // onClick={handleUpgrade}
+                    className="p-2 bg-gradient-to-r from-amber-200 to-yellow-400 hover:from-amber-300 hover:to-yellow-500 text-black font-medium flex items-center justify-center rounded-lg"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                  </div>
+                ),
               }}
-            />
-           
+            /> )}
+            
+
             <SidebarLink
               link={{
                 label: `${userInfo?.name}`,
@@ -170,13 +190,19 @@ export const Logo = () => {
       to="#"
       className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
     >
-      <div className="h-5 w-5 bg-yellow-100 dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
+       <div className="h-5 w-6 bg-yellow-100 dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0">
+    <img
+      src="../../../../public/bird_2.jpg"
+      alt="description"
+      className="w-full h-full object-contain rounded-lg"
+    />
+  </div>
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="font-medium text-yellow-100 dark:text-white whitespace-pre"
       >
-       projectease
+        projectease
       </motion.span>
     </Link>
   );
@@ -185,10 +211,17 @@ export const Logo = () => {
 export const LogoIcon = () => {
   return (
     <Link
-      to="#"
-      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
-    >
-      <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
-    </Link>
+  to="#"
+  className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
+>
+  <div className="h-5 w-6 bg-yellow-100 dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0">
+    <img
+      src="../../../../public/bird_2.jpg"
+      alt="description"
+      className="w-full h-full object-contain rounded-lg"
+    />
+  </div>
+</Link>
+
   );
 };

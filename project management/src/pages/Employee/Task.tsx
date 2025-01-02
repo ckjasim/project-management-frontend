@@ -1,29 +1,29 @@
-
-
-
 import React, { useEffect, useState } from 'react';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, KeyboardSensor, PointerSensor, UniqueIdentifier, closestCorners, useSensor, useSensors } from '@dnd-kit/core';
-import { SortableContext, sortableKeyboardCoordinates,  } from '@dnd-kit/sortable';
-
-import {  Loader2, } from 'lucide-react';
-
+import { SortableContext, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { Loader2, Search, SortAsc, SortDesc } from 'lucide-react';
 import Container from '@/components/global/Container/Container';
 import Items from '@/components/global/Items/Item';
-
-import {  patchTaskStatusApi, getTasksByProjectApi } from '@/services/api/api';
+import { patchTaskStatusApi, getTasksByProjectApi, addCommentApi } from '@/services/api/api';
 import { useParams } from 'react-router-dom';
+import TaskDetailModal from '@/components/global/Modal/taskDetailsModal';
+import { TaskType } from '@/types';
+import { motion } from 'framer-motion';
+
 
 type DNDType = {
   id: UniqueIdentifier;
   title: string;
-  items: {
-    id: UniqueIdentifier;
-    title: string;
-    description: string;
-    assignedTo:string;
-    priority:string;
-    dueDate: string;
-  }[];
+  items: TaskItem[];
+};
+
+type TaskItem = {
+  id: UniqueIdentifier;
+  title: string;
+  description: string;
+  assignedTo: string;
+  priority: string;
+  dueDate: string;
 };
 
 const CONTAINER_IDS = {
@@ -40,6 +40,8 @@ const CONTAINER_COLORS = {
   [CONTAINER_IDS.REVIEW]: 'border-green-200 bg-green-50',
 };
 
+const PRIORITY_OPTIONS = ['High', 'Medium', 'Low'];
+
 export const TaskManagement = () => {
   const [containers, setContainers] = useState<DNDType[]>([
     { id: CONTAINER_IDS.PENDING, title: 'To Do', items: [] },
@@ -47,63 +49,89 @@ export const TaskManagement = () => {
     { id: CONTAINER_IDS.COMPLETED, title: 'Completed', items: [] },
     { id: CONTAINER_IDS.REVIEW, title: 'Under Review', items: [] },
   ]);
-
+  const [originalContainers, setOriginalContainers] = useState<DNDType[]>([]);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [loading, setLoading] = useState(false);
-  const {projectId}=useParams()
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPriority, setSelectedPriority] = useState<string>('');
+  const [selectedAssignee, setSelectedAssignee] = useState<string>('');
+  const [assigneesList, setAssigneesList] = useState<string[]>([]);
+    const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
+  
+  const [sortConfig, setSortConfig] = useState<{
+    key: keyof TaskItem;
+    direction: 'asc' | 'desc';
+  } | null>(null);
+  const [showDetail, setShowDetail] = useState(false);
+
+  const { projectId } = useParams();
 
   useEffect(() => {
     fetchTasks();
   }, []);
-  
 
   const fetchTasks = async () => {
     setLoading(true);
     try {
-      
       const res = await getTasksByProjectApi(projectId);
       const tasks = res?.tasks;
-
+console.log(tasks)
       const itemsByContainerId = containers.reduce((acc, container) => {
         acc[container.id] = [];
         return acc;
       }, {} as Record<string, DNDType['items']>);
+      const uniqueAssignees = new Set<string>();
 
       tasks.forEach((task: {
         priority: string;
-        assignedTo: any;
+        assignedTo: { name: string };
         _id: UniqueIdentifier;
         title: string;
         description: string;
         dueDate: string;
         status: string;
+        attachments: Array<{
+          name: string;
+          size: string;
+          url: string;
+        }>;
+        comments: Array<{
+          author: string;
+          content: string;
+          timestamp: string;
+        }>;
       }) => {
         const taskItem = {
           id: task._id,
           title: task.title,
           assignedTo: task.assignedTo.name,
-          priority:task.priority,
+          priority: task.priority,
           description: task.description,
           dueDate: task.dueDate,
+          attachments: task.attachments || [],
+          comments:task.comments || []
+
         };
         if (itemsByContainerId[task.status]) {
           itemsByContainerId[task.status].push(taskItem);
         }
+        uniqueAssignees.add(task.assignedTo.name);
       });
 
-      setContainers(
-        containers.map((container) => ({
-          ...container,
-          items: itemsByContainerId[container.id] || [],
-        }))
-      );
+      const newContainers = containers.map((container) => ({
+        ...container,
+        items: itemsByContainerId[container.id] || [],
+      }));
+
+      setContainers(newContainers);
+      setOriginalContainers(newContainers);
+      setAssigneesList(Array.from(uniqueAssignees).sort());
     } catch (error) {
       console.error('Error fetching tasks:', error);
     } finally {
       setLoading(false);
     }
   };
-
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -118,7 +146,6 @@ export const TaskManagement = () => {
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
-    console.log(over?.id,'iiiiiiiiiiiiiiiiiiiiiiiiiii')
     
     if (!over || active.id === over.id) {
       setActiveId(null);
@@ -153,19 +180,184 @@ export const TaskManagement = () => {
     }
   };
 
+  const handleSort = (key: keyof TaskItem) => {
+    setSortConfig((currentSort) => {
+      const newDirection = 
+        currentSort?.key === key && currentSort.direction === 'asc' ? 'desc' : 'asc';
+      
+      const newSort = { key, direction: newDirection };
+      
+      setContainers((prev) => {
+        return prev.map((container) => ({
+          ...container,
+          items: [...container.items].sort((a, b) => {
+            if (newDirection === 'asc') {
+              return a[key] > b[key] ? 1 : -1;
+            }
+            return a[key] < b[key] ? 1 : -1;
+          }),
+        }));
+      });
+      
+      return newSort;
+    });
+  };
+
+  const filterAndSearchTasks = () => {
+    let filteredContainers = JSON.parse(JSON.stringify(originalContainers));
+
+    // Apply priority filter
+    if (selectedPriority) {
+      filteredContainers = filteredContainers.map((container: DNDType) => ({
+        ...container,
+        items: container.items.filter((item) => 
+          item.priority.toLowerCase() === selectedPriority.toLowerCase()
+        ),
+      }));
+    }
+
+    // Apply assignee filter
+    if (selectedAssignee) {
+      filteredContainers = filteredContainers.map((container: DNDType) => ({
+        ...container,
+        items: container.items.filter((item) => 
+          item.assignedTo === selectedAssignee
+        ),
+      }));
+    }
+
+    // Apply search
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filteredContainers = filteredContainers.map((container: DNDType) => ({
+        ...container,
+        items: container.items.filter((item) =>
+          item.title.toLowerCase().includes(searchLower) ||
+          item.description.toLowerCase().includes(searchLower) ||
+          item.assignedTo.toLowerCase().includes(searchLower)
+        ),
+      }));
+    }
+
+    setContainers(filteredContainers);
+  };
+
+  useEffect(() => {
+    filterAndSearchTasks();
+  }, [searchTerm, selectedPriority, selectedAssignee]);
+
+  const handleAddComment = async (comment: string) => {
+    if (!selectedTask?.id || !comment.trim()) return;
+  
+    try {
+      const data = {
+        content: comment,
+        taskId: selectedTask.id
+      };
+      const res = await addCommentApi(data);
+console.log(res)
+      setContainers(prevContainers => {
+        return prevContainers.map(container => ({
+          ...container,
+          items: container.items.map(item => {
+            if (item.id === selectedTask.id) {
+              return {
+                ...item,
+                comments: res.comment?.comments
+              };
+            }
+            return item;
+          })
+        }))
+      });
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
+  };
+  
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
-      
-
-      <div className="flex justify-between items-center mb-8">
+       <TaskDetailModal
+        show={showDetail}
+        onClose={() => setShowDetail(false)}
+        task={selectedTask}
+        onAddComment={handleAddComment}
+        onEdit={() => {/* Implement edit functionality */}}
+        onDelete={() => {/* Implement delete functionality */}}
+      />
+      <div className="flex flex-col gap-6 mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Task Management</h1>
         
+        <div className="flex flex-wrap gap-4 items-center">
+          {/* Search Input */}
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <input
+              type="text"
+              placeholder="Search tasks..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 w-full border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Priority Filter */}
+          <select
+            value={selectedPriority}
+            onChange={(e) => setSelectedPriority(e.target.value)}
+            className="border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Priorities</option>
+            {PRIORITY_OPTIONS.map((priority) => (
+              <option key={priority} value={priority}>
+                {priority}
+              </option>
+            ))}
+          </select>
+
+          {/* Assignee Filter */}
+          <select
+            value={selectedAssignee}
+            onChange={(e) => setSelectedAssignee(e.target.value)}
+            className="border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Assignees</option>
+            {assigneesList.map((assignee) => (
+              <option key={assignee} value={assignee}>
+                {assignee}
+              </option>
+            ))}
+          </select>
+
+          {/* Sort Buttons */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleSort('dueDate')}
+              className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50"
+            >
+              {sortConfig?.key === 'dueDate' ? (
+                sortConfig.direction === 'asc' ? <SortAsc /> : <SortDesc />
+              ) : null}
+              Due Date
+            </button>
+            <button
+              onClick={() => handleSort('priority')}
+              className="flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50"
+            >
+              {sortConfig?.key === 'priority' ? (
+                sortConfig.direction === 'asc' ? <SortAsc /> : <SortDesc />
+              ) : null}
+              Priority
+            </button>
+          </div>
+        </div>
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-        </div>
+         <div className="flex justify-center items-center h-32">
+         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+       </div>
       ) : (
         <DndContext
           sensors={sensors}
@@ -178,13 +370,26 @@ export const TaskManagement = () => {
               <Container
                 key={container.id}
                 id={container.id}
-                title={container.title }
+                title={container.title}
                 className={CONTAINER_COLORS[container.id as keyof typeof CONTAINER_COLORS]}
+               
               >
                 <SortableContext items={container.items.map((item) => item.id)}>
                   <div className="space-y-4">
                     {container.items.map((item) => (
+                       <motion.div
+                       key={item.id}
+                       initial={{ opacity: 0, scale: 0.95 }}
+                       animate={{ opacity: 1, scale: 1 }}
+                       exit={{ opacity: 0, scale: 0.95 }}
+                       className="cursor-pointer"
+                       onClick={() => {
+                         setSelectedTask(item);
+                         setShowDetail(true);
+                       }}
+                     >
                       <Items key={item.id} {...item} />
+                      </motion.div>
                     ))}
                   </div>
                 </SortableContext>
@@ -194,12 +399,15 @@ export const TaskManagement = () => {
           <DragOverlay>
             {activeId && (
               <Items
-                  id={activeId}
-                  title={containers
-                    .flatMap((c) => c.items)
-                    .find((item) => item.id === activeId)?.title || ''}
-                  description=""
-                  dueDate="" assignedTo={''} priority={''}              />
+                id={activeId}
+                title={containers
+                  .flatMap((c) => c.items)
+                  .find((item) => item.id === activeId)?.title || ''}
+                description=""
+                dueDate=""
+                assignedTo={''}
+                priority={''}
+              />
             )}
           </DragOverlay>
         </DndContext>
@@ -209,3 +417,4 @@ export const TaskManagement = () => {
 };
 
 export default TaskManagement;
+

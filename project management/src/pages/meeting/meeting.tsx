@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -8,12 +8,14 @@ import {
   Users,
   Video,
   RefreshCw,
+  Edit,
+  Trash2,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { RescheduleModal } from '@/components/global/Modal/RescheduleModal';
-import { createMeetingApi, getMeetingsApi, updateMeetingApi } from '@/services/api/api';
+import { createMeetingApi, getMeetingsApi, updateMeetingApi, deleteMeetingApi } from '@/services/api/api';
 import MeetingSheduleForm from '@/components/global/Forms/meetingSheduleForm';
 
 const MeetingScheduler = () => {
@@ -22,6 +24,7 @@ const MeetingScheduler = () => {
   const [meetings, setMeetings] = useState([]);
   const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,7 +39,15 @@ const MeetingScheduler = () => {
     fetchMeetings();
   }, []);
 
-  const isBacklogMeeting = (date) => {
+  const formatDate = (date: string | number | Date) => {
+    return new Date(date).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+  };
+
+  const isBacklogMeeting = (date: string | number | Date) => {
     const meetingDate = new Date(date);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -50,16 +61,28 @@ const MeetingScheduler = () => {
     isBacklogMeeting(meeting.date)
   );
 
-  const joinMeet = (meetLink) => {
+  const joinMeet = (meetLink: any) => {
     navigate(`join${meetLink}`);
   };
 
-  const rescheduleMeeting = (meeting) => {
+  const editMeeting = (meeting: SetStateAction<null>) => {
     setSelectedMeeting(meeting);
+    setIsEditMode(true);
     setIsRescheduleModalOpen(true);
   };
 
-  const handleReschedule = async (newDate, newTime) => {
+  const deleteMeeting = async (meetingId: any) => {
+    if (window.confirm('Are you sure you want to delete this meeting?')) {
+      try {
+        await deleteMeetingApi(meetingId);
+        setMeetings(meetings.filter(m => m._id !== meetingId));
+      } catch (error) {
+        console.error('Failed to delete meeting:', error);
+      }
+    }
+  };
+
+  const handleReschedule = async (newDate: any, newTime: any) => {
     if (!selectedMeeting || !newDate || !newTime) return;
 
     const updatedMeeting = {
@@ -77,11 +100,12 @@ const MeetingScheduler = () => {
         meetings.map((m) => (m._id === selectedMeeting._id ? updatedMeeting : m))
       );
     } catch (error) {
-      console.error('Failed to reschedule meeting:', error);
+      console.error('Failed to update meeting:', error);
     }
 
     setIsRescheduleModalOpen(false);
     setSelectedMeeting(null);
+    setIsEditMode(false);
   };
 
   const MeetingCard = ({ meeting, isBacklog }) => (
@@ -93,17 +117,33 @@ const MeetingScheduler = () => {
     >
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-lg text-gray-800">{meeting.title}</h3>
-        <span
-          className="text-sm font-medium px-3 py-1 bg-indigo-100 
-                       text-indigo-700 rounded-full"
-        >
-          {meeting.duration}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium px-3 py-1 bg-indigo-100 
+                       text-indigo-700 rounded-full">
+            {meeting.duration}
+          </span>
+          {userInfo.role === 'project manager' && (
+            <div className="flex gap-2">
+              <button
+                onClick={() => editMeeting(meeting)}
+                className="p-1 text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => deleteMeeting(meeting._id)}
+                className="p-1 text-red-600 hover:text-red-800 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center text-sm text-gray-600">
         <CalendarIcon className="w-4 h-4 mr-2 text-gray-400" />
-        {new Date(meeting.date).toLocaleDateString()}
+        {formatDate(meeting.date)}
       </div>
 
       <div className="flex items-center text-sm text-gray-600">
@@ -113,7 +153,7 @@ const MeetingScheduler = () => {
 
       <div className="flex items-center text-sm text-gray-600">
         <Users className="w-4 h-4 mr-2 text-gray-400" />
-        {meeting.teams.map((team) => team.name).join(', ')}
+        {meeting.teams.map((team: { name: any; }) => team.name).join(', ')}
       </div>
 
       <div className="flex gap-2 mt-3">
@@ -128,7 +168,7 @@ const MeetingScheduler = () => {
         )}
         {isBacklog && (
           <button
-            onClick={() => rescheduleMeeting(meeting)}
+            onClick={() => editMeeting(meeting)}
             className="w-full mt-2 flex items-center justify-center gap-2 bg-red-500 text-white font-semibold py-2 px-4 rounded-lg 
              shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 transition-all duration-200"
           >
@@ -144,10 +184,15 @@ const MeetingScheduler = () => {
     <div className="mx-auto p-9 px-9">
       <RescheduleModal
         isOpen={isRescheduleModalOpen}
-        onClose={() => setIsRescheduleModalOpen(false)}
+        onClose={() => {
+          setIsRescheduleModalOpen(false);
+          setIsEditMode(false);
+          setSelectedMeeting(null);
+        }}
         onReschedule={handleReschedule}
         currentDate={selectedMeeting?.date?.split('T')[0] || ''}
         currentTime={selectedMeeting?.time || ''}
+        isEditMode={isEditMode}
       />
       
       <div className="mb-8">

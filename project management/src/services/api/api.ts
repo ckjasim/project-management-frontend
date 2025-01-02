@@ -158,7 +158,7 @@ export const patchTaskApi = async (id: any, data: any) => {
 
 export const deleteTaskApi = async (id: any) => {
   try {
-    const response = await  baseURL.patch('/task/deleteTask', { id });
+    const response = await  baseURL.delete('/task/deleteTask', {data:{ id} });
     const tasks = response.data;
     return tasks;
   } catch (error) {
@@ -291,7 +291,7 @@ export const editProjectApi = async (id:string | undefined,data: any) => {
 }
 export const deleteProjectApi = async (id: string) => {
   try {
-    const response = await  baseURL.patch('/project/project/delete',{id});
+    const response = await  baseURL.delete('/project/project/delete',{data:{id}});
     const teams = response.data;
     return teams;
   } catch (error) {
@@ -331,6 +331,19 @@ export const getTasksByProjectApi = async (projectId:any) => {
   }
 }
 
+ //comments
+
+ export const addCommentApi = async (data:any) => {
+  try {
+    const response = await baseURL.post('/task/comments',data);
+    const teams = response.data;
+    return teams;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+}
+
 //------------chat service------------------
 
 
@@ -354,6 +367,21 @@ export const getTasksByProjectApi = async (projectId:any) => {
         throw error;
       }
     }
+    export const markMessagesAsReadApi = async (messageIds: string[]) => {
+      try {
+        const response = await fetch('/chat/markRead', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ messageIds }),
+        });
+        return await response.json();
+      } catch (error) {
+        console.error('Error marking messages as read:', error);
+        throw error;
+      }
+    };
 
     //notification service
 
@@ -368,16 +396,18 @@ export const getTasksByProjectApi = async (projectId:any) => {
       }
     }
 
-    export const deleteNotificationApi = async (id:string) => {
+    export const deleteNotificationApi = async (id: string) => {
       try {
-        const response = await  baseURL.post('/notification/deleteNotification',id);
-        const chats = response.data;
-        return chats;
+        const response = await baseURL.delete('/notification/deleteNotification', {
+          data: { id },  // Sending `id` in the request body
+        });
+        return response.data; // Return the response data
       } catch (error) {
-        console.error("Error logging out:", error);
-        throw error;
+        console.error("Error deleting notification:", error);
+        throw error; // Rethrow error to be handled by the caller
       }
-    }
+    };
+    
 
     //------Meeting---------
     export const createMeetingApi = async (data: any) => {
@@ -400,9 +430,9 @@ export const getTasksByProjectApi = async (projectId:any) => {
         throw error;
       }
     }
-    export const deleteMeetingApi = async () => {
+    export const deleteMeetingApi = async (meetingId: string) => {
       try {
-        const response = await baseURL.get('/meeting/meeting');
+        const response = await baseURL.delete('/meeting/meeting',{data:{meetingId}});
         const teams = response.data;
         return teams;
       } catch (error) {
@@ -433,3 +463,26 @@ export const getTasksByProjectApi = async (projectId:any) => {
         throw error;
       }
     }
+    export const checkPremiumApi = async () => {
+      try {
+        const response = await baseURL.get('/auth/checkPremium');
+        const teams = response.data;
+        return teams;
+      } catch (error) {
+        console.error("Error logging out:", error);
+        throw error;
+      }
+    }
+    export const fetchDrivefilesApi = async () => {
+      try {
+        const response = await baseURL.get('/meeting/files');
+        const teams = response.data;
+        return teams;
+      } catch (error) {
+        console.error("Error logging out:", error);
+        throw error;
+      }
+    }
+
+// 
+   

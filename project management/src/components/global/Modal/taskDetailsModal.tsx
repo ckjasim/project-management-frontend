@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import {
@@ -8,6 +8,8 @@ import {
   Clock,
   Edit,
   FileIcon,
+  MessageSquare,
+  Send,
   Tag,
   Trash2,
   User,
@@ -16,12 +18,22 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Textarea } from '@/components/ui/textarea';
 import Modal from './Modal';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 interface Attachment {
   name: string;
   size: string;
   url: string;
+}
+
+interface Comment {
+  _id: string;
+  author: string;
+  content: string;
+  timestamp: string;
 }
 
 interface TaskDetailModalProps {
@@ -37,9 +49,11 @@ interface TaskDetailModalProps {
     attachments: Attachment[];
     members: string[];
     status: string;
+    comments?: Comment[];
   } | null;
   onEdit: () => void;
   onDelete: () => void;
+  onAddComment?: (comment: string) => void;
 }
 
 const getPriorityColor = (priority: string) => {
@@ -65,10 +79,21 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   task,
   onEdit,
   onDelete,
+  onAddComment
 }) => {
+  const [newComment, setNewComment] = useState('');
+      const {userInfo} = useSelector((state:RootState)=>state.Auth)
+  
   if (!task) return null;
 
   const isOverdue = new Date(task.dueDate) < new Date();
+
+  const handleSubmitComment = () => {
+    if (newComment.trim() && onAddComment) {
+      onAddComment(newComment);
+      setNewComment('');
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -161,6 +186,53 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                     {task.description || 'No description provided'}
                   </p>
                 </div>
+
+                {/* Comments Section */}
+                <div className="bg-white rounded-lg p-6 shadow-sm border">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-800">
+                    <MessageSquare className="h-5 w-5 mr-2" />
+                    Comments
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    {task.comments?.map((comment) => (
+                      <div key={comment._id} className="flex space-x-3 p-3 bg-gray-50 rounded-lg">
+                        <Avatar className="h-8 w-8">
+                          {(comment.author?.profileImage?.url)?(<div><img src={comment.author?.profileImage?.url} alt="" /></div>):(<AvatarFallback>{comment.author?.name[0]}</AvatarFallback>)}
+                          
+
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium text-gray-900">{comment.author?.name}</p>
+                            <span className="text-xs text-gray-500">
+                              {format(new Date(comment.createdAt), 'MMM d, yyyy h:mm a')}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-sm text-gray-600">{comment.content}</p>
+                        </div>
+                      </div>
+                    ))}
+          {(userInfo.name===task.assignedTo || userInfo.role==='project manager')?(  <div className="mt-4">
+                      <Textarea
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        placeholder="Add a comment..."
+                        className="min-h-[80px]"
+                      />
+                      <div className="mt-2 flex justify-end">
+                        <Button
+                          onClick={handleSubmitComment}
+                          disabled={!newComment.trim()}
+                        >
+                          <Send className="h-4 w-4 mr-2" />
+                          Send
+                        </Button>
+                      </div>
+                    </div>):''}
+                  
+                  </div>
+                </div>
               </div>
 
               {/* Sidebar */}
@@ -205,11 +277,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                                   }
                                 }}
                               >
-                                {attachment.url.endsWith('.pdf') ? (
-                                  <ArrowDownToLine className="h-4 w-4" />
-                                ) : (
-                                  <ArrowDownToLine className="h-4 w-4" />
-                                )}
+                                <ArrowDownToLine className="h-4 w-4" />
                               </Button>
                             </div>
                           </li>

@@ -2,21 +2,32 @@ import { MutableRefObject } from "react";
 import { Socket } from "socket.io-client";
 import { DefaultEventsMap } from '@socket.io/component-emitter';
 
-export interface TaskType {
+// export interface TaskType {
+//   id: string;
+//   title: string;
+//   description: string;
+//   assignedTo: string;
+//   priority: string;
+//   dueDate: string;
+//   status: string;
+// }
+export type TaskType = {
+  assignedTo: string;
+  priority: string;
   id: string;
   title: string;
   description: string;
-  assignedTo: string;
-  priority: string;
   dueDate: string;
   status: string;
-}
+  attachments: Array<{
+    name: string;
+    size: string;
+    url: string;
+  }>;
+  members: string[];
+};
 
-export interface ContainerType {
-  id: string;
-  title: string;
-  items: TaskType[];
-}
+
 
 export interface TeamMember {
   id: string;
@@ -63,6 +74,22 @@ export type UserSideBarProps = {
 //   unreadCount?: number;
 // }
 
+
+export type ContainerType = {
+  id: string;
+  title: string;
+  items: TaskType[];
+};
+
+export interface ITeam {
+  id: string;
+  name: string;
+}
+
+export interface IFile {
+  name: string;
+  file: string | ArrayBuffer | null;
+}
 export interface Attachment {
   name: string;
   type: string;

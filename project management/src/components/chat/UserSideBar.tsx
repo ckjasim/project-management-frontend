@@ -9,104 +9,146 @@ import {
   getEmployeesByOrganizationApi,
   getTeamByEmployeeApi,
   getTeamsApi,
+  markMessagesAsReadApi,
 } from '@/services/api/api';
 import { RootState } from '@/redux/store';
-import {  UserSideBarProps } from '@/types';
+import { UserSideBarProps } from '@/types';
 
-interface ITeam {
-  groupName: string;
-  _id: string;
-  profileImage:any;
-
-}
-
-interface IPersonal {
-  url:any;
+interface IChat {
+  id: string;
   name: string;
   _id: string;
+  type: 'group' | 'private';
+  url?: string;
+  lastMessage?: string;
+  timestamp?: string;
+  unreadCount?: number;
+  isRead?: boolean;
 }
 
-
-
-const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef }) => {
+const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef, messages }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [groups, setGroups] = useState<ITeam[]>([]);
-  const [personal, setPersonal] = useState<IPersonal[]>([]);
+  const [chats, setChats] = useState<IChat[]>([]);
   const dispatch = useDispatch();
 
   const { userInfo } = useSelector((state: RootState) => state.Auth);
+
   useEffect(() => {
-    const fetchTeams = async () => {
+    const fetchChats = async () => {
       try {
         const empResponse = await getEmployeesByOrganizationApi();
         const personals =
           empResponse?.data?.all
-            ?.filter(
-              (val: { _id: string | undefined }) => val._id !== userInfo?._id
-            )
-            .map((val: {
-              profileImage: any;
-              url: any; name: any; _id: any ;
-}) => ({
+            ?.filter((val: { _id: string | undefined }) => val._id !== userInfo?._id)
+            ?.map((val: { profileImage: any; name: any; _id: any }) => ({
               name: val.name,
               _id: val._id,
-              url:val?.profileImage?.url
+              url: val?.profileImage?.url,
+              type: 'private',
             })) || [];
-        setPersonal(personals);
 
+        let teams = [];
         if (userInfo?.role === 'project manager') {
-          const teams = await getTeamsApi();
-
-          setGroups(
-            teams?.teams.map((team: { name: any; _id: any }) => ({
-              groupName: team.name,
-              _id: team._id,
-            })) || []
-          );
+          const teamResponse = await getTeamsApi();
+          teams = teamResponse?.teams.map((team: { name: any; _id: any }) => ({
+            name: team.name,
+            _id: team._id,
+            type: 'group',
+          }));
         } else if (userInfo?.role === 'employee') {
-          const teams = await getTeamByEmployeeApi();
-
-          setGroups(
-            teams?.teams.map((team: { name: any; _id: any }) => ({
-              groupName: team.name,
-              _id: team._id,
-            })) || []
-          );
+          const teamResponse = await getTeamByEmployeeApi();
+          teams = teamResponse?.teams.map((team: { name: any; _id: any }) => ({
+            name: team.name,
+            _id: team._id,
+            type: 'group',
+          }));
         }
+
+        const allChats = [...personals, ...teams].map((chat) => {
+          const chatMessages = messages.filter(
+            (msg) => 
+              (msg.roomId === chat._id || 
+              msg.senderId === chat._id || 
+              msg.recipientId === chat._id) && 
+              msg.type === chat.type
+          );
+
+          const lastMessage = chatMessages
+            .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
+
+          const unreadCount = chatMessages.filter(
+            (msg) => 
+              !msg?.isRead && 
+              msg.senderId !== userInfo?._id
+          ).length;
+          
+          return {
+            ...chat,
+            lastMessage: lastMessage?.content.startsWith('data:image/') ? 'photo' : lastMessage?.content || '',
+            timestamp: lastMessage?.timestamp || '',
+            unreadCount,
+            isRead: unreadCount === 0,
+          };
+        });
+
+        setChats(allChats);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
     if (userInfo?._id) {
-      fetchTeams();
+      fetchChats();
     }
+  }, [userInfo, messages]);
 
-    return () => {
+  const filteredChats = chats
+    .filter((chat) =>
+      chat.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (a.unreadCount && !b.unreadCount) return -1;
+      if (!a.unreadCount && b.unreadCount) return 1;
+      return new Date(b.timestamp || '').getTime() - new Date(a.timestamp || '').getTime();
+    });
 
-    };
-  }, [userInfo]);
-
-  const filteredGroups = groups.filter((group) =>
-    group.groupName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const filteredPersonal = personal.filter((person) =>
-    person.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  console.log(filteredPersonal,'--------------------------')
-
-  const handleItemClick = (
+  const handleItemClick = async(
     id: string,
     chatMode: 'group' | 'private',
     name: string,
-    url:any
+    url: any
   ) => {
-    dispatch(SetChat({ currentRoom: id, chatMode, name ,url}));
-
+    dispatch(SetChat({ currentRoom: id, chatMode, name, url }));
     if (chatMode === 'group') {
-      serverRef?.current?.emit('joinRoom',id)
-    } 
+      serverRef?.current?.emit('joinRoom', id);
+    }
+     // Find all unread messages for this chat
+  const unreadMessages = messages.filter(msg => 
+    !msg.isRead && 
+    msg.senderId !== userInfo?._id && 
+    ((chatMode === 'private' && (msg.senderId === id || msg.recipientId === id)) ||
+     (chatMode === 'group' && msg.roomId === id))
+  );
+
+  if (unreadMessages.length > 0) {
+    try {
+
+      await markMessagesAsReadApi(unreadMessages.map(msg => msg._id));
+      
+      // Update local messages state
+      const updatedMessages = messages.map(msg => 
+        unreadMessages.some(unread => unread._id === msg._id)
+          ? { ...msg, isRead: true }
+          : msg
+      );
+      
+      // // Update your messages state - you'll need to implement this dispatch
+      // dispatch(updateMessages(updatedMessages));
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+    }
+  }
+
   };
 
   return (
@@ -125,65 +167,51 @@ const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef }) => {
         </div>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto px-4 pb-6 space-y-4">
-        {filteredGroups.length > 0 && (
-          <div>
-            <h3 className="text-sm font-semibold text-gray-500 mb-2">Groups</h3>
-            {filteredGroups.map((team) => (
-              <div
-                key={team._id}
-                className="bg-white p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer mb-1"
-                onClick={() =>
-                  handleItemClick(team._id, 'group', team.groupName,"")
-                }
-              >
-                <div className="flex items-center space-x-4">
-                  <Avatar>
-                    <AvatarImage
-                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                        team.groupName
-                      )}`}
-                    />
-                    <AvatarFallback>{team.groupName.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-48">
-                    <p className="text-gray-800 font-medium">
-                      {team.groupName}
-                    </p>
+        {filteredChats.map((chat) => (
+          <div
+            key={chat._id}
+            className={`bg-white p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer mb-1 ${
+              !chat.isRead ? 'bg-blue-50' : ''
+            }`}
+            onClick={() => handleItemClick(chat._id, chat.type, chat.name, chat.url)}
+          >
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <Avatar>
+                  <AvatarImage
+                    src={
+                      chat.type === 'group'
+                        ? `https://ui-avatars.com/api/?name=${encodeURIComponent(chat.name)}`
+                        : chat.url
+                    }
+                  />
+                  <AvatarFallback>{chat.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                {chat?.unreadCount > 0 && (
+                  <div className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {chat.unreadCount}
                   </div>
-                </div>
+                )}
               </div>
-            ))}
-          </div>
-        )}
+              <div className="min-w-48">
+                <div className="flex justify-between items-start">
+                  <p className={`font-medium ${!chat.isRead ? 'text-blue-600' : 'text-gray-800'}`}>
+                    {chat.name}
+                  </p>
+                </div>
+                <p className={`text-sm truncate ${!chat.isRead ? 'text-blue-500' : 'text-gray-500'}`}>
+                  {chat.lastMessage || 'No messages yet'}
+                </p>
+                {chat.timestamp && (
+  <p className="text-gray-400 text-xs">
+    {new Date(chat.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+  </p>
+)}
 
-        {filteredPersonal.length > 0 && (
-          <div>
-            <h3 className="text-sm font-semibold text-gray-500 mb-2">
-              Direct Messages
-            </h3>
-            {filteredPersonal.map((person) => (
-              <div
-                key={person._id}
-                className="bg-white p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer mb-1"
-                onClick={() =>
-                  handleItemClick(person._id, 'private', person.name,person.url)
-                }
-              >
-                <div className="flex items-center space-x-4">
-                  <Avatar>
-                    <AvatarImage
-                      src={person?.url}
-                    />
-                    <AvatarFallback>{person.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-48">
-                    <p className="text-gray-800 font-medium">{person.name}</p>
-                  </div>
-                </div>
               </div>
-            ))}
+            </div>
           </div>
-        )}
+        ))}
       </CardContent>
     </Card>
   );

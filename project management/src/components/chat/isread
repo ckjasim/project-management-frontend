@@ -1,0 +1,125 @@
+interface IMessage {
+  _id: string;
+  content: string;
+  senderId: string;
+  recipientId?: string;
+  roomId?: string;
+  type: 'private' | 'group';
+  timestamp: string;
+  isRead: boolean;
+}
+
+// In your API services (api.ts or similar file)
+export const markMessagesAsReadApi = async (messageIds: string[]) => {
+  try {
+    const response = await fetch('/api/messages/mark-read', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ messageIds }),
+    });
+    return await response.json();
+  } catch (error) {
+    console.error('Error marking messages as read:', error);
+    throw error;
+  }
+};
+
+// Update your UserSideBar component's handleItemClick function
+const handleItemClick = async (
+  id: string,
+  chatMode: 'group' | 'private',
+  name: string,
+  url: any
+) => {
+  dispatch(SetChat({ currentRoom: id, chatMode, name, url }));
+  
+  // Find all unread messages for this chat
+  const unreadMessages = messages.filter(msg => 
+    !msg.isRead && 
+    msg.senderId !== userInfo?._id && 
+    ((chatMode === 'private' && (msg.senderId === id || msg.recipientId === id)) ||
+     (chatMode === 'group' && msg.roomId === id))
+  );
+
+  if (unreadMessages.length > 0) {
+    try {
+      // Mark messages as read in the backend
+      await markMessagesAsReadApi(unreadMessages.map(msg => msg._id));
+      
+      // Update local messages state
+      const updatedMessages = messages.map(msg => 
+        unreadMessages.some(unread => unread._id === msg._id)
+          ? { ...msg, isRead: true }
+          : msg
+      );
+      
+      // Update your messages state - you'll need to implement this dispatch
+      dispatch(updateMessages(updatedMessages));
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+    }
+  }
+
+  if (chatMode === 'group') {
+    serverRef?.current?.emit('joinRoom', id);
+  }
+};
+
+// Add this to your message slice (chatSlice.ts or similar)
+const chatSlice = createSlice({
+  name: 'chat',
+  initialState,
+  reducers: {
+    updateMessages: (state, action) => {
+      state.messages = action.payload;
+    },
+    // ... your other reducers
+  },
+});
+
+// On your backend (Node.js/Express example)
+app.post('/api/messages/mark-read', async (req, res) => {
+  try {
+    const { messageIds } = req.body;
+    
+    // Update messages in your database
+    await Message.updateMany(
+      { _id: { $in: messageIds } },
+      { $set: { isRead: true } }
+    );
+
+    // Emit socket event to notify other users
+    io.emit('messagesRead', { messageIds });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error marking messages as read:', error);
+    res.status(500).json({ error: 'Failed to mark messages as read' });
+  }
+});
+
+// In your socket setup, handle real-time updates
+socket.on('messagesRead', ({ messageIds }) => {
+  // Update local message state when other users read messages
+  const updatedMessages = messages.map(msg => 
+    messageIds.includes(msg._id)
+      ? { ...msg, isRead: true }
+      : msg
+  );
+  dispatch(updateMessages(updatedMessages));
+});
+
+
+
+
+
+// When receiving a new message
+socket.on('newMessage', (message) => {
+  const newMessage = {
+    ...message,
+    isRead: false // Set initial read status
+  };
+  dispatch(addMessage(newMessage));
+});
