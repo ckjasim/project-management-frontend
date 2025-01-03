@@ -100,7 +100,7 @@ const MeetingSheduleForm = ({meetings,setMeetings,setTeams ,teams}) => {
                           name="date"
                           type="date"
                           as={Input}
-                          className="mt-1 w-full px-4 py-3 rounded-xl border-slate-200 
+                          className=" w-full px-4 py-3 rounded-xl border-slate-200 
                                  bg-slate-50/99 focus:border-indigo-500 focus:ring-1 
                                  focus:ring-indigo-500 transition-all"
                         />
@@ -120,7 +120,7 @@ const MeetingSheduleForm = ({meetings,setMeetings,setTeams ,teams}) => {
                           name="time"
                           type="time"
                           as={Input}
-                          className="mt-1 w-full px-4 py-3 rounded-xl border-slate-200 
+                          className=" w-full px-4 py-3 rounded-xl border-slate-200 
                                  bg-slate-50/99 focus:border-indigo-500 focus:ring-1
                                  focus:ring-indigo-500 transition-all"
                         />
@@ -141,7 +141,7 @@ const MeetingSheduleForm = ({meetings,setMeetings,setTeams ,teams}) => {
                         name="duration"
                         as={Input}
                         placeholder="e.g., 30 mins, 1 hour"
-                        className="mt-1 w-full px-4 py-3 rounded-xl border-slate-200 
+                        className=" w-full px-4 py-3 rounded-xl border-slate-200 
                                bg-slate-50/50 focus:border-indigo-500 focus:ring-1 
                                focus:ring-indigo-500 transition-all placeholder:text-gray-400"
                       />
@@ -167,8 +167,8 @@ const MeetingSheduleForm = ({meetings,setMeetings,setTeams ,teams}) => {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 
-                             hover:from-indigo-700 hover:to-indigo-600 text-white font-medium 
+                      className="w-full bg-gradient-to-r from-indigo-500 to-teal-500 
+                             hover:from-indigo-700 hover:to-teal-600 text-white font-medium 
                              py-3 rounded-xl transition-all duration-200 shadow-lg 
                              shadow-indigo-500/20 hover:shadow-indigo-500/30
                              disabled:opacity-50 disabled:cursor-not-allowed"

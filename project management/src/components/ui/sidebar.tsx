@@ -93,12 +93,18 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full rounded-lg px-4 py-4 hidden md:flex md:flex-col bg-gradient-to-br  from-stone-900 via-stone-800 to-stone-800 dark:bg-neutral-800 w-[300px] flex-shrink-0",
+        "h-full rounded-lg px-4 py-4 hidden md:flex md:flex-col bg-gradient-to-br  from-teal-900 via-teal-800  to-teal-800 dark:bg-neutral-800 w-[300px] flex-shrink-0",
         className
       )}
       initial={{ width: "60px" }}
-      animate={{ width: animate ? (open ? "200px" : "60px") : "300px" }}
-      transition={{ duration: 0.3 }}
+      animate={{
+        width: animate ? (open ? "200px" : "60px") : "300px",
+      }}
+      transition={{
+        duration: 0.2,
+        ease: "easeInOut", 
+      }}
+      
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       {...props}

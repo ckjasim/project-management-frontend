@@ -65,19 +65,7 @@ const EmployeeLoginHero: React.FC = () => {
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-rose-50 p-4 py-32 overflow-hidden">
       <Toaster />
       <div className="w-full max-w-[1000px] flex rounded-3xl overflow-hidden bg-white shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] relative z-10">
-        {/* Left Side - Image */}
-        {/* <div className="hidden lg:block w-1/2 bg-gradient-to-br from-indigo-50 to-rose-50 p-12 relative">
-          <div className="h-full flex items-center justify-center">
-            <div className="relative w-full h-[400px]">
-              <img 
-                src={"/../../"}
-                alt="Login illustration"
-                className="rounded-2xl object-cover"
-              />
-            </div>
-          </div>
-          <BackgroundBeams className="absolute inset-0" />
-        </div> */}
+      
          <div className="  rounded-md bg-neutral-950 relative flex flex-col items-center justify-center antialiased">
       <div className="max-w-2xl  p-4">
         <h1 className="relative z-10 text-lg md:text-7xl  bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-600  text-center font-sans font-bold">
@@ -88,20 +76,14 @@ const EmployeeLoginHero: React.FC = () => {
       <BackgroundBeams />
     </div>
 
-        {/* Right Side - Form */}
         <div className="w-full lg:w-1/2 p-8 md:p-12">
-          <div className="text-right mb-8">
-            <span className="text-sm text-slate-600">Not a member? </span>
-            <Link to="/auth/employeeSignup" className="text-indigo-600 font-medium hover:text-indigo-700">
-              Register now
-            </Link>
-          </div>
+          
 
-          <div className="mb-10">
+          <div className="mb-10 mt-8">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-rose-500 bg-clip-text text-transparent mb-2">
               Hello Again!
             </h1>
-            <p className="text-slate-600">Welcome back you've been missed!</p>
+            <p className="text-slate-600">Join into a project now!</p>
           </div>
 
           <Formik
@@ -116,8 +98,8 @@ const EmployeeLoginHero: React.FC = () => {
                     name="email"
                     type="email"
                     as={Input}
-                    placeholder="Enter username"
-                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                    placeholder="Enter email"
+                    className="w-full px-4 py-3 rounded-xl border-indigo-200 bg-slate-90/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                   />
                   <ErrorMessage name="email" component="div" className="text-rose-500 text-sm" />
                 </div>
@@ -128,7 +110,7 @@ const EmployeeLoginHero: React.FC = () => {
                     type="password"
                     as={Input}
                     placeholder="Password"
-                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-90/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                   />
                   <ErrorMessage name="password" component="div" className="text-rose-500 text-sm" />
                 </div>
@@ -152,11 +134,7 @@ const EmployeeLoginHero: React.FC = () => {
                   Sign In
                 </button>
 
-                {/* <div className="relative flex items-center justify-center my-6">
-                  <div className="border-t border-slate-200 w-full"></div>
-                  <div className="absolute bg-white px-4 text-sm text-slate-500">Or continue with</div>
-                </div> */}
-
+        
                
                 <div className="text-center mt-6">
                   <p className="text-sm text-slate-600">

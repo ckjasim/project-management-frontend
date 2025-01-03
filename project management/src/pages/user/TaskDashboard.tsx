@@ -353,7 +353,7 @@ const TaskDashboard = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen py-10">
+    <div className="bg-gradient-to-br from-zinc-50 to-teal-50 min-h-screen py-10">
       <TaskDetailModal
         show={showDetail}
         onClose={() => setShowDetail(false)}
@@ -383,8 +383,8 @@ const TaskDashboard = () => {
                 key={team.id}
                 className={`px-4 py-2 rounded-full transition-all duration-300 ${
                   selectedTeam?.id === team.id
-                    ? 'bg-blue-500 text-white'
-                    : 'hover:bg-blue-100 text-gray-700'
+                    ? 'bg-gradient-to-br from-indigo-500 to-teal-500 text-white'
+                    : 'hover:bg-gradient-to-br from-indigo-100 to-teal-100 text-gray-700'
                 }`}
                 onClick={() => setSelectedTeam(team)}
               >
@@ -401,12 +401,12 @@ const TaskDashboard = () => {
           className="w-full p-6 bg-white rounded-xl shadow-md mb-6"
         >
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-gray-800">
+            <h2 className="text-gray-700 text-3xl font-semibold m-2">
               {selectedTeam?.name} Tasks
             </h2>
             <Button
               onClick={addTask}
-              className="bg-blue-500 text-white p-3 rounded-full hover:bg-blue-600 transition-colors shadow-lg"
+              className="bg-gradient-to-br from-indigo-600  to-teal-500 text-white p-3 rounded-full hover:bg-teal-700 transition-colors shadow-lg"
             >
               <Plus className="h-5 w-5" />
             </Button>

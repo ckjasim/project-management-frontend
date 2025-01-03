@@ -64,14 +64,16 @@ export function UserSignUpHero() {
       <Toaster />
       <div className="w-full max-w-[1000px] flex rounded-3xl overflow-hidden bg-white shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] relative z-10">
        
-        <div className="hidden lg:block w-1/2 rounded-md bg-neutral-950 relative flex flex-col items-center justify-center antialiased">
-          <div className="max-w-2xl p-4">
-            <h1 className="relative z-10 text-lg md:text-7xl bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-600 text-center font-sans font-bold">
-              Join us today
-            </h1>
-          </div>
-          <BackgroundBeams />
-        </div>
+      
+      <div className="  rounded-md bg-neutral-950 relative flex flex-col items-center justify-center antialiased">
+      <div className="max-w-2xl  p-6">
+        <h1 className="relative z-10 text-lg md:text-7xl  bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-600  text-center font-sans font-bold">
+          join us today!
+        </h1>
+       
+      </div>
+      <BackgroundBeams />
+    </div>
 
        
         <div className="w-full lg:w-1/2 p-8 md:p-12">
@@ -103,7 +105,7 @@ export function UserSignUpHero() {
                       type="text"
                       as={Input}
                       placeholder="First Name"
-                      className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                      className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-90/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                     />
                     <ErrorMessage name="firstName" component="div" className="text-rose-500 text-sm" />
                   </div>
@@ -113,7 +115,7 @@ export function UserSignUpHero() {
                       type="text"
                       as={Input}
                       placeholder="Last Name"
-                      className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                      className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-90/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                     />
                     <ErrorMessage name="lastName" component="div" className="text-rose-500 text-sm" />
                   </div>
@@ -125,7 +127,7 @@ export function UserSignUpHero() {
                     type="email"
                     as={Input}
                     placeholder="Email address"
-                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-90/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                   />
                   <ErrorMessage name="email" component="div" className="text-rose-500 text-sm" />
                 </div>
@@ -135,7 +137,7 @@ export function UserSignUpHero() {
                     type="organization"
                     as={Input}
                     placeholder="Organization"
-                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-90/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                   />
                   <ErrorMessage name="organization" component="div" className="text-rose-500 text-sm" />
                 </div>
@@ -146,7 +148,7 @@ export function UserSignUpHero() {
                     type="password"
                     as={Input}
                     placeholder="Password"
-                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-90/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                   />
                   <ErrorMessage name="password" component="div" className="text-rose-500 text-sm" />
                 </div>
@@ -157,7 +159,7 @@ export function UserSignUpHero() {
                     type="password"
                     as={Input}
                     placeholder="Confirm Password"
-                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-90/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                   />
                   <ErrorMessage name="confirmPassword" component="div" className="text-rose-500 text-sm" />
                 </div>

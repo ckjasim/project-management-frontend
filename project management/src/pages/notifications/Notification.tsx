@@ -42,7 +42,7 @@ export const NotificationsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-teal-50">
       <div className="container mx-auto px-4 py-6 max-w-3xl">
         <div className="flex items-center gap-2 mb-6">
           <Bell className="h-6 w-6 text-blue-600" />

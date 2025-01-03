@@ -26,7 +26,7 @@ const TeamList = () => {
   const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
   const [teamMembers, setTeamMembers] = useState([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
-  const [newMembers, setNewMembers] = useState<Employee[]>([]);
+  const [newMembers, setNewMembers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -83,7 +83,7 @@ const TeamList = () => {
   };
 
   return (
-    <div>
+    <div className="bg-gradient-to-br from-zinc-50 to-teal-50">
       <Modal
         showModal={showAddEmployeeModal}
         setShowModal={setShowAddEmployeeModal}
@@ -175,7 +175,7 @@ const TeamList = () => {
           )}
         </Formik>
       </Modal>
-      <Card className="w-full">
+      <Card className="w-full bg-gradient-to-br from-zinc-50 to-teal-50 p-6">
         <CardHeader className="flex flex-row justify-between">
           <div className="flex">
             <Button
@@ -189,7 +189,7 @@ const TeamList = () => {
           </div>
           <Button
             onClick={() => createNewTeam()}
-            className="flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors"
+            className="flex items-center gap-2 bg-gradient-to-br from-indigo-500  to-teal-500 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors"
           >
             <PlusCircle className="w-5 h-5" />
             Add a Member
@@ -202,16 +202,15 @@ const TeamList = () => {
                 key={index}
                 className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col items-center p-4"
               >
-                {/* Profile Image */}
-                <div className="relative">
+                
+                <div className="relative pt-8 ">
                   <img
                     src={employee.profileImage?.url || ''}
                     alt={`${employee.name || 'Employee'}'s Profile`}
-                    className="h-40 w-40 object-cover rounded-full shadow-lg"
+                    className="h-20 w-20 object-cover rounded-full shadow-lg"
                   />
                 </div>
 
-                {/* Employee Details */}
                 <div className="mt-4 text-center">
                   <h3 className="text-xl font-semibold">{employee?.name}</h3>
                   <p className="text-gray-500 font-medium">

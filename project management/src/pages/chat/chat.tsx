@@ -90,10 +90,10 @@ useEffect(() => {
   console.log(messages,'============================-----------')
 
   return (
-    <div className="flex h-screen">
+    <div className="flex justify-center h-screen  bg-gradient-to-br from-zinc-50 to-teal-50">
       <UserSideBar serverRef={socketRef} messages={messages} setMessages={setMessages} />
       <ChatArea serverRef={socketRef} messages={messages} setMessages={setMessages}/>
-      <DetailsSidebar attachments={attachments} members={members}  />
+      {/* <DetailsSidebar attachments={attachments} members={members}  /> */}
     </div>
   );
 };

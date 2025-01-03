@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 
-interface ItemsProps {
+interface ItemsProps { 
   id: UniqueIdentifier;
   title: string;
   description: string;

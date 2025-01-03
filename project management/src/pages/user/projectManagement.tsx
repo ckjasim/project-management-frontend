@@ -338,7 +338,7 @@ const ProjectDashboard: React.FC = () => {
     }
   };
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50  to-yellow-50 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-teal-50 p-8">
       <Modal
         showModal={showEditProjectModal}
         setShowModal={setShowEditProjectModal}
@@ -465,7 +465,7 @@ const ProjectDashboard: React.FC = () => {
           onSubmit={handleProjectSubmit}
         >
           {({ values, setFieldValue, isSubmitting }) => (
-            <Form className="bg-white rounded-xl p-8 w-full max-w-md mx-auto shadow-xl">
+            <Form className="bg-white rounded-xl p-8 w-full min-w-md mx-auto shadow-xl">
               <h1 className="text-2xl font-bold text-gray-800 mb-6">
                 Create Project
               </h1>
@@ -662,7 +662,7 @@ const ProjectDashboard: React.FC = () => {
       <div className="max-w-full mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Projects</h1>
+            <h1 className="text-gray-700 text-3xl font-semibold m-2">Projects</h1>
             <p className="text-gray-500 mt-1">
               Manage and track your team's projects
             </p>
@@ -671,7 +671,7 @@ const ProjectDashboard: React.FC = () => {
             onClick={() => {
               setShowAddProjectModal(true);
             }}
-            className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 bg-gradient-to-br from-indigo-500  to-teal-500 text-yellow-100 px-6 py-3 rounded-lg hover:bg-teal-900 transition-colors"
           >
             <PlusCircle className="w-5 h-5" />
             Create Project

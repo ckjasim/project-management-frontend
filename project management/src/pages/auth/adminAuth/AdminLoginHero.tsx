@@ -59,7 +59,6 @@ export function AdminLoginHero() {
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-50 p-4 py-32 overflow-hidden">
       <Toaster />
       <div className="w-full max-w-[1000px] flex rounded-3xl overflow-hidden bg-white shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] relative z-10">
-        {/* Left Side - Animated Background */}
         <div className="hidden lg:block w-1/2 rounded-md bg-neutral-950 relative flex flex-col items-center justify-center antialiased">
           <div className="max-w-2xl p-4">
             <h1 className="relative z-10 text-lg md:text-7xl bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-600 text-center font-sans font-bold">
@@ -68,8 +67,6 @@ export function AdminLoginHero() {
           </div>
           <BackgroundBeams />
         </div>
-
-        {/* Right Side - Form */}
         <div className="w-full lg:w-1/2 p-8 md:p-12">
           <div className="text-right mb-8">
             <span className="text-sm text-slate-600">Need help? </span>

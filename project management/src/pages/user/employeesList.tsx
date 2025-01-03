@@ -58,7 +58,7 @@ const EmployeePage = () => {
   };
   
   return (
-    <div>
+    <div className='bg-gradient-to-br from-zinc-50 to-teal-50'>
       <Modal showModal={showAddEmployeeModal} setShowModal={setShowAddEmployeeModal}>
   <Formik
     initialValues={{
@@ -124,7 +124,7 @@ const EmployeePage = () => {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            className="w-full py-3 bg-gradient-to-r from-indigo-500 to-teal-500 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
             {isSubmitting ? (
               <div className="flex items-center justify-center">
@@ -140,12 +140,12 @@ const EmployeePage = () => {
     )}
   </Formik>
 </Modal>
-<Card className="w-full">
+<Card className="w-full bg-gradient-to-br from-zinc-50 to-teal-50">
   <CardHeader className="flex flex-row justify-between">
-    <CardTitle>Employees</CardTitle>
+    <CardTitle className='text-gray-700 text-3xl font-semibold m-2'>Employees</CardTitle>
     <Button
       onClick={() => setShowAddEmployeeModal(true)}
-      className="flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors"
+      className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-teal-500 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors"
     >
       <PlusCircle className="w-5 h-5" />
       Add Employee
@@ -156,14 +156,14 @@ const EmployeePage = () => {
       {employees?.map((employee, index) => (
         <div
           key={index}
-          className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col items-center p-4"
+          className="bg-white  rounded-xl shadow-md overflow-hidden flex flex-col items-center p-4"
         >
           {/* Profile Image */}
-          <div className="relative">
+          <div className="relative  pt-8">
             <img
               src={employee.profileImage?.url || "https://via.placeholder.com/150"}
               alt={`${employee.name || "Employee"}'s Profile`}
-              className="h-40 w-40 object-cover rounded-full shadow-lg"
+              className="h-20 w-20 object-cover rounded-full shadow-lg"
             />
           </div>
 

@@ -43,7 +43,7 @@ const UserDashboard = () => {
   
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-teal-50 p-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         {/* Quick Stats Cards */}
         <Card className="bg-white">

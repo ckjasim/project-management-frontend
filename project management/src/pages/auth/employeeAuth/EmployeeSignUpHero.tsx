@@ -144,7 +144,7 @@ export function EmployeeSignUpHero() {
   return (
     <div>
       {token ? (
-        <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-rose-50 p-4 py-32 overflow-hidden">
+        <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-50 p-4 py-32 overflow-hidden">
           <Toaster />
           <div className="w-full max-w-[1000px] flex rounded-3xl overflow-hidden bg-white shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] relative z-10">
             {/* Left Side - Animation */}
@@ -258,7 +258,7 @@ export function EmployeeSignUpHero() {
                         type="text"
                         as={Input}
                         placeholder="Mobile Number"
-                        className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                        className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-90/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                       />
                       <ErrorMessage name="mobile" component="div" className="text-rose-500 text-sm" />
                     </div>
@@ -269,7 +269,7 @@ export function EmployeeSignUpHero() {
                         type="password"
                         as={Input}
                         placeholder="Password"
-                        className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                        className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-90/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                       />
                       <ErrorMessage name="password" component="div" className="text-rose-500 text-sm" />
                     </div>
@@ -280,7 +280,7 @@ export function EmployeeSignUpHero() {
                         type="password"
                         as={Input}
                         placeholder="Confirm Password"
-                        className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                        className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-90/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                       />
                       <ErrorMessage name="confirmPassword" component="div" className="text-rose-500 text-sm" />
                     </div>

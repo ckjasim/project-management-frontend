@@ -18,7 +18,6 @@ export function UserLoginHero() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const dispatch=useDispatch()
-  // const {userInfo} = useSelector((state: RootState) => state.Auth);
 
 
   const validationSchema = Yup.object({
@@ -70,7 +69,7 @@ export function UserLoginHero() {
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-rose-50 p-4 py-32 overflow-hidden">
  
       <div className="w-full max-w-[1000px] flex rounded-3xl overflow-hidden bg-white shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] relative z-10">
-        {/* Left Side - Animated Background */}
+
         <div className="  rounded-md bg-neutral-950 relative flex flex-col items-center justify-center antialiased">
       <div className="max-w-2xl  p-4">
         <h1 className="relative z-10 text-lg md:text-7xl  bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-600  text-center font-sans font-bold">
@@ -94,7 +93,7 @@ export function UserLoginHero() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-rose-500 bg-clip-text text-transparent mb-2">
               Hello Again!
             </h1>
-            <p className="text-slate-600">Welcome back you've been missed!</p>
+            <p className="text-slate-600">Manage your project now!</p>
           </div>
 
           <Formik
@@ -110,7 +109,7 @@ export function UserLoginHero() {
                     type="email"
                     as={Input}
                     placeholder="Enter username"
-                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-90/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                   />
                   <ErrorMessage name="email" component="div" className="text-rose-500 text-sm" />
                 </div>
@@ -121,7 +120,7 @@ export function UserLoginHero() {
                     type="password"
                     as={Input}
                     placeholder="Password"
-                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                    className="w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-90/50 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                   />
                   <ErrorMessage name="password" component="div" className="text-rose-500 text-sm" />
                 </div>

@@ -159,7 +159,7 @@ const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef, messages,setMessag
   };
 
   return (
-    <Card className="h-full flex flex-col rounded-3xl shadow-lg">
+    <Card className="my-5 flex flex-col rounded-l-3xl shadow-lg">
       <CardHeader className="px-4 pt-6 rounded-t-3xl">
         <CardTitle className="text-gray-700 text-2xl m-4">Chats</CardTitle>
         <div className="flex items-center mt-5">
@@ -177,7 +177,7 @@ const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef, messages,setMessag
         {filteredChats.map((chat) => (
           <div
             key={chat._id}
-            className={`bg-white p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer mb-1 ${
+            className={`bg-white p-4  rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer mb-1 ${
               !chat.isRead ? 'bg-blue-50' : ''
             }`}
             onClick={() => handleItemClick(chat._id, chat.type, chat.name, chat.url)}

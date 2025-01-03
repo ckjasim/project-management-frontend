@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import {  useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-
 import { checkPremiumApi, logoutApi } from '@/services/api/authApi';
 import { useToast } from '@/components/hooks/use-toast';
 import { useSelector } from 'react-redux';
@@ -11,7 +9,6 @@ import { RootState } from '@/redux/store';
 import {
   BellRing,
   CalendarClock,
-  FolderTree,
   Group,
   LayoutDashboard,
   LogOut,
@@ -54,9 +51,6 @@ useEffect(() => {
       console.error('Logout failed:', error);
     }
   };
-  const googleAuth = () => {
-    window.location.href = 'http://localhost:3000/drive';
-  };
 
   const links = [
     {
@@ -94,13 +88,6 @@ useEffect(() => {
         <CalendarClock className="text-yellow-100 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
       ),
     },
-    // isPremium && {
-    //   label: 'Files',
-    //   onClick: googleAuth,
-    //   icon: (
-    //     <FolderTree className="text-yellow-100 dark:text-neutral-200 h-6 w-6 flex-shrink-0" />
-    //   ),
-    // },
     {
       label: 'Employees',
       href: '/user/employees',
@@ -116,15 +103,12 @@ useEffect(() => {
       ),
     },
   ];
-  const handleUpgrade = () => {
-    // Add your premium upgrade logic here
-    console.log('Upgrading to premium');
-  };
+
 
   return (
     <div
       className={cn(
-        ' p-3 flex flex-col md:flex-row bg-gray-50 dark:bg-neutral-800  overflow-hidden',
+        ' p-3 flex flex-col md:flex-row bg-gradient-to-br from-zinc-50 to-zinc-50 dark:bg-neutral-800  overflow-hidden',
         'h-screen'
       )}
     >
@@ -155,7 +139,6 @@ useEffect(() => {
                 href: '/user/premium',
                 icon: (
                   <div
-                    // onClick={handleUpgrade}
                     className="p-2 bg-gradient-to-r from-amber-200 to-yellow-400 hover:from-amber-300 hover:to-yellow-500 text-black font-medium flex items-center justify-center rounded-lg"
                   >
                     <Sparkles className="h-4 w-4" />
@@ -163,21 +146,18 @@ useEffect(() => {
                 ),
               }}
             /> )}
-            
+          <SidebarLink
+  link={{
+    label: `${userInfo?.name || 'User'}`,
+    href: '#',
+    icon: (
+      <div className="h-7 w-7 flex-shrink-0 rounded-full bg-teal-500 text-white flex items-center justify-center">
+        {userInfo?.name?.charAt(0).toUpperCase() || 'U'}
+      </div>
+    ),
+  }}
+/>
 
-            <SidebarLink
-              link={{
-                label: `${userInfo?.name}`,
-                href: '#',
-                icon: (
-                  <img
-                    src=""
-                    className="h-7 w-7 flex-shrink-0 rounded-full"
-                    alt="Avatar"
-                  />
-                ),
-              }}
-            />
           </div>
         </SidebarBody>
       </Sidebar>

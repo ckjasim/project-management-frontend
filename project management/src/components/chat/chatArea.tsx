@@ -162,7 +162,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         <div
           className={`py-2 px-2 rounded-lg max-w-[70%] min-w-[200px] shadow-sm ${
             msg.senderId === userInfo?._id
-              ? 'bg-emerald-300 text-gray-800 rounded-br-none'
+              ? 'bg-teal-200 text-gray-800 rounded-br-none'
               : 'bg-gray-100 text-gray-800 rounded-bl-none'
           }`}
         >
@@ -188,10 +188,10 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   };
 
   return (
-    <div className="flex h-screen w-full max-w-4xl mx-auto bg-gray-100">
-      <div className="flex-1 p-8">
-        <Card className="h-full flex flex-col rounded-3xl shadow-lg">
-          <CardHeader className="bg-emerald-600 text-white p-6 rounded-t-3xl">
+    <div className="flex h-screen w-full max-w-4xl  bg-gradient-to-br from-zinc-50 to-teal-50">
+      <div className="flex-1 py-5 ">
+        <Card className="h-full flex flex-col rounded-r-3xl shadow-lg">
+          <CardHeader className="bg-teal-700 text-white p-6 rounded-tr-3xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <Avatar className="mr-4">
@@ -215,14 +215,14 @@ const ChatArea: React.FC<ChatAreaProps> = ({
             <div ref={messageEndRef} />
           </CardContent>
 
-          <CardFooter className="bg-gray-100 p-4 rounded-b-3xl w-full">
+          <CardFooter className="bg-gray-100 p-4 rounded-br-3xl w-full">
             <div className="flex items-center border rounded-full px-4 py-2 w-full">
               <Input
                 type="text"
                 placeholder={`Message${
                   chatMode === 'group' ? '' : ` ${name || 'Select a recipient'}`
                 }`}
-                className="flex-1 focus:outline-none"
+                className="flex-1 focus:outline-none w-[670px]"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
@@ -243,14 +243,14 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                   (chatMode === 'private' && !currentRoom)
                 }
               >
-                <SendHorizontal className="text-xl text-blue-500" />
+                <SendHorizontal className="text-xl text-teal-400" />
               </Button>
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 className="rounded-full ml-2 bg-slate-100"
                 disabled={chatMode === 'private' && !currentRoom}
               >
-                <Image className="text-xl text-blue-500" />
+                <Image className="text-xl text-teal-400" />
               </Button>
             </div>
           </CardFooter>

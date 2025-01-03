@@ -128,25 +128,25 @@ const MeetingScheduler = () => {
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-lg text-gray-800">{meeting.title}</h3>
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium px-3 py-1 bg-indigo-100 
-                       text-indigo-700 rounded-full">
+          <span className="text-sm font-medium px-3 py-1 bg-teal-50 
+                       text-teal-700 rounded-full">
             {meeting.duration}
           </span>
           {userInfo.role === 'project manager' && (
             <div className="flex gap-2">
               <button
                 onClick={() => editMeeting(meeting)}
-                className="p-1 text-blue-600 hover:text-blue-800 transition-colors"
+                className="p-1 text-teal-600 hover:text-teal-800 transition-colors"
               >
                 <Edit className="w-4 h-4" />
               </button>
              { dltLoading ? (
                     <div className="flex justify-center items-center h-32">
-                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-500" />
+                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-teal-500" />
                     </div>
                   ):( <button
                     onClick={() => deleteMeeting(meeting._id)}
-                    className="p-1 text-red-600 hover:text-red-800 transition-colors"
+                    className="p-1 text-red-500 hover:text-red-600 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>)}
@@ -175,7 +175,7 @@ const MeetingScheduler = () => {
         {!isBacklog && (
           <button
             onClick={() => joinMeet(meeting.meetingLink)}
-            className="w-full mt-2 bg-indigo-50 text-indigo-600 py-2 rounded-lg
+            className="w-full mt-2 bg-teal-50 text-teal-600 py-2 rounded-lg
                   hover:bg-indigo-100 transition-colors"
           >
             Join Meeting
@@ -184,7 +184,7 @@ const MeetingScheduler = () => {
         {isBacklog && (
           <button
             onClick={() => editMeeting(meeting)}
-            className="w-full mt-2 flex items-center justify-center gap-2 bg-red-500 text-white font-semibold py-2 px-4 rounded-lg 
+            className="w-full mt-2 flex items-center justify-center gap-2 bg-gradient-to-r from-rose-500 to-rose-600 text-white font-semibold py-2 px-4 rounded-lg 
              shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 transition-all duration-200"
           >
             <RefreshCw className="w-5 h-5" />
@@ -196,7 +196,7 @@ const MeetingScheduler = () => {
   );
 
   return (
-    <div className="mx-auto p-9 px-9">
+    <div className="mx-auto p-9 px-9 bg-gradient-to-br from-zinc-50 to-teal-50">
       <RescheduleModal
         isOpen={isRescheduleModalOpen}
         onClose={() => {
@@ -211,7 +211,7 @@ const MeetingScheduler = () => {
       />
       
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-2">Meetings</h1>
+        <h1 className="text-gray-700 text-3xl font-semibold m-2">Meetings</h1>
         <p className="text-gray-500 text-lg">
           Schedule and manage your team meetings
         </p>
@@ -221,7 +221,7 @@ const MeetingScheduler = () => {
         {userInfo.role === 'project manager' && (
           <Card className="bg-white shadow-xl shadow-indigo-100/20">
             <CardHeader className="pb-4">
-              <CardTitle className="text-2xl font-bold flex items-center gap-2">
+              <CardTitle className="text-2xl font-semibold flex items-center gap-2">
                 <Video className="w-6 h-6 text-indigo-500" />
                 Schedule Meeting
               </CardTitle>
@@ -239,7 +239,7 @@ const MeetingScheduler = () => {
 
         <Card className="bg-white shadow-xl shadow-indigo-100/20">
           <CardHeader className="pb-4">
-            <CardTitle className="text-2xl font-bold flex items-center gap-2">
+            <CardTitle className="text-2xl font-semibold flex items-center gap-2">
               <CalendarIcon className="w-6 h-6 text-indigo-500" />
               Upcoming Meetings
             </CardTitle>
@@ -267,7 +267,7 @@ const MeetingScheduler = () => {
         {userInfo.role === 'project manager' && (
           <Card className="bg-white shadow-xl shadow-indigo-100/20">
             <CardHeader className="pb-4">
-              <CardTitle className="text-2xl font-bold flex items-center gap-2">
+              <CardTitle className="text-2xl font-semibold flex items-center gap-2">
                 <CalendarIcon className="w-6 h-6 text-indigo-500" />
                 Backlog Meetings
               </CardTitle>
