@@ -63,6 +63,7 @@ const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef, messages,setMessag
           }));
         } else if (userInfo?.role === 'employee') {
           const teamResponse = await getTeamByEmployeeApi();
+          console.log(teamResponse)
           teams = teamResponse?.teams.map((team: { name: any; _id: any }) => ({
             name: team.name,
             _id: team._id,
