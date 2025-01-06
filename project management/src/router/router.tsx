@@ -35,8 +35,21 @@ import PaymentSuccess from '@/pages/user/paymentSucess';
 import PaymentFailure from '@/pages/user/paymentFailure';
 import { NotificationsPage } from '@/pages/notifications/Notification';
 import DriveIntegration from '@/pages/files/fileManagement';
+import Home from '@/pages/landing/home';
 
 const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <AuthLayout />,
+    children: [
+      { path: '', element: <Home/> },
+      { path: 'userSignup', element: <UserSignUpHero /> },
+      { path: 'employeeSignup', element: <EmployeeSignUpHero /> },
+      { path: 'employeeLogin', element: <EmployeeLoginHero /> },
+      { path: 'adminLogin', element: <AdminLoginHero /> },
+      { path: 'otp', element: <InputOTPForm /> },
+    ],
+  },
   {
     path: '/auth',
     element: <AuthLayout />,
