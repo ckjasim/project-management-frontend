@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
-const plugin = require("tailwindcss/plugin");
+
+import plugin from "tailwindcss/plugin"
 
 const addVariablesForColors = plugin(function ({ addBase, theme }) {
   const flattenColorPalette = require("tailwindcss/lib/util/flattenColorPalette").default;
