@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Users, Briefcase, Clock, Calendar, ArrowUp, ArrowDown, Activity, DollarSign, CheckCircle, AlertCircle } from 'lucide-react';
+import  {  useState } from 'react';
+import { LineChart, Line,   XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Users, Briefcase, Clock,  ArrowUp, ArrowDown,  DollarSign,  AlertCircle } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { useNotificationService } from '@/services/notificationService';
 
@@ -177,7 +177,7 @@ const UserDashboard = () => {
               paddingAngle={5}
               dataKey="value"
             >
-              {projectStatus.map((entry, index) => (
+              {projectStatus.map((_, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index]} />
               ))}
             </Pie>

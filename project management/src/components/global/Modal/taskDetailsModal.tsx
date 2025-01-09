@@ -31,22 +31,6 @@ import { ErrorMessage, Field, Form, Formik } from 'formik';
 import { Input } from '@/components/ui/input';
 import { EmployeeSelect, PrioritySelect } from '@/components/ui/select';
 
-const getPriorityColor = (priority: string) => {
-  switch (priority.toLowerCase()) {
-    case 'high':
-      return 'bg-red-100 text-red-800';
-    case 'medium':
-      return 'bg-yellow-100 text-yellow-800';
-    case 'low':
-      return 'bg-green-100 text-green-800';
-    default:
-      return 'bg-gray-100 text-gray-800';
-  }
-};
-
-const formatDate = (date: string) => {
-  return format(new Date(date), 'MMM d, yyyy');
-};
 
 const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   show,
@@ -57,7 +41,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
 }) => {
   const [newComment, setNewComment] = useState('');
   const { userInfo } = useSelector((state: RootState) => state.Auth);
-  const [isDeleting, setIsDeleting] = useState(false);
+  // const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [teamMembers, setTeamMembers] = useState([]);
@@ -98,14 +82,14 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
 
   const onDelete = async () => {
 
-      setIsDeleting(true);
+      // setIsDeleting(true);
       try {
         await deleteTaskApi(task.id);
         // You might want to trigger a refresh of the task list here
       } catch (error) {
         console.error('Error deleting task:', error);
       } finally {
-        setIsDeleting(false);
+        // setIsDeleting(false);
       }
   
   };
@@ -166,7 +150,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                       {task.title}
                     </h2>
                     <Badge
-                      variant={task.priority.toLowerCase()}
+                      
                       className="capitalize"
                     >
                       {task.priority}
@@ -187,7 +171,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                         {format(new Date(task.dueDate), 'MMM d, yyyy')}
                       </span>
                       {isOverdue && (
-                        <Badge variant="destructive" className="ml-2">
+                        <Badge  className="ml-2">
                           <AlertCircle className="h-3 w-3 mr-1" />
                           Overdue
                         </Badge>

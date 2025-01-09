@@ -46,7 +46,8 @@ export interface PriorityLevel {
   color: string;
 }
 export interface Message {
-  id: string;
+  _id?: any;
+  id?: string;
   senderId: string;
   senderName: string;
   content: string;
@@ -116,7 +117,10 @@ export interface IFile {
 export interface Employee {
   _id: string;
   name: string;
-  jobRole: string;
+  email?: string;
+  jobRole?: string;
+  mobile?: string;
+  profileImage?: { url: string };
 }
 
 export interface Team {
@@ -137,11 +141,11 @@ export interface Project {
 }
 
 export interface ProjectFormValues {
-  title: string;
-  description: string;
-  dueDate: string;
-  teams?: [];
-  priority: string;
+  title?: string;
+  description?: string;
+  dueDate?: string;
+  teams?: any;
+  priority?: string;
 }
 
 export interface TeamFormValues {
@@ -156,10 +160,11 @@ export interface Attachment {
 }
 
 export interface Comment {
+  createdAt: string | number | Date;
   _id: string;
-  author: string;
+  author: any;
   content: string;
-  timestamp: string;
+  timestamp?: string;
 }
 
 export interface TaskDetailModalProps {
@@ -176,7 +181,7 @@ export interface TaskDetailModalProps {
     members: string[];
     status: string;
     comments?: Comment[];
-  } | null;
+  } 
   selectedTeam:any;
   onAddComment?: (comment: string) => void;
 }

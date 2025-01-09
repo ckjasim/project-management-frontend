@@ -1,7 +1,21 @@
 import React from 'react';
-import { Headphones, Shield, Layout, Share2, DollarSign, Maximize } from 'lucide-react';
-
-const FeatureCard = ({ icon: Icon, title, description, bgColor, iconColor, learnMore = true }) => (
+import { Headphones, Shield, Layout, Share2, DollarSign, Maximize, LucideIcon } from 'lucide-react';
+interface Feature {
+  icon: LucideIcon; // Type for Lucide icons
+  title: string;
+  description: string;
+  bgColor: string;
+  iconColor: string;
+}
+interface FeatureCardProps {
+  icon: LucideIcon; // Type for Lucide icons
+  title: string;
+  description: string;
+  bgColor: string;
+  iconColor: string;
+  learnMore?: boolean; // Optional prop
+}
+const FeatureCard: React.FC<FeatureCardProps>  = ({ icon: Icon, title, description, bgColor, iconColor, learnMore = true }) => (
   <div className={`p-8 rounded-2xl ${bgColor}`}>
     <div className={`w-12 h-12 rounded-full border-2 ${iconColor} flex items-center justify-center mb-6`}>
       <Icon className={iconColor.replace('border-', 'text-')} size={24} />
@@ -20,7 +34,7 @@ const FeatureCard = ({ icon: Icon, title, description, bgColor, iconColor, learn
 );
 
 const FeaturesSection = () => {
-  const features = [
+  const features : Feature[] = [
     {
       icon: Headphones,
       title: "24/7 Support",

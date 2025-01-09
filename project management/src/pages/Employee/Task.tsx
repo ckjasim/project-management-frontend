@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import {
   DndContext,
   DragEndEvent,
@@ -15,7 +15,7 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
-import { Filter, Loader2, Search, SortAsc, SortDesc } from 'lucide-react';
+import { Filter,  Search, SortAsc, SortDesc } from 'lucide-react';
 import Container from '@/components/global/Container/Container';
 import Items from '@/components/global/Items/Item';
 
@@ -26,7 +26,7 @@ import {
 } from '@/services/api/taskApi';
 import { useParams } from 'react-router-dom';
 import TaskDetailModal from '@/components/global/Modal/taskDetailsModal';
-import { DNDType, TaskItem, TaskType } from '@/types';
+import { DNDType, TaskItem  } from '@/types';
 import { motion } from 'framer-motion';
 
 const CONTAINER_IDS = {
@@ -59,7 +59,7 @@ export const TaskManagement = () => {
   const [selectedPriority, setSelectedPriority] = useState<string>('');
   const [selectedAssignee, setSelectedAssignee] = useState<string>('');
   const [assigneesList, setAssigneesList] = useState<string[]>([]);
-  const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
+  const [selectedTask, setSelectedTask] = useState<any>(null);
 const [options,setOptions]=useState(false)
   const [sortConfig, setSortConfig] = useState<{
     key: keyof TaskItem;
@@ -193,10 +193,10 @@ const [options,setOptions]=useState(false)
 
   const handleSort = (key: keyof TaskItem) => {
     setSortConfig((currentSort) => {
-      const newDirection =
-        currentSort?.key === key && currentSort.direction === 'asc'
-          ? 'desc'
-          : 'asc';
+      const newDirection: "asc" | "desc" =
+        currentSort?.key === key && currentSort.direction === "asc"
+          ? "desc"
+          : "asc";
 
       const newSort = { key, direction: newDirection };
 
@@ -295,12 +295,12 @@ const handleOptions = ()=>{
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
-      <TaskDetailModal
+    <TaskDetailModal
         show={showDetail}
         onClose={() => setShowDetail(false)}
-        task={selectedTask}
-        onAddComment={handleAddComment}
-      />
+        task={selectedTask || { id: '', title: '', description: '', priority: '', assignedTo: '', dueDate: '', attachments: [], members: [], status: '' }}
+        onAddComment={handleAddComment} selectedTeam={undefined}/>
+
       <div className="flex flex-col gap-6 mb-8">
         <div className='flex justify-between'>
         <h1 className="text-3xl font-bold text-gray-900">Task Management</h1>
@@ -422,7 +422,7 @@ const handleOptions = ()=>{
                           setShowDetail(true);
                         }}
                       >
-                        <Items key={item.id} {...item} />
+                        <Items selectedTeam={undefined} key={item.id} {...item} />
                       </motion.div>
                     ))}
                   </div>
@@ -433,17 +433,14 @@ const handleOptions = ()=>{
           <DragOverlay>
             {activeId && (
               <Items
-                id={activeId}
-                title={
-                  containers
+                  id={activeId}
+                  title={containers
                     .flatMap((c) => c.items)
-                    .find((item) => item.id === activeId)?.title || ''
-                }
-                description=""
-                dueDate=""
-                assignedTo={''}
-                priority={''}
-              />
+                    .find((item) => item.id === activeId)?.title || ''}
+                  description=""
+                  dueDate=""
+                  assignedTo={''}
+                  priority={''} selectedTeam={undefined}              />
             )}
           </DragOverlay>
         </DndContext>

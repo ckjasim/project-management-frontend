@@ -48,9 +48,9 @@ const getPriorityBadge = (priority: string) => {
 
 export const ProjectCard: React.FC<{
   project: Project;
-  setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
-  setShowEditProjectModal: React.Dispatch<React.SetStateAction<boolean>>;
-  setCurrentProject: React.Dispatch<React.SetStateAction<Project | undefined>>;
+  setProjects?: React.Dispatch<React.SetStateAction<Project[]>>;
+  setShowEditProjectModal?: React.Dispatch<React.SetStateAction<boolean>>;
+  setCurrentProject?: React.Dispatch<React.SetStateAction<Project | undefined>>;
 }> = ({ project, setProjects, setShowEditProjectModal, setCurrentProject }) => {
   const navigate = useNavigate();
   const [showOptions, setShowOptions] = useState(false);
@@ -101,7 +101,7 @@ export const ProjectCard: React.FC<{
     try {
       const res = await deleteProjectApi(project._id);
       if (res) {
-        setProjects((prev) => prev.filter((prj) => prj._id !== project._id));
+        setProjects?.((prev) => prev.filter((prj) => prj._id !== project._id));
       } else {
         console.error('Error deleting project:', res.message);
       }
@@ -162,9 +162,9 @@ export const ProjectCard: React.FC<{
                       className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setCurrentProject(project);
+                        setCurrentProject?.(project);
                         setShowOptions(false);
-                        setShowEditProjectModal(true);
+                        setShowEditProjectModal?.(true);
                       }}
                     >
                       <span className="flex-1 text-left">Edit Project</span>

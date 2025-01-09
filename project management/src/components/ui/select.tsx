@@ -1,21 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-const cn = (...classes: string[]) => classes.filter(Boolean).join(' ');
+const cn = (...classes: any[]) => classes.filter(Boolean).join(' ');
 
 interface Option {
-  value: string;
+  value?: any;
   label: string;
   color?: string;
-  className?: string;
+  className?: any;
 }
 
 interface CustomSelectProps {
-  value: string;
-  onValueChange: (value: string) => void;
+  value: any ;
+  onValueChange: any;
   placeholder: string;
   options: Option[];
-  renderOption?: (option: Option) => React.ReactNode;
-  className?: string;
+  renderOption?: any;
+  className?: any;
 }
 
 const CustomSelect: React.FC<CustomSelectProps> = ({ 

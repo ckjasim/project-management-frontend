@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 
 import { Link, useNavigate } from "react-router-dom";
-import axios, { AxiosError } from "axios";
+import  { AxiosError } from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Toaster } from "@/components/ui/toaster";

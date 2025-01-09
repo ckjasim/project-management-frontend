@@ -1,7 +1,5 @@
-import { SetStateAction, useEffect, useState } from 'react';
+import {  useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import {
   Calendar as CalendarIcon,
   Clock,
@@ -15,19 +13,36 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { RescheduleModal } from '@/components/global/Modal/RescheduleModal';
-import { createMeetingApi, getMeetingsApi, updateMeetingApi, deleteMeetingApi } from '@/services/api/meetingApi';
+import {
+  getMeetingsApi,
+  deleteMeetingApi,
+} from '@/services/api/meetingApi';
 import MeetingSheduleForm from '@/components/global/Forms/meetingSheduleForm';
+
+type Meeting = {
+  _id: string;
+  title: string;
+  date: string;
+  time: string;
+  duration: string;
+  teams: { name: string }[];
+  meetingLink: string;
+};
+
+type Team = {
+  name: string;
+};
 
 const MeetingScheduler = () => {
   const { userInfo } = useSelector((state: RootState) => state.Auth);
-  const [teams, setTeams] = useState([]);
-  const [meetings, setMeetings] = useState([]);
-  const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
-  const [selectedMeeting, setSelectedMeeting] = useState(null);
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [meetings, setMeetings] = useState<Meeting[]>([]);
+  const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState<boolean>(false);
+  const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
+  // const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [dltLoading, setDltLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [dltLoading, setDltLoading] = useState<boolean>(false);
 
   useEffect(() => {
     setLoading(true);
@@ -37,16 +52,14 @@ const MeetingScheduler = () => {
         setMeetings(res.meetings || []);
       } catch (error) {
         console.error('Failed to fetch meetings:', error);
-      }finally{
+      } finally {
         setLoading(false);
       }
     };
     fetchMeetings();
-  
-
   }, []);
 
-  const formatDate = (date: string | number | Date) => {
+  const formatDate = (date: string | number | Date): string => {
     return new Date(date).toLocaleDateString('en-GB', {
       day: '2-digit',
       month: '2-digit',
@@ -54,7 +67,7 @@ const MeetingScheduler = () => {
     });
   };
 
-  const isBacklogMeeting = (date: string | number | Date) => {
+  const isBacklogMeeting = (date: string | number | Date): boolean => {
     const meetingDate = new Date(date);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -68,31 +81,29 @@ const MeetingScheduler = () => {
     isBacklogMeeting(meeting.date)
   );
 
-  const joinMeet = (meetLink: any) => {
+  const joinMeet = (meetLink: string): void => {
     navigate(`join${meetLink}`);
   };
 
-  const editMeeting = (meeting: SetStateAction<null>) => {
+  const editMeeting = (meeting: Meeting | null): void => {
     setSelectedMeeting(meeting);
-    setIsEditMode(true);
+    // setIsEditMode(true);
     setIsRescheduleModalOpen(true);
   };
 
-  const deleteMeeting = async (meetingId: any) => {
-      try {
-        setDltLoading(true)
-        await deleteMeetingApi(meetingId);
-        setMeetings(meetings.filter(m => m._id !== meetingId));
-      } catch (error) {
-        console.error('Failed to delete meeting:', error);
-      }finally{
-        setDltLoading(false)
-
-      }
-  
+  const deleteMeeting = async (meetingId: string): Promise<void> => {
+    try {
+      setDltLoading(true);
+      await deleteMeetingApi(meetingId);
+      setMeetings(meetings.filter((m) => m._id !== meetingId));
+    } catch (error) {
+      console.error('Failed to delete meeting:', error);
+    } finally {
+      setDltLoading(false);
+    }
   };
 
-  const handleReschedule = async (newDate: any, newTime: any) => {
+  const handleReschedule = async (newDate: string, newTime: string): Promise<void> => {
     if (!selectedMeeting || !newDate || !newTime) return;
 
     const updatedMeeting = {
@@ -105,7 +116,7 @@ const MeetingScheduler = () => {
     };
 
     try {
-      await updateMeetingApi(updatedMeeting);
+      // await updateMeetingApi(updatedMeeting);
       setMeetings(
         meetings.map((m) => (m._id === selectedMeeting._id ? updatedMeeting : m))
       );
@@ -115,10 +126,16 @@ const MeetingScheduler = () => {
 
     setIsRescheduleModalOpen(false);
     setSelectedMeeting(null);
-    setIsEditMode(false);
+    // setIsEditMode(false);
   };
 
-  const MeetingCard = ({ meeting, isBacklog }) => (
+  const MeetingCard = ({
+    meeting,
+    isBacklog,
+  }: {
+    meeting: Meeting;
+    isBacklog: boolean;
+  }) => (
     <div
       key={meeting._id}
       className="p-4 border border-slate-200 rounded-xl space-y-3 
@@ -140,17 +157,18 @@ const MeetingScheduler = () => {
               >
                 <Edit className="w-4 h-4" />
               </button>
-             { dltLoading ? (
-                    <div className="flex justify-center items-center h-32">
-                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-teal-500" />
-                    </div>
-                  ):( <button
-                    onClick={() => deleteMeeting(meeting._id)}
-                    className="p-1 text-red-500 hover:text-red-600 transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>)}
-             
+              {dltLoading ? (
+                <div className="flex justify-center items-center h-32">
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-teal-500" />
+                </div>
+              ) : (
+                <button
+                  onClick={() => deleteMeeting(meeting._id)}
+                  className="p-1 text-red-500 hover:text-red-600 transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -168,7 +186,7 @@ const MeetingScheduler = () => {
 
       <div className="flex items-center text-sm text-gray-600">
         <Users className="w-4 h-4 mr-2 text-gray-400" />
-        {meeting.teams.map((team: { name: any; }) => team.name).join(', ')}
+        {meeting.teams.map((team) => team.name).join(', ')}
       </div>
 
       <div className="flex gap-2 mt-3">
@@ -201,13 +219,13 @@ const MeetingScheduler = () => {
         isOpen={isRescheduleModalOpen}
         onClose={() => {
           setIsRescheduleModalOpen(false);
-          setIsEditMode(false);
+          // setIsEditMode(false);
           setSelectedMeeting(null);
         }}
         onReschedule={handleReschedule}
         currentDate={selectedMeeting?.date?.split('T')[0] || ''}
         currentTime={selectedMeeting?.time || ''}
-        isEditMode={isEditMode}
+        // isEditMode={isEditMode}
       />
       
       <div className="mb-8">
@@ -227,10 +245,10 @@ const MeetingScheduler = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <MeetingSheduleForm 
-                meetings={meetings} 
-                setMeetings={setMeetings} 
-                setTeams={setTeams} 
+              <MeetingSheduleForm
+                meetings={meetings}
+                setMeetings={setMeetings}
+                setTeams={setTeams}
                 teams={teams}
               />
             </CardContent>
@@ -245,22 +263,24 @@ const MeetingScheduler = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-      {loading ? (
-                <div className="flex justify-center items-center h-32">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
-                </div>
-              ):( <div className="space-y-4">
-                {upcomingMeetings
-                  .sort((a, b) => new Date(a.date) - new Date(b.date))
-                  .map((meeting) => (
-                    <MeetingCard
-                      key={meeting._id}
-                      meeting={meeting}
-                      isBacklog={false}
-                    />
-                  ))}
-              </div>)}
-           
+            {loading ? (
+              <div className="flex justify-center items-center h-32">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+              </div>
+            ) : (
+              <div className="space-y-4">
+              {upcomingMeetings
+                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                .map((meeting) => (
+                  <MeetingCard
+                    key={meeting._id}
+                    meeting={meeting}
+                    isBacklog={false}
+                  />
+                ))}
+            </div>
+            
+            )}
           </CardContent>
         </Card>
 
@@ -273,23 +293,23 @@ const MeetingScheduler = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-            {loading ? (
+              {loading ? (
                 <div className="flex justify-center items-center h-32">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
                 </div>
-              ):( <div className="space-y-4">
-                {backlogMeetings
-                  .sort((a, b) => new Date(b.date) - new Date(a.date))
-                  .map((meeting) => (
-                    <MeetingCard
-                      key={meeting._id}
-                      meeting={meeting}
-                      isBacklog={true}
-                      
-                    />
-                  ))}
-              </div>)}
-             
+              ) : (
+                <div className="space-y-4">
+                  {backlogMeetings
+                    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                    .map((meeting) => (
+                      <MeetingCard
+                        key={meeting._id}
+                        meeting={meeting}
+                        isBacklog={true}
+                      />
+                    ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

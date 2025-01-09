@@ -142,9 +142,9 @@ const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef, messages,setMessag
     console.log(unreadMessages)
     try {
 
-      const res = await markMessagesAsReadApi(unreadMessages.map(msg => msg._id));
+    await markMessagesAsReadApi(unreadMessages.map(msg => msg._id));
       
-      // Update local messages state
+
       const updatedMessages = messages.map(msg => 
         unreadMessages.some(unread => unread._id === msg._id)
           ? { ...msg, isRead: true }
@@ -195,7 +195,7 @@ const UserSideBar: React.FC<UserSideBarProps> = ({ serverRef, messages,setMessag
                   />
                   <AvatarFallback>{chat.name.charAt(0)}</AvatarFallback>
                 </Avatar>
-                {chat?.unreadCount > 0 && (
+                {chat?.unreadCount && chat?.unreadCount > 0 && (
                   <div className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                     {chat.unreadCount}
                   </div>

@@ -1,4 +1,3 @@
-import React from 'react';
 
 const IntegrationSection = () => {
   // Tool icons with their positions along the circles

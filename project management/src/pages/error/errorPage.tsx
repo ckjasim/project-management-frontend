@@ -1,5 +1,4 @@
-import React from 'react';
-import { AlertOctagon, ArrowLeft, Home } from 'lucide-react';
+import { AlertOctagon, Home } from 'lucide-react';
 
 const ErrorPage = ({ 
   errorCode = '404', 

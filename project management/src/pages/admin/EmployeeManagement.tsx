@@ -1,12 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import ManagementTable from '@/components/table/table';
 
 import { employeeManageApi, getAllEmployeesApi } from '@/services/api/authApi';
 import { useToast } from '@/components/hooks/use-toast';
-
+type Employee = {
+  _id: string;
+  name: string;
+  email: string;
+  organization?: any;
+  jobRole: string;
+  createdAt: string;
+  isBlock: boolean;
+  dateJoined?: string;
+};
 const EmployeeManagement = () => {
   const { toast } = useToast();
-  const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -27,7 +36,7 @@ const EmployeeManagement = () => {
   const handleBlock = async (employeeId: string, email: string) => {
     try {
       setEmployees((prevEmployees) =>
-        prevEmployees.map((employee) =>
+        prevEmployees?.map((employee) =>
           employee._id === employeeId ? { ...employee, isBlock: !employee.isBlock } : employee
         )
       );

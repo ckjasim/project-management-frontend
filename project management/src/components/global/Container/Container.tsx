@@ -2,10 +2,11 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { UniqueIdentifier } from '@dnd-kit/core';
 
 interface ContainerProps {
-  id: string;
-  title: string;
+  id: UniqueIdentifier;
+  title: any;
   children: React.ReactNode;
   className?: string;
 }

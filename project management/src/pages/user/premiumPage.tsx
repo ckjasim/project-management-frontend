@@ -1,5 +1,4 @@
-import React from 'react';
-import { Check, Cloud, HardDrive, Shield, Zap, Lock, Gift } from 'lucide-react';
+import {  Cloud, HardDrive, Shield, Zap, Lock, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,

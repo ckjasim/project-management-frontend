@@ -1,13 +1,12 @@
 import { TeamSelect } from '@/components/project/teamSelect';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
-import React from 'react'
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import * as Yup from 'yup';
 import { createMeetingApi } from '@/services/api/meetingApi';
 
-const MeetingSheduleForm = ({meetings,setMeetings,setTeams ,teams}) => {
-    function randomID(len) {
+const MeetingSheduleForm:React.FC<any>= ({meetings,setMeetings,setTeams ,teams}) => {
+    function randomID(len: number) {
       let result = '';
       if (result) return result;
       var chars =
@@ -57,7 +56,7 @@ const MeetingSheduleForm = ({meetings,setMeetings,setTeams ,teams}) => {
                     }),
                     meetingLink,
                     teams: values.teams.map(
-                      (id) => teams.find((t) => t.id === id)?.id || ''
+                      (id) => teams.find((t: { id: any; }) => t.id === id)?.id || ''
                     ),
                     duration: values.duration,
                   };

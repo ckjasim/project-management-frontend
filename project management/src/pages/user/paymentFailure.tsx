@@ -1,5 +1,4 @@
-import React from 'react';
-import { XCircle, AlertCircle, ArrowRight, RefreshCcw, HelpCircle } from 'lucide-react';
+import { XCircle, ArrowRight, RefreshCcw, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 // import { Alert, AlertDescription } from '@/components/ui/alert';

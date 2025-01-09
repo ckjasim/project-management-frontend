@@ -34,7 +34,6 @@ import PremiumPage from '@/pages/user/premiumPage';
 import PaymentSuccess from '@/pages/user/paymentSucess';
 import PaymentFailure from '@/pages/user/paymentFailure';
 import { NotificationsPage } from '@/pages/notifications/Notification';
-import DriveIntegration from '@/pages/files/fileManagement';
 import Home from '@/pages/landing/home';
 
 const router = createBrowserRouter([
@@ -116,7 +115,6 @@ const router = createBrowserRouter([
       { path: 'success', element: <PaymentSuccess /> }, 
       { path: 'cancel', element: <PaymentFailure /> },  
       { path: 'notification', element: <NotificationsPage /> },  
-      { path: 'files', element: <DriveIntegration /> },  
 
     ],
   },

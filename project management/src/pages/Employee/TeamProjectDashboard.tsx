@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2, FolderPlus } from 'lucide-react';
 
-import { getAllProjectApi, getProjectByTeamApi } from '@/services/api/projectApi';
+import {
+  getProjectByTeamApi,
+} from '@/services/api/projectApi';
 import { ProjectCard } from '@/components/project/projectCard';
 import { Project } from '@/types';
 import { useNotificationService } from '@/services/notificationService';
@@ -16,7 +18,7 @@ const getProjectStatus = (
 };
 
 const TeamProjectDashboard: React.FC = () => {
-  useNotificationService()
+  useNotificationService();
   const [projects, setProjects] = useState<Project[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -24,10 +26,10 @@ const TeamProjectDashboard: React.FC = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        console.log('hjhjh')
+        console.log('hjhjh');
         setIsLoading(true);
         const res = await getProjectByTeamApi();
-        console.log(res)
+        console.log(res);
         const formattedProjects = res.projects.map((project: Project) => ({
           ...project,
           expiry: getProjectStatus(project.dueDate),
@@ -65,7 +67,6 @@ const TeamProjectDashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map((project) => (
               <ProjectCard
-              
                 key={project._id}
                 project={project}
                 setProjects={setProjects}

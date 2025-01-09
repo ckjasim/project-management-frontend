@@ -1,5 +1,5 @@
-// TaskModal.tsx
-import React from 'react';
+
+import React, { Dispatch, SetStateAction } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import Modal from './Modal';
@@ -17,7 +17,7 @@ interface TeamMember {
 
 interface TaskModalProps {
   showAddItemModal: boolean;
-  setShowAddItemModal: (show: boolean) => void;
+  setShowAddItemModal: Dispatch<SetStateAction<boolean>>;
   teamMembers: TeamMember[];
   priorityLevels: PriorityLevel[];
   onAddItem: (values: any) => void;
@@ -26,7 +26,7 @@ interface TaskModalProps {
 
 interface TaskModalProps {
   showAddItemModal: boolean;
-  setShowAddItemModal: (show: boolean) => void;
+  setShowAddItemModal: Dispatch<SetStateAction<boolean>>;
   teamMembers: TeamMember[];
   priorityLevels: PriorityLevel[];
   onAddItem: (values: any) => void;

@@ -32,7 +32,7 @@ export const createTeamApi = async (data: any) => {
     throw error;
   }
 }
-export const addTeamMemberApi = async (id:string,data: any) => {
+export const addTeamMemberApi = async (id:string | undefined,data: any) => {
   try {
     const response = await  baseURL.post('/project/project/addTeamMember',{id,data});
     const teams = response.data;

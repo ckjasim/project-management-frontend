@@ -118,10 +118,13 @@ useEffect(() => {
             {open ? <Logo /> : <LogoIcon />}
 
             <div className="mt-8 flex flex-col gap-2">
-              {links.map((link, idx) => (
-                <SidebarLink key={idx} link={link} />
-              ))}
-            </div>
+  {links
+    .filter((link): link is any => typeof link !== "boolean") // Filter out boolean values
+    .map((link, idx) => (
+      <SidebarLink key={idx} link={link} />
+    ))}
+</div>
+
           </div>
           <div>
             <SidebarLink

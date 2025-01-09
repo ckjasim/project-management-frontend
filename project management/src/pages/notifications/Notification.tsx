@@ -1,6 +1,6 @@
 import { RootState } from '@/redux/store';
 import { deleteNotificationApi, getNotification } from '@/services/api/notificationApi';
-import { Bell, Trash2, Calendar, User, CheckCircle2 } from 'lucide-react';
+import { Bell, Trash2, User, CheckCircle2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Card, CardContent } from '@/components/ui/card';

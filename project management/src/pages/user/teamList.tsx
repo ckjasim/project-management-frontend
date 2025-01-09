@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeftIcon, Loader2, PlusCircle, Users } from 'lucide-react';
+import { ArrowLeftIcon, PlusCircle, Users } from 'lucide-react';
 import Modal from '@/components/global/Modal/Modal';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
@@ -10,9 +10,9 @@ import {
   getTeamMembersByTeamIdApi,
 } from '@/services/api/projectApi';
 import { getEmployeesByOrganizationApi } from '@/services/api/authApi';
-import { useToast } from '@/components/hooks/use-toast';
+// import { useToast } from '@/components/hooks/use-toast';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Employee, TeamFormValues } from '@/types';
+import { Employee } from '@/types';
 
 const teamValidationSchema = Yup.object().shape({
   employees: Yup.array()
@@ -21,10 +21,10 @@ const teamValidationSchema = Yup.object().shape({
 });
 
 const TeamList = () => {
-  const { toast } = useToast();
+
   const { id: id } = useParams();
   const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
-  const [teamMembers, setTeamMembers] = useState([]);
+  const [teamMembers, setTeamMembers] = useState<Employee[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [newMembers, setNewMembers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,7 +43,7 @@ const TeamList = () => {
 
   const handleTeamSubmit = async (
     values: any,
-    { setSubmitting, setFieldValue }: any
+    { setSubmitting }: any
   ) => {
     try {
       console.log(values);
@@ -131,7 +131,7 @@ const TeamList = () => {
                     Team Members
                   </label>
 
-                  {newMembers.length > 0 ? (
+                  {!isLoading && newMembers.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {newMembers.map((employee) => (
                         <div

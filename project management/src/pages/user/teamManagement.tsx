@@ -55,7 +55,7 @@ const TeamDashboard: React.FC = () => {
     setIsLoading(true);
     try {
       const res = await getEmployeesByOrganizationApi();
-      setEmployees(res?.employees || []);
+      setEmployees(res?.data?.all || []);
     } catch (error) {
       console.error('Error fetching employees:', error);
     } finally {
@@ -82,7 +82,7 @@ const TeamDashboard: React.FC = () => {
 
   const handleTeamSubmit = async (
     values: TeamFormValues,
-    { setSubmitting, setFieldValue }: any
+    { setSubmitting }: any
   ) => {
     try {
       console.log(values);
@@ -195,7 +195,7 @@ const TeamDashboard: React.FC = () => {
                   <label className="block text-gray-700 font-medium mb-4">
                     Team Members
                   </label>
-                  {employees.length > 0 ? (
+                  {!isLoading && employees.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {employees.map((employee) => (
                         <div

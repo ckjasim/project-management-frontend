@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import UserSideBar from '@/components/chat/UserSideBar';
 import ChatArea from '@/components/chat/chatArea';
-import DetailsSidebar from '@/components/chat/detailesSideBar';
 
 import { io, Socket } from 'socket.io-client';
 import { DefaultEventsMap } from '@socket.io/component-emitter';
@@ -74,26 +73,12 @@ useEffect(() => {
     };
   }, []);
 
-  const attachments = [
-    { name: 'Very important file.fig', type: 'figma', size: '7.5 MB', timestamp: '3.22.22, 11:15 AM' },
-    { name: 'Some file.scratch', type: 'scratch', size: '7.5 MB', timestamp: '3.22.22, 11:15 AM' },
-    { name: 'List of something.xd', type: 'xd', size: '7.5 MB', timestamp: '3.22.22, 11:15 AM' },
-  ];
-    // const teams = [
-  //   { name: 'Testing team', lastMessage: 'Typing...', time: '4:30 PM', isTyping: true },
-  //   { name: 'Design Team', lastMessage: 'Hello! Everyone', time: '9:36 AM' },
-  //   { name: 'Development team', lastMessage: 'Wow really Cool 🔥', time: '1:15 AM' },
-  // ];
- 
 
-  const members = ['Novita', 'Millie Nose', 'Ikhsan SD', 'Aditya'];
-  console.log(messages,'============================-----------')
 
   return (
     <div className="flex justify-center h-screen  bg-gradient-to-br from-zinc-50 to-teal-50">
       <UserSideBar serverRef={socketRef} messages={messages} setMessages={setMessages} />
       <ChatArea serverRef={socketRef} messages={messages} setMessages={setMessages}/>
-      {/* <DetailsSidebar attachments={attachments} members={members}  /> */}
     </div>
   );
 };

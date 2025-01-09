@@ -1,5 +1,4 @@
 import { BarChart2, FileText, Folder } from 'lucide-react'
-import React from 'react'
 
 const Hero = () => {
   return (

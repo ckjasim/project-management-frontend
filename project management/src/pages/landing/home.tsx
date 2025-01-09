@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import {
   Users,
   BarChart2,
@@ -6,16 +6,12 @@ import {
   Settings,
   Star,
   CheckCircle,
-  ArrowRight,
   ChevronRight,
-  Folder,
-  FileText,
-  BarChart3,
+
 } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import Hero from '@/components/Home/hero';
-import Trustedby from '@/components/Home/trustedby';
+
 import First from '@/components/Home/first';
 import TeamCollaborationSection from '@/components/Home/teamCollaboration';
 import IntegrationSection from '@/components/Home/integration';
@@ -24,6 +20,7 @@ import UnlockPerksSection from '@/components/Home/unlock';
 import FeaturesSection from '@/components/Home/features';
 import TestimonialsSection from '@/components/Home/testimonial';
 import Footer from '@/components/Home/footer';
+import Trustedby from '@/components/Home/trustedBy';
 
 const EnhancedLandingPage = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -126,35 +123,35 @@ const EnhancedLandingPage = () => {
     },
   ];
 
-  const teamMembers = [
-    { id: 1, color: '#FFD700', top: '20%', left: '10%' },
-    { id: 2, color: '#87CEEB', top: '10%', left: '50%' },
-    { id: 3, color: '#FF69B4', top: '20%', left: '90%' },
-    { id: 4, color: '#98FB98', top: '50%', left: '95%' },
-    { id: 5, color: '#DDA0DD', top: '80%', left: '90%' },
-    { id: 6, color: '#F0E68C', top: '90%', left: '50%' },
-    { id: 7, color: '#87CEFA', top: '80%', left: '10%' },
-    { id: 8, color: '#FFB6C1', top: '50%', left: '5%' },
-  ];
+  // const teamMembers = [
+  //   { id: 1, color: '#FFD700', top: '20%', left: '10%' },
+  //   { id: 2, color: '#87CEEB', top: '10%', left: '50%' },
+  //   { id: 3, color: '#FF69B4', top: '20%', left: '90%' },
+  //   { id: 4, color: '#98FB98', top: '50%', left: '95%' },
+  //   { id: 5, color: '#DDA0DD', top: '80%', left: '90%' },
+  //   { id: 6, color: '#F0E68C', top: '90%', left: '50%' },
+  //   { id: 7, color: '#87CEFA', top: '80%', left: '10%' },
+  //   { id: 8, color: '#FFB6C1', top: '50%', left: '5%' },
+  // ];
 
-  const tools = [
-    { id: 'excel', icon: '📊', color: '#217346', position: 'top-8 right-1/4' },
-    { id: 'slack', icon: '💬', color: '#4A154B', position: 'top-1/4 right-8' },
-    { id: 'dropbox', icon: '📦', color: '#0061FF', position: 'left-8 top-1/2' },
-    {
-      id: 'shopify',
-      icon: '🛍️',
-      color: '#96bf48',
-      position: 'bottom-16 left-1/4',
-    },
-    {
-      id: 'google-drive',
-      icon: '📝',
-      color: '#FBBC05',
-      position: 'bottom-8 right-16',
-    },
-    { id: 'teams', icon: '👥', color: '#6264A7', position: 'top-1/4 right-16' },
-  ];
+  // const tools = [
+  //   { id: 'excel', icon: '📊', color: '#217346', position: 'top-8 right-1/4' },
+  //   { id: 'slack', icon: '💬', color: '#4A154B', position: 'top-1/4 right-8' },
+  //   { id: 'dropbox', icon: '📦', color: '#0061FF', position: 'left-8 top-1/2' },
+  //   {
+  //     id: 'shopify',
+  //     icon: '🛍️',
+  //     color: '#96bf48',
+  //     position: 'bottom-16 left-1/4',
+  //   },
+  //   {
+  //     id: 'google-drive',
+  //     icon: '📝',
+  //     color: '#FBBC05',
+  //     position: 'bottom-8 right-16',
+  //   },
+  //   { id: 'teams', icon: '👥', color: '#6264A7', position: 'top-1/4 right-16' },
+  // ];
 
   return (
     <div className="min-h-screen bg-white">

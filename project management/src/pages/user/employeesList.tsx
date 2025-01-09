@@ -1,19 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, PlusCircle, X } from 'lucide-react';
+import { Loader2, PlusCircle, } from 'lucide-react';
 import Modal from '@/components/global/Modal/Modal';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { addEmployeeInvitationApi, getEmployeesByOrganizationApi } from '@/services/api/authApi';
 import { useToast } from '@/components/hooks/use-toast';
-import { set } from 'date-fns';
    
-
+interface Employee {
+  _id: string;
+  name: string;
+  email: string;
+  jobRole: string;
+  mobile: string;
+  profileImage?: { url: string };
+}
 const EmployeePage = () => {
   const { toast } = useToast();
   const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
-  const [employees,setEmployees]=useState([])
+  const [employees,setEmployees]=useState<Employee[]>([])
 
   useEffect(()=>{
   const fetchEmployee=async ()=>{
@@ -38,9 +44,9 @@ const EmployeePage = () => {
   });
  
 
-  const handleEmployeeSubmit =async (values: { name: string; email: string; jobRole: string }, { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }) => {
+  const handleEmployeeSubmit =async (values: { name: string; email: string; jobRole: string }) => {
     try {
-      const res = await addEmployeeInvitationApi(values)
+       await addEmployeeInvitationApi(values)
       setShowAddEmployeeModal(false)
       toast({
         title: 'Invitation send ',

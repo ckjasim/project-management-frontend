@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 
 const testimonials = [
   {
@@ -42,7 +42,7 @@ const TestimonialsSection = () => {
 
       <div className="relative">
         <div className="flex gap-6">
-          {testimonials.map((testimonial, idx) => (
+          {testimonials.map((testimonial) => (
             <div
               key={testimonial.id}
               className="w-1/3 bg-white rounded-2xl p-8 shadow-[0_2px_8px_rgba(0,0,0,0.08)]"

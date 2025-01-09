@@ -1,4 +1,3 @@
-import React from 'react';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 import { MoreHorizontal, MessageCircle, FileText } from 'lucide-react';
 
@@ -9,9 +8,13 @@ const DetailedReportsSection = () => {
     { value: 17 }, { value: 14 }, { value: 18 },
     { value: 16 }, { value: 19 }
   ];
-
-  // Progress circle component
-  const ProgressCircle = ({ percentage, color, label }) => (
+  type ProgressCircleProps = {
+    percentage: number;
+    color: string;
+    label: string;
+  };
+ 
+  const ProgressCircle: React.FC<ProgressCircleProps>  = ({ percentage, color, label }) => (
     <div className="flex flex-col items-center">
       <div className="relative w-24 h-24">
         <svg className="w-full h-full transform -rotate-90">

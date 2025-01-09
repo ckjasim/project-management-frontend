@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import  { useState, useCallback } from "react";
 import {
   motion,
   AnimatePresence,
@@ -29,7 +29,7 @@ export const FloatingNav = ({
   const navigate=useNavigate()
   const logout = async () => {
      try {
-       const res = await logoutApi();
+       await logoutApi();
        localStorage.removeItem('user')
        navigate('/auth/adminLogin',{ replace: true })
      } catch (error) {

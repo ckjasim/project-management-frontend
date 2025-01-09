@@ -1,6 +1,4 @@
 "use client";
-import React from "react";
-
 import { Home, Users2, Contact } from "lucide-react";
 import { FloatingNav } from "@/components/ui/floating-navbar-landing";
 export function LandingNavbar() {

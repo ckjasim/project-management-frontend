@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState,  useEffect } from 'react';
 import {
   PlusCircle,
   Users,
@@ -70,9 +70,8 @@ const ProjectDashboard: React.FC = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [editProject, setEditProject] = useState<Project | null>();
-  const [selectedProject, setSelectedProject] = useState<string>('');
-  const [currentProject, setCurrentProject] = useState<Project>({});
+  const [currentProject, setCurrentProject] = useState<Project>();
+
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -345,13 +344,13 @@ const ProjectDashboard: React.FC = () => {
       >
         <Formik
           initialValues={{
-            title: currentProject.title,
-            description: currentProject.description,
-            dueDate: currentProject.dueDate
-              ? new Date(currentProject.dueDate).toISOString().split('T')[0]
+            title: currentProject?.title,
+            description: currentProject?.description,
+            dueDate: currentProject?.dueDate
+              ? new Date(currentProject?.dueDate).toISOString().split('T')[0]
               : '',
-            teams: currentProject.teams,
-            priority: currentProject.priority,
+            teams: currentProject?.teams,
+            priority: currentProject?.priority,
           }}
           validationSchema={projectValidationSchema}
           onSubmit={handleEditProjectSubmit}

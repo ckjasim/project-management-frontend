@@ -1,12 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { getAllUsersApi, userManageApi } from '@/services/api/authApi';
 import { useToast } from '@/components/hooks/use-toast';
 import ManagementTable from '@/components/table/table';
 
+type User = {
+  _id: string;
+  name: string;
+  email: string;
+  organization?: any;
+  createdAt: string;
+  isBlock: boolean;
+  dateJoined?: string;
+};
 const UserManagement = () => {
   const { toast } = useToast();
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
     const fetchUsers = async () => {

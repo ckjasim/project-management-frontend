@@ -1,0 +1,16 @@
+
+.dockerignore
+Dockerfile
+.dockerignore
+
+
+node_modules
+npm-debug.log
+public
+yarn-debug.log
+yarn-error.log
+
+*.log
+*.swp
+.DS_Store
+

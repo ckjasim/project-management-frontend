@@ -3,7 +3,7 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 const AdminDashboard = () => {
   const monthlyData = [
@@ -135,7 +135,7 @@ const AdminDashboard = () => {
   );
 };
 
-const StatsCard = ({ icon, title, value, change, data, color }) => (
+const StatsCard: React.FC<any>  = ({ icon, title, value, change, data, color }) => (
   <Card>
     <CardContent className="p-4">
       <div className="flex justify-between items-start mb-2">

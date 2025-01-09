@@ -49,7 +49,7 @@ const TaskDashboard = () => {
   const navigate = useNavigate();
 
   // Core state
-  const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
+  const [selectedTask, setSelectedTask] = useState<any >(null);
   const [containers, setContainers] = useState<ContainerType[]>([
     { id: CONTAINER_IDS.PENDING, title: 'Pending', items: [] },
     { id: CONTAINER_IDS.PROGRESSING, title: 'Progressing', items: [] },
@@ -98,7 +98,7 @@ const TaskDashboard = () => {
   }, [containers]);
 
   // Icons for container types
-  const containerIcons = {
+  const containerIcons:any = {
     [CONTAINER_IDS.PENDING]: <ClipboardList className="text-blue-500" />,
     [CONTAINER_IDS.PROGRESSING]: <CircleDashed className="text-yellow-500" />,
     [CONTAINER_IDS.COMPLETED]: <Check className="text-green-500" />,

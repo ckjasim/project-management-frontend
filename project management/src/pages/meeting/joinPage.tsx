@@ -1,9 +1,8 @@
-import * as React from 'react';
 import { ZegoUIKitPrebuilt } from '@zegocloud/zego-uikit-prebuilt';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 
-function randomID(len) {
+function randomID(len: number) {
   let result = '';
   if (result) return result;
   var chars = '12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP',
@@ -27,7 +26,7 @@ export default function App() {
   const {userInfo} = useSelector((state:RootState)=>state.Auth)
 
   const roomID = getUrlParams().get('roomID') || randomID(5);
-  let myMeeting = async (element) => {
+  let myMeeting = async (element: any) => {
 
  // generate Kit Token
  const appID = Number(import.meta.env.VITE_ZEGO_APP_ID);

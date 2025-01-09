@@ -1,4 +1,5 @@
 export interface TUser{
+  profileImage?: any;
   _id:string ,
   email:string,
   name:string,
