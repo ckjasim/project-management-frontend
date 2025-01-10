@@ -1,14 +1,6 @@
 
 const IntegrationSection = () => {
-  // Tool icons with their positions along the circles
-  const tools = [
-    { id: 'excel', icon: '📊', color: '#217346', position: 'top-8 right-1/4' },
-    { id: 'slack', icon: '💬', color: '#4A154B', position: 'top-1/4 right-8' },
-    { id: 'dropbox', icon: '📦', color: '#0061FF', position: 'left-8 top-1/2' },
-    { id: 'shopify', icon: '🛍️', color: '#96bf48', position: 'bottom-16 left-1/4' },
-    { id: 'google-drive', icon: '📝', color: '#FBBC05', position: 'bottom-8 right-16' },
-    { id: 'teams', icon: '👥', color: '#6264A7', position: 'top-1/4 right-16' }
-  ];
+
 
   return (
     <div className="flex items-center justify-between max-w-4xl mx-auto  py-16 gap-16">
