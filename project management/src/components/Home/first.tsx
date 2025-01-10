@@ -17,7 +17,7 @@ const First = () => {
     <div className="grid md:grid-cols-2 gap-12 items-center mt-16 justify-center">
       <div className="space-y-8">
       <span className="px-4 py-1 text-sm bg-gradient-to-r text-transparent bg-clip-text border-2 border-gradient from-indigo-500 to-rose-500 rounded-full">
-  Integration
+  Task Management
 </span>
 
 
@@ -40,9 +40,9 @@ const First = () => {
           </li>
         </ul>
   
-        <Button className="bg-purple-600 text-white hover:bg-purple-700">
+        <button className="px-6 py-2 bg-indigo-900 text-white rounded-full hover:bg-indigo-800 transition-colors">
           Start for free
-        </Button>
+        </button>
       </div>
   
       {/* Centered Div */}

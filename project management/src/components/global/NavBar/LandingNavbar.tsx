@@ -5,17 +5,17 @@ export function LandingNavbar() {
   const navItems = [
     {
       name: "Home",
-      link: "/admin/dashboard",
+      link: "/",
       icon: <Home className="h-4 w-4 text-neutral-500 dark:text-white" />,
     },
     {
       name: "Contact",
-      link: "/employee/chat",
+      link: "/contactUs",
       icon: <Contact className="h-4 w-4 text-neutral-500 dark:text-white" />,
     },
     {
       name: "About Us",
-      link: "/admin/employeeManagement",
+      link: "/aboutUs",
       icon: (
         <Users2 className="h-4 w-4 text-neutral-500 dark:text-white" />
       ),

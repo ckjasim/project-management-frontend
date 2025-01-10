@@ -46,6 +46,18 @@ export const userSignupApi = async (data:any) => {
     throw error;
   }
 };
+export const recoverPasswordApi = async (email:any) => {
+  try {
+
+    const response = await baseURL.post('/auth/recoverPassword',{email});
+
+    const tasks = response.data;
+    return tasks;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+};
 export const userLoginApi = async (data:any) => {
   try {
 
@@ -62,6 +74,28 @@ export const otpApi = async (data:any) => {
   try {
 
     const response = await baseURL.post('/auth/otp',data);
+    const tasks = response.data;
+    return tasks;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+};
+export const recoverOtpApi = async (data:any) => {
+  try {
+
+    const response = await baseURL.post('/auth/recoverOtp',data);
+    const tasks = response.data;
+    return tasks;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+};
+export const submitPasswordApi = async (data:any) => {
+  try {
+
+    const response = await baseURL.post('/auth/submitPassword',data);
     const tasks = response.data;
     return tasks;
   } catch (error) {
@@ -140,6 +174,18 @@ export const getAllUsersApi = async () => {
   try {
     console.log('kkkkkwwwwww')
     const response = await  baseURL.get('/auth/usersList');
+    const users = response.data;
+    return users;
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+}
+
+export const getAllOrganizationApi = async () => {
+  try {
+    console.log('kkkkkwwwwww')
+    const response = await  baseURL.get('/auth/organizationList');
     const users = response.data;
     return users;
   } catch (error) {

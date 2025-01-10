@@ -16,13 +16,13 @@ interface FeatureCardProps {
   learnMore?: boolean; // Optional prop
 }
 const FeatureCard: React.FC<FeatureCardProps>  = ({ icon: Icon, title, description, bgColor, iconColor, learnMore = true }) => (
-  <div className={`p-8 rounded-2xl ${bgColor}`}>
-    <div className={`w-12 h-12 rounded-full border-2 ${iconColor} flex items-center justify-center mb-6`}>
+  <div className={`p-6 rounded-2xl ${bgColor}`}>
+    <div className={`w-10 h-10 rounded-full border-2 ${iconColor} flex items-center justify-center mb-3`}>
       <Icon className={iconColor.replace('border-', 'text-')} size={24} />
     </div>
     
-    <h3 className="text-xl font-semibold mb-4">{title}</h3>
-    <p className="text-gray-600 mb-4 leading-relaxed">{description}</p>
+    <h3 className="text-lg font-semibold mb-3">{title}</h3>
+    <p className="text-gray-600 mb-4 text-sm leading-relaxed">{description}</p>
     
     {learnMore && (
       <button className="text-purple-600 font-medium inline-flex items-center group">
@@ -80,9 +80,9 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-16">
+    <div className="max-w-5xl mx-auto px-6 py-16">
       <div className="text-center mb-16">
-        <h2 className="text-4xl font-bold mb-4">
+        <h2 className="text-4xl font-semibold mb-4">
           Everything you will <span className="text-gray-400">ever need</span>
         </h2>
         <p className="text-gray-600 max-w-2xl mx-auto">

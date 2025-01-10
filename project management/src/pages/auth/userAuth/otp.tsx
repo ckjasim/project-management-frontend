@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { SetUser } from '@/redux/features/auth/authSlice';
 import { otpApi, resendOtpApi } from '@/services/api/authApi';
-import { BackgroundBeams } from '@/components/ui/background-beams';
 
 export function InputOTPForm() {
   const navigate = useNavigate();
@@ -124,7 +123,6 @@ export function InputOTPForm() {
                 />
               ))}
             </div>
-            <BackgroundBeams/>
             {error && <p className="text-red-500 text-center">{error}</p>}
             <div className="flex flex-col items-center space-y-4">
               <div className="text-indigo-600 font-semibold text-lg">

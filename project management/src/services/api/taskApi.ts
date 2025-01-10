@@ -14,6 +14,18 @@ export const getTasksByTeamApi = async (teamId:string | undefined,projectId:stri
   }
 };
 
+export const getAllTasksApi = async () => {
+  try {
+    
+    const response = await  baseURL.get('/task/getAllTasks');
+    const tasks = response?.data;
+    return tasks;
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
+    throw error;
+  }
+};
+
 export const postTasksApi = async (data: any) => {
   try {
     const response = await  baseURL.post('/task/createTask', { data });

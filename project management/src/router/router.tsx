@@ -35,6 +35,11 @@ import PaymentSuccess from '@/pages/user/paymentSucess';
 import PaymentFailure from '@/pages/user/paymentFailure';
 import { NotificationsPage } from '@/pages/notifications/Notification';
 import Home from '@/pages/landing/home';
+import ContactPage from '@/pages/landing/contact';
+import AboutUs from '@/pages/landing/aboutUs';
+import PasswordRecovery from '@/pages/landing/forgotPassword';
+import RecoverOTPForm from '@/pages/landing/otp';
+import NewPasswordPage from '@/pages/landing/newPassword';
 
 const router = createBrowserRouter([
   {
@@ -42,11 +47,13 @@ const router = createBrowserRouter([
     element: <AuthLayout />,
     children: [
       { path: '', element: <Home/> },
-      { path: 'userSignup', element: <UserSignUpHero /> },
-      { path: 'employeeSignup', element: <EmployeeSignUpHero /> },
-      { path: 'employeeLogin', element: <EmployeeLoginHero /> },
-      { path: 'adminLogin', element: <AdminLoginHero /> },
-      { path: 'otp', element: <InputOTPForm /> },
+      { path: 'contactUs', element: <ContactPage /> },
+      { path: 'aboutUs', element: <AboutUs /> },
+      { path: 'forgotPassword', element: <PasswordRecovery /> },
+      { path: 'forgotOtp', element: <RecoverOTPForm /> },
+      { path: 'newPassword', element: <NewPasswordPage /> },
+
+
     ],
   },
   {

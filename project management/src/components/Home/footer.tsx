@@ -7,13 +7,13 @@ const Footer = () => {
         {/* Large Background Text */}
         <div>
         <div className="absolute inset-0 flex items-end justify-center pointer-events-none overflow-hidden">
-  <div className="text-[232px] leading-none font-bold text-[#F3F4F6] opacity-80">
-    ProjectEase
+  <div className="text-[250px] leading-none font-bold text-[#eeeeeed6] opacity-95">
+    FlowSpace
   </div>
 </div>
 
 
-        <div className="grid grid-cols-12 gap-8 mb-20 relative">
+        <div className="grid grid-cols-12 gap-8 mb-20 relative max-">
           {/* Company Info */}
           <div className="col-span-4">
             <div className="flex items-center gap-2 mb-6">

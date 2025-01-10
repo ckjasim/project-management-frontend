@@ -11,20 +11,20 @@ const IntegrationSection = () => {
   ];
 
   return (
-    <div className="flex items-center justify-between max-w-6xl mx-auto px-6 py-16 gap-16">
+    <div className="flex items-center justify-between max-w-4xl mx-auto  py-16 gap-16">
       {/* Left side content */}
       <div className="flex-1">
-        <span className="px-4 py-1 text-sm text-purple-600 bg-purple-50 rounded-full inline-block">
+      <span className="inline-block px-4 py-1 text-sm bg-gradient-to-r  text-transparent bg-clip-text border border-gradient-to-r from-indigo-500 to-rose-500 rounded-full">
           Integration
         </span>
         
-        <h2 className="text-4xl font-bold mt-6 mb-6 leading-tight">
-          Integrate with popular tools to streamline your workflow.
+        <h2 className="text-4xl font-semibold mt-6 mb-6 leading-tight">
+          Integrate with popular <br />tools to streamline your <br /> workflow.
         </h2>
         
-        <p className="text-gray-600 mb-8 text-lg leading-relaxed">
-          Integrating with popular tools centralizes tasks, automates 
-          processes, and improves collaboration, saving time and boosting 
+        <p className="text-gray-600 mb-8  leading-relaxed">
+          Integrating with popular tools centralizes tasks, automates <br /> 
+          processes, and improves collaboration, saving time and boosting <br />
           productivity.
         </p>
         
@@ -33,57 +33,10 @@ const IntegrationSection = () => {
         </button>
       </div>
 
-      {/* Right side visualization */}
-      <div className="relative w-96 h-96 bg-gray-50 rounded-3xl flex items-center justify-center">
-        {/* Center logo */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center text-white text-2xl">
-          A
-        </div>
+      <div className="relative w-96 h-96 bg-gray-50 rounded-3xl p-7 pb-12 flex items-center justify-center">
+        <img src="./Group 328.png" alt="" />
 
-        {/* Three overlapping circles */}
-        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 400">
-          <circle 
-            cx="200" 
-            cy="200" 
-            r="120" 
-            fill="none" 
-            stroke="#E5E7EB" 
-            strokeWidth="2" 
-            strokeDasharray="4 4"
-            transform="rotate(0 200 200)"
-          />
-          <circle 
-            cx="200" 
-            cy="200" 
-            r="120" 
-            fill="none" 
-            stroke="#E5E7EB" 
-            strokeWidth="2" 
-            strokeDasharray="4 4"
-            transform="rotate(120 200 200)"
-          />
-          <circle 
-            cx="200" 
-            cy="200" 
-            r="120" 
-            fill="none" 
-            stroke="#E5E7EB" 
-            strokeWidth="2" 
-            strokeDasharray="4 4"
-            transform="rotate(240 200 200)"
-          />
-        </svg>
-
-        {/* Tool icons */}
-        {tools.map((tool) => (
-          <div
-            key={tool.id}
-            className={`absolute w-10 h-10 rounded-lg bg-white shadow-md flex items-center justify-center text-xl ${tool.position}`}
-            style={{ border: '2px solid #F3F4F6' }}
-          >
-            {tool.icon}
-          </div>
-        ))}
+       
       </div>
     </div>
   );

@@ -65,26 +65,14 @@ export const FloatingNav = ({
           ))}
 
           {/* Login Button with Dropdown */}
-          <div className="relative group">
-            <button className="border text-sm font-medium border-neutral-200 dark:border-white/[0.2] text-black dark:text-white px-4 py-2 rounded-full">
-              <span>Login</span>
-              <span className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-blue-500 to-transparent h-px" />
-            </button>
-            <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-40 bg-white dark:bg-black border border-neutral-200 dark:border-white/[0.2] rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none group-hover:pointer-events-auto">
-              <Link
-                to="/auth/userLogin"
-                className="block px-4 py-2 text-sm text-neutral-600 dark:text-neutral-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                User Login
-              </Link>
-              <Link
-                to="/auth/employeeLogin"
-                className="block px-4 py-2 text-sm text-neutral-600 dark:text-neutral-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                Employee Login
-              </Link>
-            </div>
-          </div>
+          <Link
+  to="/auth/userLogin"
+  className="relative group border text-sm font-medium border-neutral-200 dark:border-white/[0.2] text-black dark:text-white px-4 py-2 rounded-full"
+>
+  <span>Login</span>
+  <span className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-blue-500 to-transparent h-px" />
+</Link>
+
         </motion.div>
       )}
     </AnimatePresence>

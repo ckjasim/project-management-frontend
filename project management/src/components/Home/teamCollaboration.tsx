@@ -92,7 +92,7 @@ const TeamCollaborationSection = () => {
       default:
         return null;
     }
-  };
+  }; 
 
   return (
     <div className="flex items-center justify-between max-w-5xl mx-auto px-6 py-16 gap-16">

@@ -5,7 +5,7 @@ const testimonials = [
     id: 1,
     name: 'Tom Nguyen',
     role: 'CEO, Techbites',
-    image: '/api/placeholder/48/48',
+    image: './2.png',
     content: 'This platform has transformed how we work! Its seamless integration with our existing tools has cut our workload in half, and the intuitive interface makes it easy for everyone on the team to use. Highly recommend!',
     rating: 5.0
   },
@@ -13,7 +13,7 @@ const testimonials = [
     id: 2,
     name: 'Michael Morales',
     role: 'CEO, Techbites',
-    image: '/api/placeholder/48/48',
+    image: './1.png',
     content: 'The customer support is top-notch! Whenever we had questions, their team responded quickly with clear solutions. The platform itself is reliable, with features that perfectly meet our needs.',
     rating: 5.0
   },
@@ -21,7 +21,7 @@ const testimonials = [
     id: 3,
     name: 'Rachel Kim',
     role: 'CTO, Megabytes',
-    image: '/api/placeholder/48/48',
+    image: './2.png',
     content: 'Since adopting this SaaS solution, our productivity has soared. The automation features save us hours every week, and the real-time analytics help us make informed decisions faster.',
     rating: 5.0
   }
@@ -31,9 +31,9 @@ const TestimonialsSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-20 rounded-lg bg-pink-50">
+    <div className="max-w-6xl mx-auto px-8 py-20 rounded-lg bg-pink-50">
       <div className="text-center mb-16">
-        <h2 className="text-[2.5rem] font-bold text-[#1a1a1a] leading-tight">
+        <h2 className="text-[2.5rem] font-semibold text-[#1a1a1a] leading-tight">
           Testimonials from our
           <br />
           <span className="text-[#6b7280] font-normal">satisfied customers</span>
@@ -45,7 +45,7 @@ const TestimonialsSection = () => {
           {testimonials.map((testimonial) => (
             <div
               key={testimonial.id}
-              className="w-1/3 bg-white rounded-2xl p-8 shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+              className="w-1/3 bg-white rounded-2xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
             >
               <div className="flex items-center mb-6">
                 <img
@@ -60,7 +60,7 @@ const TestimonialsSection = () => {
                   <p className="text-[#6b7280] text-sm">{testimonial.role}</p>
                 </div>
               </div>
-              <p className="text-[#374151] text-base leading-relaxed mb-8">
+              <p className="text-[#374151]  text-sm leading-relaxed mb-8">
                 {testimonial.content}
               </p>
               <div className="flex items-center justify-between">
@@ -78,14 +78,10 @@ const TestimonialsSection = () => {
                     ))}
                   </div>
                   <span className="text-[#6b7280] text-sm">
-                    {testimonial.rating.toFixed(1)} Review from
+                    {testimonial.rating.toFixed(1)} Review
                   </span>
                 </div>
-                <img 
-                  src="/api/placeholder/80/20"
-                  alt="Trustpilot"
-                  className="h-5"
-                />
+               
               </div>
             </div>
           ))}
