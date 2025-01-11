@@ -57,7 +57,7 @@ useEffect(() => {
       transports: ['websocket'],
       query: { userId: userInfo?._id },
       reconnection: true,
-      reconnectionAttempts: 3,
+      reconnectionAttempts: 4,
       reconnectionDelay: 10000,
    
     });
