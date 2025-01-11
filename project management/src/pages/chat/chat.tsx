@@ -59,7 +59,7 @@ useEffect(() => {
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 10000,
-      path:'/chat'
+      path:'/chatSocket'
     });
 
     setupListeners();
