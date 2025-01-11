@@ -52,7 +52,7 @@ useEffect(() => {
 
 
   const SOCKET_URL = 
-  window.location.protocol === 'https:' ? 'wss://backend.flowspace.cloud' : 'ws://backend.flowspace.cloud';
+  window.location.protocol === 'https:' ? 'wss://backend.flowspace.cloud/socket.io' : 'ws://backend.flowspace.cloud/socket.io';
 
   useEffect(() => {
     socketRef.current = io(`${SOCKET_URL}`, {
