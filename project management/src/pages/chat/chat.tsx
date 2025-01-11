@@ -53,13 +53,13 @@ useEffect(() => {
 
 
   useEffect(() => {
-    socketRef.current = io(import.meta.env.VITE_BASE_URL, {
-      // transports: ['websocket'],
+    socketRef.current = io(`${import.meta.env.VITE_BASE_URL}/chatSocket`, {
+      transports: ['websocket'],
       query: { userId: userInfo?._id },
-      // reconnection: true,
-      // reconnectionAttempts: 5,
-      // reconnectionDelay: 10000,
-      path:'/chatSocket'
+      reconnection: true,
+      reconnectionAttempts: 3,
+      reconnectionDelay: 10000,
+   
     });
 
     setupListeners();
