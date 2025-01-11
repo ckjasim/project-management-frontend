@@ -51,7 +51,7 @@ useEffect(() => {
   };
 
 
-  const SOCKET_URL = 'backend.flowspace.cloud/chat'
+  // const SOCKET_URL = 'backend.flowspace.cloud/chat'
   // window.location.protocol === 'https:' ? 'wss://backend.flowspace.cloud/socket.io' : 'ws://backend.flowspace.cloud/socket.io';
 
   useEffect(() => {
