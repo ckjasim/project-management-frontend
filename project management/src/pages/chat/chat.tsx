@@ -51,9 +51,11 @@ useEffect(() => {
   };
 
 
+  const SOCKET_URL = 
+  window.location.protocol === 'https:' ? 'wss://backend.flowspace.cloud' : 'ws://backend.flowspace.cloud';
 
   useEffect(() => {
-    socketRef.current = io(`${import.meta.env.VITE_BASE_URL}/chatSocket`, {
+    socketRef.current = io(`${SOCKET_URL}`, {
       transports: ['websocket'],
       query: { userId: userInfo?._id },
       reconnection: true,
