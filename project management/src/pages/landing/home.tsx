@@ -1,6 +1,5 @@
 
 import Hero from '@/components/Home/hero';
-
 import First from '@/components/Home/first';
 import TeamCollaborationSection from '@/components/Home/teamCollaboration';
 import IntegrationSection from '@/components/Home/integration';
@@ -14,7 +13,7 @@ import Trustedby from '@/components/Home/trustedBy';
 const EnhancedLandingPage = () => {
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <Hero />
       <Trustedby />
       <First />
