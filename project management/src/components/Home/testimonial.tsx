@@ -1,4 +1,7 @@
-import  { useState } from 'react';
+"use client"
+
+import React, { useState } from 'react';
+import { motion, useInView } from 'framer-motion';
 
 const testimonials = [
   {
@@ -29,27 +32,48 @@ const testimonials = [
 
 const TestimonialsSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const ref = React.useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.3 });
 
   return (
-    <div className="max-w-6xl mx-auto px-8 py-20 rounded-lg bg-pink-50">
-      <div className="text-center mb-16">
+    <motion.div 
+      ref={ref}
+      className="max-w-6xl mx-auto px-8 py-20 rounded-lg bg-pink-50"
+      initial={{ opacity: 0 }}
+      animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+      transition={{ duration: 0.8 }}
+    >
+      <motion.div 
+        className="text-center mb-16"
+        initial={{ opacity: 0, y: -50 }}
+        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -50 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+      >
         <h2 className="text-[2.5rem] font-semibold text-[#1a1a1a] leading-tight">
           Testimonials from our
           <br />
           <span className="text-[#6b7280] font-normal">satisfied customers</span>
         </h2>
-      </div>
+      </motion.div>
 
       <div className="relative">
-        <div className="flex gap-6">
-          {testimonials.map((testimonial) => (
-            <div
+        <motion.div 
+          className="flex gap-6"
+          initial={{ opacity: 0, x: -50 }}
+          animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          {testimonials.map((testimonial, index) => (
+            <motion.div
               key={testimonial.id}
               className="w-1/3 bg-white rounded-2xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+              initial={{ opacity: 0, y: 50 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+              transition={{ duration: 0.8, delay: 0.4 + index * 0.1 }}
             >
               <div className="flex items-center mb-6">
                 <img
-                  src={testimonial.image}
+                  src={testimonial.image || "/placeholder.svg"}
                   alt={testimonial.name}
                   className="w-12 h-12 rounded-full mr-4"
                 />
@@ -60,7 +84,7 @@ const TestimonialsSection = () => {
                   <p className="text-[#6b7280] text-sm">{testimonial.role}</p>
                 </div>
               </div>
-              <p className="text-[#374151]  text-sm leading-relaxed mb-8">
+              <p className="text-[#374151] text-sm leading-relaxed mb-8">
                 {testimonial.content}
               </p>
               <div className="flex items-center justify-between">
@@ -81,13 +105,17 @@ const TestimonialsSection = () => {
                     {testimonial.rating.toFixed(1)} Review
                   </span>
                 </div>
-               
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        <div className="flex justify-center mt-12 space-x-2">
+        <motion.div 
+          className="flex justify-center mt-12 space-x-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+        >
           {testimonials.map((_, index) => (
             <button
               key={index}
@@ -98,9 +126,9 @@ const TestimonialsSection = () => {
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

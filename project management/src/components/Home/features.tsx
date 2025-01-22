@@ -1,40 +1,65 @@
+"use client"
+
 import React from 'react';
-import { Headphones, Shield, Layout, Share2, DollarSign, Maximize, LucideIcon } from 'lucide-react';
+import { Headphones, Shield, Layout, Share2, DollarSign, Maximize, type LucideIcon } from 'lucide-react';
+import { motion, useInView } from 'framer-motion';
+
 interface Feature {
-  icon: LucideIcon; // Type for Lucide icons
+  icon: LucideIcon;
   title: string;
   description: string;
   bgColor: string;
   iconColor: string;
 }
+
 interface FeatureCardProps {
-  icon: LucideIcon; // Type for Lucide icons
+  icon: LucideIcon;
   title: string;
   description: string;
   bgColor: string;
   iconColor: string;
-  learnMore?: boolean; // Optional prop
+  learnMore?: boolean;
+  index: number;
 }
-const FeatureCard: React.FC<FeatureCardProps>  = ({ icon: Icon, title, description, bgColor, iconColor, learnMore = true }) => (
-  <div className={`p-6 rounded-2xl ${bgColor}`}>
-    <div className={`w-10 h-10 rounded-full border-2 ${iconColor} flex items-center justify-center mb-3`}>
-      <Icon className={iconColor.replace('border-', 'text-')} size={24} />
-    </div>
-    
-    <h3 className="text-lg font-semibold mb-3">{title}</h3>
-    <p className="text-gray-600 mb-4 text-sm leading-relaxed">{description}</p>
-    
-    {learnMore && (
-      <button className="text-purple-600 font-medium inline-flex items-center group">
-        Learn more 
-        <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-      </button>
-    )}
-  </div>
-);
+
+const FeatureCard: React.FC<FeatureCardProps> = ({ icon: Icon, title, description, bgColor, iconColor, learnMore = true, index }) => {
+  const ref = React.useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.3 });
+
+  return (
+    <motion.div 
+      ref={ref}
+      className={`p-6 rounded-2xl ${bgColor}`}
+      initial={{ opacity: 0, y: 50 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+      transition={{ duration: 0.8, delay: 0.2 + index * 0.1 }}
+    >
+      <div className={`w-10 h-10 rounded-full border-2 ${iconColor} flex items-center justify-center mb-3`}>
+        <Icon className={iconColor.replace('border-', 'text-')} size={24} />
+      </div>
+      
+      <h3 className="text-lg font-semibold mb-3">{title}</h3>
+      <p className="text-gray-600 mb-4 text-sm leading-relaxed">{description}</p>
+      
+      {learnMore && (
+        <motion.button 
+          className="text-purple-600 font-medium inline-flex items-center group"
+          whileHover={{ x: 5 }}
+          transition={{ type: "spring", stiffness: 400, damping: 10 }}
+        >
+          Learn more 
+          <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+        </motion.button>
+      )}
+    </motion.div>
+  );
+};
 
 const FeaturesSection = () => {
-  const features : Feature[] = [
+  const ref = React.useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.3 });
+
+  const features: Feature[] = [
     {
       icon: Headphones,
       title: "24/7 Support",
@@ -80,8 +105,19 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-16">
-      <div className="text-center mb-16">
+    <motion.div 
+      ref={ref}
+      className="max-w-5xl mx-auto px-6 py-16"
+      initial={{ opacity: 0 }}
+      animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+      transition={{ duration: 0.8 }}
+    >
+      <motion.div 
+        className="text-center mb-16"
+        initial={{ opacity: 0, y: -50 }}
+        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -50 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+      >
         <h2 className="text-4xl font-semibold mb-4">
           Everything you will <span className="text-gray-400">ever need</span>
         </h2>
@@ -89,7 +125,7 @@ const FeaturesSection = () => {
           Decide if you want to throw it away or retain it and continue with your 
           workflow unhindered. Need short bursts of productivity?
         </p>
-      </div>
+      </motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {features.map((feature, index) => (
@@ -100,10 +136,11 @@ const FeaturesSection = () => {
             description={feature.description}
             bgColor={feature.bgColor}
             iconColor={feature.iconColor}
+            index={index}
           />
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

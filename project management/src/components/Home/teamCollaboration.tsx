@@ -1,8 +1,11 @@
 
 import { Cpu, Rabbit, Send, } from 'lucide-react';
-
+import React from "react"
+import { motion, useInView } from "framer-motion"
 const TeamCollaborationSection = () => {
   // Inner circle items
+  const ref = React.useRef(null)
+  const isInView = useInView(ref, { once: true, amount: 0.3 })
   const innerCircleItems = [
     { type: 'avatar', angle: 0, size: 'sm', image: './2.png' },
     { type: 'icon', angle: 72, icon: <Cpu className='stroke-indigo-400'/>, background: 'bg-purple-100' },
@@ -131,37 +134,79 @@ const TeamCollaborationSection = () => {
       </div>
 
       {/* Right side content remains unchanged */}
-      <div className="flex-1">
-        <span className="inline-block px-4 py-1 text-sm bg-gradient-to-r  text-transparent bg-clip-text border border-gradient-to-r from-indigo-500 to-rose-500 rounded-full">
+      <motion.div
+        ref={ref}
+        className="flex-1"
+        initial={{ opacity: 0, x: 50 }}
+        animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.span
+          className="inline-block px-4 py-1 text-sm bg-gradient-to-r text-transparent bg-clip-text border border-gradient-to-r from-indigo-500 to-rose-500 rounded-full"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
           Team Collaboration
-        </span>
+        </motion.span>
 
-        <h2 className="text-3xl font-semibold mt-4 mb-4">
+        <motion.h2
+          className="text-3xl font-semibold mt-4 mb-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           Collaborate seamlessly <br /> with your team in <br /> real-time.
-        </h2>
+        </motion.h2>
 
-        <p className="text-gray-600 mb-8">
-          Our platform offers live editing, instant updates, and synchronized
-          teamwork tools, ensuring your team stays connected and aligned
-          effortlessly.
-        </p>
+        <motion.p
+          className="text-gray-600 mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          Our platform offers live editing, instant updates, and synchronized teamwork tools, ensuring your team stays
+          connected and aligned effortlessly.
+        </motion.p>
 
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
+        <motion.div
+          className="space-y-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <motion.div
+            className="flex items-center gap-3"
+            initial={{ opacity: 0, x: -20 }}
+            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+          >
             <div className="w-2 h-2 rounded-full bg-purple-600" />
             <span>Provide live chat support during peak hours.</span>
-          </div>
+          </motion.div>
 
-          <div className="flex items-center gap-3">
+          <motion.div
+            className="flex items-center gap-3"
+            initial={{ opacity: 0, x: -20 }}
+            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
             <div className="w-2 h-2 rounded-full bg-purple-600" />
             <span>Offer email support with guaranteed response times.</span>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <button className="mt-8 px-6 py-2 bg-indigo-900 text-white rounded-full hover:bg-indigo-800 transition-colors">
+        <motion.button
+          className="mt-8 px-6 py-2 bg-indigo-900 text-white rounded-full hover:bg-indigo-800 transition-colors"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.7 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
           Start for free
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
     </div>
   );
 };
