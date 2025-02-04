@@ -464,7 +464,7 @@ const ProjectDashboard: React.FC = () => {
           onSubmit={handleProjectSubmit}
         >
           {({ values, setFieldValue, isSubmitting }) => (
-            <Form className="bg-white rounded-xl p-8 w-full min-w-md mx-auto shadow-xl">
+            <Form className="bg-white rounded-xl p-8 w-full min-w-2xl mx-auto shadow-xl">
               <h1 className="text-2xl font-bold text-gray-800 mb-6">
                 Create Project
               </h1>
