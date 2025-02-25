@@ -104,8 +104,9 @@ const AppContainer = () => {
       <BeecompBackground />
       
       <nav className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto relative z-10">
-        <div className="flex items-center space-x-8">
-          <h1 className="text-xl font-medium">TaskHive</h1>
+        <div className="flex items-center space-x-8 ml-34 mt-10">
+                    <img className='w-32 relative' src="logo1.png" alt="ddddddddddd" />
+          
         </div>
       </nav>
 

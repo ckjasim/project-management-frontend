@@ -10,7 +10,6 @@ const addAuthToken = (config: any) => {
   const userString = window.localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
   const token = user?.token;
-  console.log(user, 'token');
   if (token) {
     config.headers['Authorization'] = `Bearer ${token}`;
   }
